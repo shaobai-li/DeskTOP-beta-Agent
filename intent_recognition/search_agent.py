@@ -1,5 +1,6 @@
 import os
 import openai
+import faiss
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer 
 load_dotenv()
@@ -12,9 +13,11 @@ DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 system_prompt = ""
 
 embedding_model = SentenceTransformer('BAAI/bge-large-zh-v1.5')
+index = faiss.read_index("database/cg_chunks_20251014.index")
 
 def local_search(queries, k):
-    queries_embedded = embedding_model.encode(queries)
+    queries_embedded = embedding_model.encode([queries])
+    D, I = index.search(queries_embedded, k=10)
     return ["我是中国人", "我爱中国"]
 
 def main():
