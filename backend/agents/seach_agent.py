@@ -30,25 +30,27 @@ class SearchAgent:
         with open("database/cg_chunks_20251014.json", "r", encoding="utf-8") as f:
             cg_chunks_json = json.load(f)
         self.id_to_chunk = {c["id"]: c for c in cg_chunks_json}
-        
+        self.topic = ""
+        self.texts_retrieved = ""
         self.content_framework_module = {
             "llm_client": openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY")),
             "llm_model": "gpt-4o-2024-08-06"
         }
 
     def local_search(self, queries, k):
+        self.topic = queries
         queries_embedded = self.embedding_model.encode([queries])
         _, I = self.cg_chunks_index.search(queries_embedded, k=10)
         
-        chunks = []
+        self.texts_retrieved = ""
         for idx in I[0]:
-            chunks.append(self.id_to_chunk[idx]["text"])
-        return chunks
+            self.texts_retrieved += f"<text>{self.id_to_chunk[idx]["text"]}</text>\n\n"
 
-    def content_framework(self):
+    def content_framework(self, chunks):
+        
         messages=[
             {"role": "system", "content": ""},
-            {"role": "assistant", "content": "搜索出来一句话<text>床前明月光</text>"}
+            {"role": "assistant", "content": f"{self.texts_retrieved}用户想做<topic>{self.topic}</topic>相关的自媒体内容，请根据上面给予的文字材料。提取与<topic>{self.topic}</topic>角度最相关的核心观点（3个），重要结论（4个）"}
             ]
         response = self.content_framework_module["llm_client"].chat.completions.create(
             model="gpt-4o-2024-08-06",

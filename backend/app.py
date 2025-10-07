@@ -19,8 +19,9 @@ def main():
     user_content = input("You: ")
     print(f"AI: 根据你的选题方向，我搜索一下本地数据库。")
     chunks = search_agent.local_search(user_content, 4)
-    for text in chunks:
-        print(f"AI: {text}")
+    
+    ai_content = search_agent.content_framework(chunks)
+    print(f"AI: {ai_content}")
     
 
 if __name__ == "__main__":
