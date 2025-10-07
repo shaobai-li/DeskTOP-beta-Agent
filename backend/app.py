@@ -2,18 +2,12 @@ import os
 import json
 import openai
 import faiss
-from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer 
-load_dotenv()
 
 from agents import SearchAgent
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
-
-
-system_prompt = ""
-
 
 def main():
 

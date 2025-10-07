@@ -1,6 +1,26 @@
+import os
 import json
 import faiss
-from sentence_transformers import SentenceTransformer 
+import openai
+from sentence_transformers import SentenceTransformer
+
+from dotenv import load_dotenv
+load_dotenv()
+
+
+
+def llm_client(choice="chatgpt"):
+    if choice == "chatgpt":
+        return openai.OpenAI(
+            api_key=os.environ.get("OPENAI_API_KEY")
+            )
+    elif choice == "deepseek":
+        return openai.OpenAI(
+            api_key=os.environ.get("DEEPSEEK_API_KEY"), 
+            base_url=os.environ.get("DEEPSEEK_BASE_URL")
+            )
+    else:
+        raise ValueError(f"Undefined model choice '{choice}'")
 
 class SearchAgent:
     
@@ -10,6 +30,8 @@ class SearchAgent:
         with open("database/cg_chunks_20251014.json", "r", encoding="utf-8") as f:
             cg_chunks_json = json.load(f)
         self.id_to_chunk = {c["id"]: c for c in cg_chunks_json}
+        
+        self.content_framework_module = {}
 
     def local_search(self, queries, k):
         queries_embedded = self.embedding_model.encode([queries])
@@ -19,4 +41,5 @@ class SearchAgent:
         for idx in I[0]:
             chunks.append(self.id_to_chunk[idx]["text"])
         return chunks
+    
     
