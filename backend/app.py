@@ -5,13 +5,8 @@ import faiss
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer 
 load_dotenv()
-import utils
 
-print(utils.__file__)
-
-exit(0)
-
-from agent import SearchAgent
+from agents import SearchAgent
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
