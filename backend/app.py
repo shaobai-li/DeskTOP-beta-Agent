@@ -1,28 +1,29 @@
+# backend.py
 import os
 import json
-import openai
-import faiss
-from sentence_transformers import SentenceTransformer 
-
+from fastapi import FastAPI
+from pydantic import BaseModel
 from agents import SearchAgent
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
+# 初始化
+app = FastAPI()
+search_agent = SearchAgent()
 
-def main():
+# 定义请求体
+class UserQuery(BaseModel):
+    topic: str
 
-    print("加载 search_agent ...")
-    search_agent = SearchAgent()
-    print("加载成功\n")
+@app.get("/")
+def root():
+    return {"message": "AI 内容创作助手已启动"}
 
-    print(f"AI: 您好，今天的自媒体内容创作，您对什么样的选题感兴趣？")
-    user_content = input("You: ")
-    print(f"AI: 根据你的选题方向，我搜索一下本地数据库。")
-    chunks = search_agent.local_search(user_content, 4)
-    
+@app.post("/generate")
+def generate_content(query: UserQuery):
+    """
+    用户发送选题，后端返回生成的内容
+    """
+    topic = query.topic
+    print(f"收到选题：{topic}")
+    chunks = search_agent.local_search(topic, 4)
     ai_content = search_agent.content_framework(chunks)
-    print(f"AI: {ai_content}")
-    
-
-if __name__ == "__main__":
-    main()
+    return {"topic": topic, "generated_content": ai_content}
