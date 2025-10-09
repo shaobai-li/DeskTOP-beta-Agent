@@ -22,10 +22,30 @@ function App() {
     }
   ]);
   
-  const handleSendMessage = (message) => {
-    setMessages([...messages, {role: "user", content: message}]);
+  const handleSendMessage = async (message) => {
+    setMessages((prev) => [...prev, { role: "user", content: message }]);
     console.log(messages);
-  }
+
+    try {
+      const response = await fetch("/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ topic: message })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+
+      const data = await response.json();
+      setMessages((prev) => [...prev, { role: "assistant", content: data.generated_content }]);
+    } catch (error) {
+      console.error("Error:", error);
+      setMessages((prev) => [...prev, { role: "assistant", content: "Server connection failed" }])
+    }
+  };
 
   return (
     <>
