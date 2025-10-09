@@ -46,6 +46,8 @@ class SearchAgent:
         for idx in I[0]:
             self.texts_retrieved += f"<text>{self.id_to_chunk[idx]["text"]}</text>\n\n"
 
+        return self.texts_retrieved
+
     def content_framework(self, chunks):
         
         messages=[
