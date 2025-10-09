@@ -23,9 +23,9 @@ function App() {
   ]);
   
   const handleSendMessage = async (message) => {
+    // 先显示用户输入
     setMessages((prev) => [...prev, { role: "user", content: message }]);
-    console.log(messages);
-
+  
     try {
       const response = await fetch("/generate", {
         method: "POST",
@@ -34,16 +34,47 @@ function App() {
         },
         body: JSON.stringify({ topic: message })
       });
-
+  
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
-
-      const data = await response.json();
-      setMessages((prev) => [...prev, { role: "assistant", content: data.generated_content }]);
+  
+      // 👇 改这里 — 用流式读取 response.body
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let partialChunk = "";
+  
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+  
+        // 解码流式分段
+        partialChunk += decoder.decode(value, { stream: true });
+        const parts = partialChunk.split("\n");
+        partialChunk = parts.pop(); // 保留未完整的部分
+  
+        for (const jsonStr of parts) {
+          if (!jsonStr.trim()) continue;
+  
+          try {
+            const data = JSON.parse(jsonStr);
+  
+            setMessages((prev) => [
+              ...prev,
+              { role: "assistant", content: data.generated_content}
+            ]);
+          } catch (e) {
+            console.error("JSON parse error:", e, jsonStr);
+          }
+        }
+      }
+  
     } catch (error) {
       console.error("Error:", error);
-      setMessages((prev) => [...prev, { role: "assistant", content: "Server connection failed" }])
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "⚠️ Server connection failed." }
+      ]);
     }
   };
 
