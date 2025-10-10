@@ -12,6 +12,13 @@ export default function ChatInput({ onSendMessage }) {
     }
   }
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  }
+
   return (
     <div className="chat-input">
       <input
@@ -19,6 +26,7 @@ export default function ChatInput({ onSendMessage }) {
         placeholder="Ask anything"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <div className="chat-button-container">
         <button 
