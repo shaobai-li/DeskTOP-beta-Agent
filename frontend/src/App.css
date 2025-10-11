@@ -22,6 +22,7 @@ html, body {
     flex-direction: column;
     flex: 1;
     align-items: center;
+    overflow-y: auto;
 }
 
 .messages-container {
@@ -29,4 +30,16 @@ html, body {
     display: flex;
     flex-direction: column;
     max-width: 550px;
+    padding-bottom: 100px;
 }
+
+.input-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    max-width: 550px;
+    position: fixed;
+    bottom: 0;
+    z-index: 10;
+}
+

@@ -81,7 +81,9 @@ function App() {
             )
           ))}
         </div>
-        <ChatInput onSendMessage={handleSendMessage} />
+        <div className="input-container">
+          <ChatInput onSendMessage={handleSendMessage} />
+        </div>
       </div>
     </div>    
   )
