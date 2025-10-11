@@ -1,17 +1,16 @@
 .chat-input {
-  max-width: 830px;
+  max-width: 550px;
   display: flex;
   flex-direction: column;
   border: 1px solid #ccc;
   border-radius: 30px;
-  padding: 5px;
   box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.1);
 }
 
 .input-field {
   padding: 10px 10px;
   border: none;
-  border-radius: 0px;
+  border-radius: 20px;
   outline: none;
   font-size: 18px;
   font-weight: normal;

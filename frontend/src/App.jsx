@@ -3,7 +3,7 @@ import UserMessage from "./components/UserMessage";
 import AIMessage from "./components/AIMessage";
 import { useState } from "react";
 //import "./border.css";
-
+import "./App.css";
 
 
 function App() {
@@ -71,16 +71,22 @@ function App() {
   };
 
   return (
-    <>
-      <div className="chat-container"
-      style={{display: "flex", flexDirection: "column", maxWidth: "840px"}}>
-        {messages.map((message, index) => (
-          message.role === "user" ? (<UserMessage key={index} message={message.content} />) : (<AIMessage key={index} message={message.content} />
-          )
-        ))}
+    <div className="app-container"
+    style={{display: "flex", flexDirection: "row", height: "100vh"}}>
+      <div className="side-panel"
+      style={{width: "200px", backgroundColor: "#AFAFAF"}}>
       </div>
-      <ChatInput onSendMessage={handleSendMessage} />
-    </>
+      <div className="chat-panel">
+        <div className="messages-container"
+        style={{display: "flex", flexDirection: "column", maxWidth: "550px"}}>
+          {messages.map((message, index) => (
+            message.role === "user" ? (<UserMessage key={index} message={message.content} />) : (<AIMessage key={index} message={message.content} />
+            )
+          ))}
+        </div>
+        <ChatInput onSendMessage={handleSendMessage} />
+      </div>
+    </div>    
   )
 }
 
