@@ -1,4 +1,5 @@
 .chat-input {
+  width: 100%;
   max-width: 550px;
   display: flex;
   flex-direction: column;
