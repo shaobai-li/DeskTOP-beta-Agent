@@ -71,14 +71,11 @@ function App() {
   };
 
   return (
-    <div className="app-container"
-    style={{display: "flex", flexDirection: "row", height: "100vh"}}>
-      <div className="side-panel"
-      style={{width: "200px", backgroundColor: "#AFAFAF"}}>
+    <div className="app-container">
+      <div className="side-panel">
       </div>
       <div className="chat-panel">
-        <div className="messages-container"
-        style={{display: "flex", flexDirection: "column", maxWidth: "550px"}}>
+        <div className="messages-container">
           {messages.map((message, index) => (
             message.role === "user" ? (<UserMessage key={index} message={message.content} />) : (<AIMessage key={index} message={message.content} />
             )

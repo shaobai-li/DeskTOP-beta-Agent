@@ -1,3 +1,15 @@
+.app-container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    padding: 0px;
+}
+
+.side-panel {
+    width: 200px;
+    background-color: #AFAFAF;
+}
+
 .chat-panel {
     display: flex;
     flex-direction: column;
@@ -7,4 +19,5 @@
 .messages-container {
     display: flex;
     flex-direction: column;
+    max-width: 550px;
 }
