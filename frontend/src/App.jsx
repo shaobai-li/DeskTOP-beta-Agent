@@ -72,9 +72,9 @@ function App() {
 
   return (
     <div className="app-container">
-      <div className="side-panel">
-      </div>
-      <div className="chat-panel">
+      <aside className="side-panel">
+      </aside>
+      <main className="chat-panel">
         <div className="messages-container">
           <div className="messages-list">
             {messages.map((message, index) => (
@@ -87,7 +87,7 @@ function App() {
           <ChatInput onSendMessage={handleSendMessage} />
           <p className="input-footer-text"> Powered by 知能新体 — 提升你的自媒体内容生产效率</p>
         </div>
-      </div>
+      </main>
     </div>    
   )
 }
