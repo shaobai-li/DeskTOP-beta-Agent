@@ -1,5 +1,5 @@
 import './ChatInput.css';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import sendButton from './icons8-send-button-90.png';
 
 export default function ChatInput({ onSendMessage }) {
