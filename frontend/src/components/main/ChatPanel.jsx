@@ -2,22 +2,96 @@ import ChatInput from "./ChatInput";
 import UserMessage from "./UserMessage";
 import AIMessage from "./AIMessage";
 import "./ChatPanel.css";
+import { useState, useRef, useEffect } from "react";
 
-export default function ChatPanel({ messages, handleSendMessage }) {
-  return (
-    <main className="chat-panel">
-        <div className="messages-container">
-          <div className="messages-list">
-            {messages.map((message, index) => (
-              message.role === "user" ? (<UserMessage key={index} message={message.content} />) : (<AIMessage key={index} message={message.content} />
-              )
-            ))}
-          </div>
-        </div>
-        <div className="input-container">
-          <ChatInput onSendMessage={handleSendMessage} />
-          <p className="input-footer-text"> Powered by 知能新体 — 提升你的自媒体内容生产效率</p>
-        </div>
-    </main>
-  )
+export default function ChatPanel() {
+
+    const [messages, setMessages] = useState([
+        {
+          role: "assistant",
+          content: "您好，今天您有什么感兴趣的自媒体内容选题吗？"
+        }
+    ]);
+
+    const messagesEndRef = useRef(null);
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, [messages]);
+
+      
+    const handleSendMessage = async (message) => {
+        // 先显示用户输入
+        setMessages((prev) => [...prev, { role: "user", content: message }]);
+      
+        try {
+          const response = await fetch("/generate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ topic: message })
+          });
+      
+          if (!response.ok) {
+            throw new Error("Failed to fetch data");
+          }
+      
+          // 👇 改这里 — 用流式读取 response.body
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder("utf-8");
+          let partialChunk = "";
+      
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+      
+            // 解码流式分段
+            partialChunk += decoder.decode(value, { stream: true });
+            const parts = partialChunk.split("\n");
+            partialChunk = parts.pop(); // 保留未完整的部分
+      
+            for (const jsonStr of parts) {
+              if (!jsonStr.trim()) continue;
+      
+              try {
+                const data = JSON.parse(jsonStr);
+      
+                setMessages((prev) => [
+                  ...prev,
+                  { role: "assistant", content: data.generated_content}
+                ]);
+              } catch (e) {
+                console.error("JSON parse error:", e, jsonStr);
+              }
+            }
+          }
+      
+        } catch (error) {
+          console.error("Error:", error);
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: "⚠️ Server connection failed." }
+          ]);
+        }
+    };
+
+
+    return (
+        <main className="chat-panel">
+            <div className="messages-container">
+                <div className="messages-list">
+                    {messages.map((message, index) => (
+                    message.role === "user" ? (<UserMessage key={index} message={message.content} />) : (<AIMessage key={index} message={message.content} />
+                    )
+                    ))}
+                    <div ref={messagesEndRef} />
+                </div>
+            </div>
+            <div className="input-container">
+                <ChatInput onSendMessage={handleSendMessage} />
+                <p className="input-footer-text"> Powered by 知能新体 — 提升你的自媒体内容生产效率</p>
+            </div>
+        </main>
+    )
 }
