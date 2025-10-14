@@ -11,10 +11,12 @@ const SidePanel = () => {
 
   return (
     <aside className="side-panel">
-      <MenuItem title="我的数据库" 
+      <MenuItem title="我的文本库" 
+                path="/textbase"
                 selectedItem={selectedItem} 
                 handleMenuItemClick={handleMenuItemClick} />
       <MenuItem title="聊天记录1" 
+                path="/chat"
                 selectedItem={selectedItem} 
                 handleMenuItemClick={handleMenuItemClick} />
     </aside>

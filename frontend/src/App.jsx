@@ -3,7 +3,7 @@ import { BrowserRouter , Routes, Route } from "react-router-dom";
 import ChatPanel from "./components/chatbot/ChatPanel";
 import SidePanel from "./components/sidebar/SidePanel";
 import TextbasePage from "./components/textbase/TextbasePage";
-import { useState } from "react";
+
 //import "./border.css";
 import "./App.css";
 

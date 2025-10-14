@@ -12,3 +12,9 @@ html, body {
     flex-direction: row;
     height: 100vh;
 }
+
+.main-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
