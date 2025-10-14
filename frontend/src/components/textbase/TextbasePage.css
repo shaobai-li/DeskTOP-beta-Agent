@@ -6,38 +6,63 @@
     background-color: #fafafa;
     min-height: 100vh;
     box-sizing: border-box;
-  }
-  
-  .textbase-header {
-    margin-bottom: 30px;
-  }
-  
-  .textbase-header h1 {
+}
+
+.textbase-header {
+    margin-bottom: 30px;    
+}
+
+.textbase-header h1 {
     font-size: 26px;
     font-weight: 600;
     color: #222;
     margin-bottom: 8px;
-  }
-  
-  .textbase-subtitle {
-    font-size: 14px;
-    color: #666;
-  }
-  
-  .textbase-content {
-    background-color: #fff;
-    border: 1px solid #e3e3e3;
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.textbase-subtitle {
+font-size: 14px;
+color: #666;
+}
+
+.textbase-content {  
     flex: 1;
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     justify-content: center;
-  }
-  
-  .empty-state {
-    text-align: center;
-    color: #888;
-    font-size: 15px;
-  }
+}
+
+
+.table-wrapper {
+    width: 100%;
+    border: 1px solid #C7C7C7;
+    border-radius: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    border-radius: 10px;
+}
+
+
+thead {
+    background-color: #EAEAEA;;
+    border-radius: 10px 10px 0 0;
+}
+
+th {
+    height: 15px;
+    padding: 9px 16px;
+    border-bottom: 1px solid #C7C7C7;
+    border-radius: 10px 10px 0 0;
+}
+
+td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #C7C7C7;
+}
+
+tr:hover {
+    background-color: #EFEFEF;
+}
