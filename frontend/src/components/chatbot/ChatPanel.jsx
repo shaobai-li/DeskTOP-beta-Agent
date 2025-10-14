@@ -78,7 +78,7 @@ export default function ChatPanel() {
 
 
     return (
-        <main className="chat-panel">
+        <div className="chat-panel">
             <div className="messages-container">
                 <div className="messages-list">
                     {messages.map((message, index) => (
@@ -92,6 +92,6 @@ export default function ChatPanel() {
                 <ChatInput onSendMessage={handleSendMessage} />
                 <p className="input-footer-text"> Powered by 知能新体 — 提升你的自媒体内容生产效率</p>
             </div>
-        </main>
+        </div>
     )
 }

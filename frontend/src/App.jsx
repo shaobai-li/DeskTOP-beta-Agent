@@ -1,15 +1,25 @@
-import ChatPanel from "./components/main/ChatPanel";
-import SidePanel from "./components/side/SidePanel";
+import { BrowserRouter , Routes, Route } from "react-router-dom";
+
+import ChatPanel from "./components/chatbot/ChatPanel";
+import SidePanel from "./components/sidebar/SidePanel";
+import TextbasePage from "./components/textbase/TextbasePage";
 import { useState } from "react";
 //import "./border.css";
 import "./App.css";
 
 function App() {
   return (
-    <div className="app-container">
-      <SidePanel />
-      <ChatPanel />
-    </div>    
+    <BrowserRouter>
+      <div className="app-container">
+        <SidePanel />
+        <main className="main-container">
+          <Routes>
+            <Route path="/chat" element={<ChatPanel />} />
+            <Route path="/textbase" element={<TextbasePage />} />
+          </Routes>
+        </main>
+      </div>    
+    </BrowserRouter>
   )
 }
 
