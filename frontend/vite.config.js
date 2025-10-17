@@ -6,7 +6,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/generate': 'http://127.0.0.1:8000'
+      '/generate': 'http://127.0.0.1:8000',
+      '/rows': 'http://127.0.0.1:8000'
     }
   }
 })
