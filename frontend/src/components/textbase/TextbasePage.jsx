@@ -1,17 +1,17 @@
 import './TextbasePage.css';
-  
-const MOCK_ROWS = [
-    { id: 1, title: "Header" },
-    { id: 2, title: "Table of contents" },
-    { id: 3, title: "Cover page" },
-    { id: 4, title: "Executive summary" },
-    { id: 5, title: "Technical approach" },
-    { id: 6, title: "Design" },
-];
+import { useEffect, useState } from "react";
+
 
 export default function TextbasePage() {
 
-    const rows = MOCK_ROWS;
+    const [rows, setRows] = useState([]);
+
+    useEffect(() => {
+        fetch("/rows")
+          .then((res) => res.json())
+          .then((data) => setRows(data))
+          .catch((err) => console.error("请求失败：", err));
+    }, []);
 
     return (
         <div className="textbase-page">
@@ -26,6 +26,8 @@ export default function TextbasePage() {
                         <thead>
                         <tr>
                             <th>文档名称</th>
+                            <th>日期</th>
+                            <th>状态</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -34,11 +36,19 @@ export default function TextbasePage() {
                             <td colSpan={1} className="empty-cell">
                                 暂无数据
                             </td>
+                            <td colSpan={1} className="empty-cell">
+                                暂无数据
+                            </td>
+                            <td colSpan={1} className="empty-cell">
+                                暂无数据
+                            </td>
                             </tr>
                         ) : (
                             rows.map((r) => (
                             <tr key={r.id}>
                                 <td>{r.title}</td>
+                                <td>{r.date}</td>
+                                <td>{r.status}</td>
                             </tr>
                             ))
                         )}
