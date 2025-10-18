@@ -71,7 +71,7 @@ export default function ChatPanel() {
           console.error("Error:", error);
           setMessages((prev) => [
             ...prev,
-            { role: "assistant", content: "⚠️ Server connection failed." }
+            { role: "assistant", content: "⚠️ 无法连接到服务器，请稍后重试。" }
           ]);
         }
     };
