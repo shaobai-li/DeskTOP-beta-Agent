@@ -1,0 +1,45 @@
+.table-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #C7C7C7;
+    border-radius: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    border-radius: 10px;
+}
+
+
+thead {
+    background-color: #EAEAEA;;
+    border-radius: 10px 10px 0 0;
+}
+
+th {
+    font-size: 11px;
+    height: 11px;
+    padding: 7px 12px;
+    border-bottom: 1px solid #C7C7C7;
+    border-radius: 10px 10px 0 0;
+}
+
+td {
+    font-size: 12px;
+    padding: 8px 8px;
+    border-bottom: 1px solid #C7C7C7;
+}
+
+tr:hover {
+    background-color: #EFEFEF;
+}
+
+.pagination {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    margin-top: 10px;
+}

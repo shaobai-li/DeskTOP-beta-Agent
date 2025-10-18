@@ -1,5 +1,6 @@
 import './TextbasePage.css';
 import { useEffect, useState } from "react";
+import TextTable from "./TextTable";
 
 
 export default function TextbasePage() {
@@ -21,40 +22,7 @@ export default function TextbasePage() {
             </div>
 
             <div className="textbase-content">
-                <div className="table-wrapper">
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>文档名称</th>
-                            <th>日期</th>
-                            <th>状态</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {rows.length === 0 ? (
-                            <tr>
-                            <td colSpan={1} className="empty-cell">
-                                暂无数据
-                            </td>
-                            <td colSpan={1} className="empty-cell">
-                                暂无数据
-                            </td>
-                            <td colSpan={1} className="empty-cell">
-                                暂无数据
-                            </td>
-                            </tr>
-                        ) : (
-                            rows.map((r) => (
-                            <tr key={r.id}>
-                                <td>{r.title}</td>
-                                <td>{r.date}</td>
-                                <td>{r.status}</td>
-                            </tr>
-                            ))
-                        )}
-                        </tbody>
-                    </table>
-                </div>
+                <TextTable rows={rows} />
             </div>
         </div>
     )
