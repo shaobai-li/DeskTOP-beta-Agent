@@ -8,21 +8,21 @@ export default function PageSizeSelect({ options, defaultValue }) {
   const [value, setValue] = useState(defaultValue);
 
   return (
-    <div className="custom-select">
+    <div className="pagination__rowsize__select">
       <div
-        className="select-display"
+        className="pagination__rowsize__select__display"
         onClick={() => setOpen(!open)}
       >
-        <span className="select-value">{value}</span>
-        <span className="select-arrow">∨</span>
+        <span className="pagination__rowsize__select__value">{value}</span>
+        <span className="pagination__rowsize__select__arrow">∨</span>
       </div>
 
       {open && (
-        <div className="select-dropdown">
+        <div className="pagination__rowsize__select__dropdown">
           {options.map((opt) => (
             <div
               key={opt}
-              className="select-option"
+              className="pagination__rowsize__select__option"
               onClick={() => {
                 setValue(opt);
                 setOpen(false);
