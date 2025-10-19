@@ -1,0 +1,9 @@
+.checkmark {
+  display: inline-block;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+.checkmark:hover {
+  color: #007bff;
+}

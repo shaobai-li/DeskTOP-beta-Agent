@@ -1,9 +1,10 @@
 import { useState } from "react";
+import PageSizeSelect from "./PageSizeSelect";
 import "./TextTable.css";
 
-function TextTable({ rows }) {
+export default function TextTable({ rows }) {
     const [currentPage, setCurrentPage] = useState(1);
-    const rowsPerPage = 5;
+    const rowsPerPage = 20;
     const totalPages = Math.ceil(rows.length / rowsPerPage);
 
     const handleNextPage = () => {
@@ -47,20 +48,35 @@ function TextTable({ rows }) {
         </tbody>
       </table>
       <div className="pagination">
-        <button onClick={handlePreviousPage}>
-            &lt;
-        </button>
-        
-        <span>
-            页码 {currentPage} / {totalPages}
+        <div className="pagination__rowsize">
+          <label className="pagination__rowsize__label">每页文本数</label>
+          <PageSizeSelect
+            options={["20", "40", "60"]}
+            defaultValue="20"
+          />
+        </div>
+
+        <span className="pagination__pageinfo">
+          第 {currentPage} / {totalPages} 页
         </span>
 
-        <button onClick={handleNextPage}>
-            &gt;
-        </button>
+        <div className="pagination__pagebuttons">
+          <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
+            «
+          </button>
+          <button onClick={handlePreviousPage} disabled={currentPage === 1}>
+            ‹
+          </button>
+          <button onClick={handleNextPage} disabled={currentPage === totalPages}>
+            ›
+          </button>
+          <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>
+            »
+          </button>
+        </div>
+
+
       </div>
     </div>
   );
 }
-
-export default TextTable;
