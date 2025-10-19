@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PageSizeSelect from "./PageSizeSelect";
+import UploadButton from "./UploadButton";
 import "./TextTable.css";
 
 export default function TextTable({ rows }) {
@@ -17,6 +18,10 @@ export default function TextTable({ rows }) {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
         }
+    };
+
+    const handleFileSelect = (file) => {
+        console.log(file);
     };
 
   return (
@@ -47,35 +52,40 @@ export default function TextTable({ rows }) {
           )}
         </tbody>
       </table>
-      <div className="pagination">
-        <div className="pagination__rowsize">
-          <label className="pagination__rowsize__label">每页文本数</label>
-          <PageSizeSelect
-            options={["20", "40", "60"]}
-            defaultValue="20"
-          />
+
+      <div className="upload-pagination-container">
+        <div className="upload">
+          <UploadButton onFileSelect={handleFileSelect} accept=".doc" multiple={false} />
         </div>
 
-        <span className="pagination__pageinfo">
-          第 {currentPage} / {totalPages} 页
-        </span>
+        <div className="pagination">
+          <div className="pagination__rowsize">
+            <label className="pagination__rowsize__label">每页文本数</label>
+            <PageSizeSelect
+              options={["20", "40", "60"]}
+              defaultValue="20"
+            />
+          </div>
 
-        <div className="pagination__pagebuttons">
-          <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
-            «
-          </button>
-          <button onClick={handlePreviousPage} disabled={currentPage === 1}>
-            ‹
-          </button>
-          <button onClick={handleNextPage} disabled={currentPage === totalPages}>
-            ›
-          </button>
-          <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>
-            »
-          </button>
+          <span className="pagination__pageinfo">
+            第 {currentPage} / {totalPages} 页
+          </span>
+
+          <div className="pagination__pagebuttons">
+            <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
+              «
+            </button>
+            <button onClick={handlePreviousPage} disabled={currentPage === 1}>
+              ‹
+            </button>
+            <button onClick={handleNextPage} disabled={currentPage === totalPages}>
+              ›
+            </button>
+            <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>
+              »
+            </button>
+          </div>
         </div>
-
-
       </div>
     </div>
   );
