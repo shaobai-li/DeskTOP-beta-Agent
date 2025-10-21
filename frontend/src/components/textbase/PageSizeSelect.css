@@ -23,8 +23,9 @@
 
 .pagination__rowsize__select__arrow {
   margin-left: 8px;
-  color: #666;
-  font-size: 12px;
+  width: 10px;
+  height: 10px;
+  opacity: 0.5;
 }
 
 
@@ -60,4 +61,12 @@
   margin: 4px 8px;
   padding: 6px 4px;
   border-radius: 8px;
+}
+
+.pagination__rowsize__select__checkmark {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
 }

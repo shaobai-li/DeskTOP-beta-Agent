@@ -5,8 +5,13 @@ import "./TextTable.css";
 
 export default function TextTable({ rows }) {
     const [currentPage, setCurrentPage] = useState(1);
-    const rowsPerPage = 20;
+    const [rowsPerPage, setRowsPerPage] = useState(20);
     const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+    
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const currentRows = rows.slice(startIndex, endIndex);
 
     const handleNextPage = () => {
         if (currentPage < totalPages) {
@@ -19,6 +24,25 @@ export default function TextTable({ rows }) {
             setCurrentPage(currentPage - 1);
         }
     };
+
+    const handleFirstPage = () => {
+      setCurrentPage(1);
+    };
+
+    const handleLastPage = () => {
+        setCurrentPage(totalPages);
+    };
+
+    // 每页行数选择功能
+    const handlePageSizeChange = (newSize) => {
+      const newRowsPerPage = parseInt(newSize);
+      setRowsPerPage(newRowsPerPage);
+      // 重新计算当前页，确保不超出范围
+      const newTotalPages = Math.ceil(rows.length / newRowsPerPage);
+      if (currentPage > newTotalPages) {
+          setCurrentPage(newTotalPages || 1);
+      }
+    };  
 
     const handleFileSelect = (file) => {
         console.log(file);
@@ -42,7 +66,7 @@ export default function TextTable({ rows }) {
               </td>
             </tr>
           ) : (
-            rows.map((r) => (
+            currentRows.map((r) => (
               <tr key={r.id}>
                 <td>{r.title}</td>
                 <td>{r.date}</td>
@@ -64,6 +88,7 @@ export default function TextTable({ rows }) {
             <PageSizeSelect
               options={["20", "40", "60"]}
               defaultValue="20"
+              onValueChange={handlePageSizeChange}
             />
           </div>
 
