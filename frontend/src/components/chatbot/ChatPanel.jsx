@@ -1,6 +1,7 @@
 import ChatInput from "./ChatInput";
 import UserMessage from "./UserMessage";
 import AIMessage from "./AIMessage";
+import AgentSwitcher from "./AgentSwitcher";
 import "./ChatPanel.css";
 import { useState, useRef, useEffect } from "react";
 
@@ -79,6 +80,7 @@ export default function ChatPanel() {
 
     return (
         <div className="chat-panel">
+            <AgentSwitcher />
             <div className="messages-container">
                 <div className="messages-list">
                     {messages.map((message, index) => (
