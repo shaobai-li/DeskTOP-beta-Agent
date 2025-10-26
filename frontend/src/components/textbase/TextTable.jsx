@@ -26,7 +26,7 @@ export default function TextTable({ rows }) {
     };
 
     const handleFirstPage = () => {
-      setCurrentPage(1);
+        setCurrentPage(1);
     };
 
     const handleLastPage = () => {
@@ -44,8 +44,21 @@ export default function TextTable({ rows }) {
       }
     };  
 
-    const handleFileSelect = (file) => {
-        console.log(file);
+    const handleFileSelect = async (file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+  
+      try {
+        const response = await fetch('/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        const result = await response.json();
+        alert(`上传成功：${result.message}\n文件名：${result.filename}`);
+      } catch (error) {
+        alert(`上传失败：${error.message}`);
+      }
     };
 
   return (
@@ -97,7 +110,7 @@ export default function TextTable({ rows }) {
           </span>
 
           <div className="pagination__pagebuttons">
-            <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
+            <button onClick={handleFirstPage} disabled={currentPage === 1}>
               «
             </button>
             <button onClick={handlePreviousPage} disabled={currentPage === 1}>
@@ -106,7 +119,7 @@ export default function TextTable({ rows }) {
             <button onClick={handleNextPage} disabled={currentPage === totalPages}>
               ›
             </button>
-            <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages}>
+            <button onClick={handleLastPage} disabled={currentPage === totalPages}>
               »
             </button>
           </div>
