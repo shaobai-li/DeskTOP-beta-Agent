@@ -10,7 +10,7 @@ export default function ChatPanel() {
     const [messages, setMessages] = useState([
         {
           role: "assistant",
-          content: "您好，今天您有什么感兴趣的自媒体内容选题吗？"
+          content: "您好，<card>今天您有什么感兴趣的自媒体内容选题吗？</card>"
         }
     ]);
 
