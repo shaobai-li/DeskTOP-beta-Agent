@@ -1,82 +1,73 @@
-import "./AIMessage.css"
+import "./AIMessage.css";
 import ReactMarkdown from "react-markdown";
 import VerticalTabs from "./VerticalTabs";
 
-export default function AIMessage({message}) {
-    // 检查消息内容是否包含<card>标签
-    if (message.includes("<card>") && message.includes("</card>")) {
-        // 提取所有卡片内容
-        const cardContents = [];
-        const cardRegex = /<card>(.*?)<\/card>/g;
-        let match;
-        
-        while ((match = cardRegex.exec(message)) !== null) {
-            const cardContent = match[1];
-            // 检查是否包含title和subtitle标签
-            const titleMatch = cardContent.match(/<title>(.*?)<\/title>/);
-            const subtitleMatch = cardContent.match(/<subtitle>(.*?)<\/subtitle>/);
-            
-            if (titleMatch && subtitleMatch) {
-                // 如果包含title和subtitle标签，则提取它们的内容
-                cardContents.push({
-                    title: titleMatch[1],
-                    subtitle: subtitleMatch[1]
-                });
-            } else {
-                // 否则，使用原始内容
-                cardContents.push(cardContent);
-            }
-        }
-        
-        // 提取卡片前后的消息内容
-        const parts = message.split(/<\/?card>/);
-        const messageBeforeCard = parts[0];
-        
-        // 创建一个包含所有内容的数组，按顺序排列
-        const contentElements = [];
-        
-        // 添加第一个卡片前的内容
-        if (messageBeforeCard && messageBeforeCard.trim() !== "") {
-            contentElements.push(
-                <div key="before-card" className="ai-message-bubble">
-                    <ReactMarkdown>{messageBeforeCard}</ReactMarkdown>
-                </div>
-            );
-        }
-        
-        // 添加卡片和卡片之间的内容
-        for (let i = 0; i < cardContents.length; i++) {
-            // 添加卡片
-            contentElements.push(
-                <VerticalTabs key={`card-${i}`} cardContents={[cardContents[i]]} />
-            );
-            
-            // 添加卡片后的内容（如果不是最后一个卡片且有内容）
-            const afterCardIndex = (i + 1) * 2;
-            if (afterCardIndex < parts.length && parts[afterCardIndex] && parts[afterCardIndex].trim() !== "") {
-                contentElements.push(
-                    <div key={`after-card-${i}`} className="ai-message-bubble">
-                        <ReactMarkdown>{parts[afterCardIndex]}</ReactMarkdown>
-                    </div>
-                );
-            }
-        }
-        
-        return (
-            <div className="ai-message">
-                <div className="ai-message-bubble">
-                    {contentElements}
-                </div>                
-            </div>
-        );
-    } else {
-        // 普通消息，直接渲染
-        return (
-            <div className="ai-message">
-                <div className="ai-message-bubble">
-                    <ReactMarkdown>{message}</ReactMarkdown>
-                </div>
-            </div>
-        );
+export default function AIMessage({ message }) {
+  const cardBlockRegex = /<card>([\s\S]*?)<\/card>/gi;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = cardBlockRegex.exec(message)) !== null) {
+    const start = match.index;
+    const end = cardBlockRegex.lastIndex;
+
+    const textBefore = message.slice(lastIndex, start);
+    if (textBefore.trim() !== "") {
+      parts.push({ type: "text", content: textBefore });
     }
+
+    const cardRaw = match[1];
+
+    // 提取 <title> 和 <subtitle>，忽略大小写
+    const titleMatch = cardRaw.match(/<title>([\s\S]*?)<\/title>/i);
+    const subtitleMatch = cardRaw.match(/<subtitle>([\s\S]*?)<\/subtitle>/i);
+
+    // 兼容两种情况
+    const title = titleMatch ? titleMatch[1].trim() : cardRaw.trim();
+    const subtitle = subtitleMatch ? subtitleMatch[1].trim() : "";
+
+    // 按 VerticalTabs 期望的格式传入
+    parts.push({
+      type: "card",
+      cardContents: [{ title, subtitle }],
+    });
+
+    lastIndex = end;
+  }
+
+  const tail = message.slice(lastIndex);
+  if (tail.trim() !== "") {
+    parts.push({ type: "text", content: tail });
+  }
+
+  // 没有任何 <card> 的情况也统一处理
+  if (parts.length === 0) {
+    parts.push({ type: "text", content: message });
+  }
+
+  return (
+    <div
+      className="ai-message"
+      style={{
+        display: "flex",
+        flexDirection: "column", // 垂直排列
+        alignItems: "flex-start",
+        gap: "8px",
+      }}
+    >
+      {parts.map((p, i) =>
+        p.type === "card" ? (
+          <VerticalTabs
+            key={`card-${i}`}
+            cardContents={p.cardContents} // ✅ 注意这里传数组
+          />
+        ) : (
+          <div key={`text-${i}`} className="ai-message-bubble">
+            <ReactMarkdown>{p.content}</ReactMarkdown>
+          </div>
+        )
+      )}
+    </div>
+  );
 }

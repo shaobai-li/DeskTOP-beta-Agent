@@ -10,7 +10,15 @@ export default function ChatPanel() {
     const [messages, setMessages] = useState([
         {
           role: "assistant",
-          content: "<card><title>自媒体内容推荐</title><subtitle>这是自媒体内容推荐的简短描述</subtitle></card><card><title>自媒体内容推荐</title><subtitle>这是自媒体内容推荐的简短描述</subtitle></card>"
+          content: `您好，请问您有什么感兴趣的自媒体选题么？
+          <card><title>【选题4】标题：跨模态AI技术如何塑造未来数字产品</title>
+<subtitle>
+- 灵感来源：<text 1>, <text 2>
+- 核心观点：跨模态能力的AI正在重塑产品界面和用户体验，带来更多创新机会。
+- 内容方向：探讨跨模态技术在实际应用中的具体案例，如AI生成的播客、视频，以及未来可能的演变路径。
+- 受众价值：启发数字产品开发者探索新技术应用，拓宽产品创新方向。
+</subtitle>
+</card>`
         }
     ]);
 
