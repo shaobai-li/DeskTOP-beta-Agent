@@ -26,17 +26,23 @@ SYSTEM_PROMPT_CONTENT_TOPIC = """
 5. 受众价值：说明为什么这个选题可能吸引受众，解决了什么问题或提供了什么价值。
 
 【输出格式示例】
-【选题1】标题：为什么越来越多年轻人开始反向旅游？  
+<card><title>【选题1】标题：为什么越来越多年轻人开始反向旅游？</title>
+<subtitle>
 - 灵感来源：<text 2>, <text 5>  
 - 核心观点：年轻人开始避开热门城市，追求冷门目的地的独特体验。  
 - 内容方向：探讨反向旅游背后的心理动因、经济因素、社交媒体影响。  
 - 受众价值：提供新旅行思路，满足差异化和个性化的出行需求。  
+</subtitle>
+</card>
 
-【选题2】标题：AI写作会取代自媒体人吗？  
+<card><title>【选题2】标题：AI写作会取代自媒体人吗？</title>
+<subtitle>
 - 灵感来源：<text 1>, <text 4>  
 - 核心观点：AI工具带来高效内容生产，但缺乏个性与情绪共鸣。  
 - 内容方向：比较AI与人类创作的差异，探讨“创作人格”在内容时代的重要性。  
 - 受众价值：帮助创作者思考如何与AI共创而非被替代。  
+</subtitle>
+</card>
 
 【分析与思考要求】
 - 你必须基于提供的 <text> 内容生成洞察，**不要编造不存在的信息**。  
@@ -92,14 +98,17 @@ class SearchAgent:
         return self.texts_retrieved
 
     def content_framework(self, chunks):
-        
+        print("Entering content_framework...")
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT_CONTENT_TOPIC},
             {"role": "user", "content": f"{self.texts_retrieved}"}
             ]
+        print("Sending messages to LLM...")
         response = self.content_framework_module["llm_client"].chat.completions.create(
             model="gpt-4o-2024-08-06",
             messages=messages
             )
+        print("Received response from LLM...")
         completion = response.choices[0].message.content
+        print(completion)
         return completion
