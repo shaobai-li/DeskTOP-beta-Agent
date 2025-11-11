@@ -4,25 +4,25 @@ import AIMessage from "./AIMessage";
 import AgentSwitcher from "./AgentSwitcher";
 import "./ChatPanel.css";
 import { useState, useRef, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { mockMessages } from "../../temp/chatData";
 
 export default function ChatPanel() {
-
-    const [messages, setMessages] = useState([
-        {
-          role: "assistant",
-          content: `您好，请问您有什么感兴趣的自媒体选题么？
-          <topic_list><topic><title>【选题4】标题：跨模态AI技术如何塑造未来数字产品</title>
-<subtitle>
-- 灵感来源：<text 1>, <text 2>
-- 核心观点：跨模态能力的AI正在重塑产品界面和用户体验，带来更多创新机会。
-- 内容方向：探讨跨模态技术在实际应用中的具体案例，如AI生成的播客、视频，以及未来可能的演变路径。
-- 受众价值：启发数字产品开发者探索新技术应用，拓宽产品创新方向。
-</subtitle></topic>
-</topic_list>`
-        }
-    ]);
+    const { chatId } = useParams();
+    const [messages, setMessages] = useState([]);
 
     const messagesEndRef = useRef(null);
+
+    useEffect(() => {
+        const loadedMessages = mockMessages.filter(m => m.chatId === chatId);
+        if (loadedMessages.length > 0) {
+            setMessages(loadedMessages);
+        } else {
+            setMessages([
+              { role: "assistant", content: "你好，这里是新的聊天窗口，有什么可以帮你？" },
+            ]);
+        }
+    }, [chatId]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

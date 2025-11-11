@@ -15,6 +15,7 @@ function App() {
         <main className="main-container">
           <Routes>
             <Route path="/chat" element={<ChatPanel />} />
+            <Route path="/chat/:chatId" element={<ChatPanel />} />
             <Route path="/textbase" element={<TextbasePage />} />
           </Routes>
         </main>
