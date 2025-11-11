@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-// import './MenuItem.css';
+import './MenuItem.css';
 
 export default function MenuItem({ title, path, selectedItem, handleMenuItemClick, icon }) {
     return (
