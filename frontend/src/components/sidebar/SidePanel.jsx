@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './SidePanel.css';
 import MenuItem from './MenuItem';
+import databaseIcon from '../../assets/icons8-sidebar_database-16.png';
+import newChatIcon from '../../assets/icons8-sidebar_new-chat-24.png';
 
 const SidePanel = () => {
   const [selectedItem, setSelectedItem] = useState(null);
@@ -14,11 +16,13 @@ const SidePanel = () => {
       <MenuItem title="我的文本库" 
                 path="/textbase"
                 selectedItem={selectedItem} 
-                handleMenuItemClick={handleMenuItemClick} />
-      <MenuItem title="聊天记录1" 
+                handleMenuItemClick={handleMenuItemClick}
+                icon={databaseIcon} />
+      <MenuItem title="新聊天" 
                 path="/chat"
                 selectedItem={selectedItem} 
-                handleMenuItemClick={handleMenuItemClick} />
+                handleMenuItemClick={handleMenuItemClick}
+                icon={newChatIcon} />
     </aside>
   );
 };

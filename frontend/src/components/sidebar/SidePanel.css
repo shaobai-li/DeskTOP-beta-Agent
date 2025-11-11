@@ -5,17 +5,20 @@
   height: 100%;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
   border-right: 1px solid #C7C7C7;
+  font-size: 16px;
 }
 
 .menu-item {
   padding: 8px 15px 8px 20px;
   color: #333;
-  font-size: 14px;
+  font-size: 16px;
   cursor: pointer;
   margin: 0px 0px;
   border-radius: 10px;
   display: flex;
+  align-items: center;
   text-decoration: none;
+  gap: 8px;
 }
 
 .menu-item:hover {
@@ -26,6 +29,11 @@
 .menu-item.selected {
   background-color: #EAEAEA;
   border-radius: 10px;
+}
+
+.menu-item-icon {
+  width: 0.9em;
+  height: 0.9em;
 }
 
 .menu-item-text {
