@@ -6,27 +6,27 @@ import databaseIcon from '../../assets/icons8-sidebar_database-16.png';
 import newChatIcon from '../../assets/icons8-sidebar_new-chat-24.png';
 
 const SidePanel = () => {
-  const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedItem, setSelectedItem] = useState(null);
 
-  const handleMenuItemClick = (itemName) => {
-    setSelectedItem(itemName);
-  };
+    const handleMenuItemClick = (itemName) => {
+        setSelectedItem(itemName);
+    };
 
-  return (
-    <aside className="side-panel">
-      <MenuItem title="我的文本库" 
-                path="/textbase"
-                selectedItem={selectedItem} 
-                handleMenuItemClick={handleMenuItemClick}
-                icon={databaseIcon} />
-      <MenuItem title="新聊天" 
-                path="/chat"
-                selectedItem={selectedItem} 
-                handleMenuItemClick={handleMenuItemClick}
-                icon={newChatIcon} />
-      <ChatHistory />
-    </aside>
-  );
+    return (
+      <aside className="side-panel">
+        <MenuItem title="我的文本库" 
+                  path="/textbase"
+                  selectedItem={selectedItem} 
+                  handleMenuItemClick={handleMenuItemClick}
+                  icon={databaseIcon} />
+        <MenuItem title="新聊天" 
+                  path="/chat"
+                  selectedItem={selectedItem} 
+                  handleMenuItemClick={handleMenuItemClick}
+                  icon={newChatIcon} />
+        <ChatHistory />
+      </aside>
+    );
 };
 
 export default SidePanel;
