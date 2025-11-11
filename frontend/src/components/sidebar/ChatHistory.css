@@ -1,0 +1,94 @@
+.chat-history__list {
+  margin-top: 8px;
+  padding: 0; /* 与菜单项列表一致，不额外内边距 */
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+/* 列表项 */
+.chat-history__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: transparent;
+  color: #333; /* 与菜单项文字颜色一致 */
+  padding: 8px 15px 8px 20px; /* 与 .menu-item 一致 */
+  border-radius: 10px; /* 与 .menu-item 一致 */
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.chat-history__item:hover {
+  background-color: #EFEFEF; /* 与 .menu-item:hover 一致 */
+  border-radius: 10px;
+}
+
+.chat-history__item-title {
+  font-size: inherit; /* 与侧边栏统一的基础字体保持一致 */
+  color: inherit; /* 与父容器颜色一致 */
+  flex: 1; /* 与 .menu-item-text 一致的布局 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 30px; /* 保持与右侧空间一致 */
+}
+
+/* 选中态：保持背景为 #EFEFEF */
+.chat-history__item--selected {
+  background-color: #EFEFEF;
+}
+
+/* 列表项右侧图标（功能点） */
+.chat-history__item-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: 0; /* 默认隐藏 */
+}
+
+/* 鼠标悬浮时显示右侧图标 */
+.chat-history__item:hover .chat-history__item-icon {
+  opacity: 1;
+}
+
+.chat-history__header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  margin: 30px 8px 4px 20px; /* 加大与上方“新聊天”的间距，并保持左侧对齐 */
+  cursor: pointer;
+  user-select: none;
+  color: #aaa; /* 统一标题与箭头颜色 */
+}
+
+.chat-history__header-title {
+  color: #aaa;
+  font-size: inherit; /* 与侧边栏统一的基础字体保持一致 */
+  font-weight: normal; /* 取消加粗效果 */
+  margin: 0; /* 移除默认边距，避免文字与箭头过远 */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 头部箭头图标 */
+.chat-history__header-icon {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background-color: currentColor;
+  opacity: 0;                 /* 默认完全透明 */
+  transition: opacity 0.2s ease;
+}
+
+.chat-history__header:hover .chat-history__header-icon {
+  opacity: 1;
+}
+
+.chat-history__header-icon--collapsed {
+  transform: rotate(-90deg);
+}
+
+.chat-history__header-icon--expanded {
+  transform: rotate(0deg);
+}
