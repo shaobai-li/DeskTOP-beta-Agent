@@ -40,7 +40,7 @@
   margin-right: 15px;  
 }
 
-.menu-item:has(.menu-item__link:hover) {
+.menu-item:hover {
   background-color: #efefef;
   border-radius: 10px;
 }
@@ -52,8 +52,6 @@
   background-color: #EAEAEA;
   border-radius: 10px;
 }
-
-
-.menu-item:hover .menu-item-trailing-icon {
-  opacity: 1;
+.menu-item:has(.menu-item__feature-icon:hover) {
+  background-color: transparent !important;
 }
