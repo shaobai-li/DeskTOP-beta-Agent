@@ -1,4 +1,10 @@
 .menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.menu-item__link {
   padding: 8px 15px 8px 20px;
   color: #333;
   font-size: 16px;
@@ -11,6 +17,26 @@
   gap: 8px;
 }
 
+
+.menu-item__icon {
+  width: 0.9em;
+  height: 0.9em;
+}
+
+.menu-item__text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 30px;
+}
+
+.menu-item__feature-icon {
+  width: 0.85em;
+  height: 0.85em;
+  margin-right: 20px;
+}
+
 .menu-item:hover {
   background-color: #EFEFEF;
   border-radius: 10px;
@@ -21,19 +47,7 @@
   border-radius: 10px;
 }
 
-.menu-item-text {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding-right: 30px;
-}
 
 .menu-item:hover .menu-item-trailing-icon {
   opacity: 1;
-}
-
-.menu-item-icon {
-  width: 0.9em;
-  height: 0.9em;
 }
