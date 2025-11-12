@@ -5,7 +5,6 @@ import AgentSwitcher from "./AgentSwitcher";
 import "./ChatPanel.css";
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { mockMessages } from "../../temp/chatData";
 
 export default function ChatPanel() {
     const { chatId } = useParams();
@@ -14,14 +13,29 @@ export default function ChatPanel() {
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
-        const loadedMessages = mockMessages.filter(m => m.chatId === chatId);
-        if (loadedMessages.length > 0) {
-            setMessages(loadedMessages);
-        } else {
+      async function fetchMessages() {
+        try {
+          const response = await fetch(`/api/chat/${chatId}/messages`);
+          if (!response.ok) throw new Error("网络错误：" + response.status);
+    
+          const data = await response.json();
+          if (data && data.length > 0) {
+            // 数据库中存的字段是 role / content，与前端一致
+            setMessages(data);
+          } else {
             setMessages([
               { role: "assistant", content: "你好，这里是新的聊天窗口，有什么可以帮你？" },
             ]);
+          }
+        } catch (error) {
+          console.error("加载聊天记录失败：", error);
+          setMessages([
+            { role: "assistant", content: "⚠️ 无法加载历史消息，请稍后再试。" },
+          ]);
         }
+      }
+    
+      if (chatId) fetchMessages();
     }, [chatId]);
 
     useEffect(() => {

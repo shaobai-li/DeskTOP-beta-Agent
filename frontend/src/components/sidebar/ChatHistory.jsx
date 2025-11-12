@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './ChatHistory.css';
 import expandArrowIcon from '../../assets/icons8-expand-arrow-52.png';
-import { mockChatList } from '../../temp/chatData';
 import MenuItem from './MenuItem';
 
 const ChatHistory = ({ selectedItem, handleMenuItemClick }) => {
@@ -15,10 +14,6 @@ const ChatHistory = ({ selectedItem, handleMenuItemClick }) => {
   const selectedId = location.pathname.startsWith('/chat/')
     ? location.pathname.split('/')[2]
     : null;
-
-  // useEffect(() => {
-  //   setChats(mockChatList);
-  // }, []);
 
   useEffect(() => {
     async function fetchChats() {

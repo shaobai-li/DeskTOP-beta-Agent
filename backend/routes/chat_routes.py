@@ -9,6 +9,12 @@ DB_PATH = Path(__file__).resolve().parent.parent / "database" / "chatbot.db"
 def dict_factory(cursor, row):
     return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
 
+def to_camel_case(data):
+    def convert_key(key):
+        parts = key.split('_')
+        return parts[0] + ''.join(word.capitalize() for word in parts[1:])
+    return [{convert_key(k): v for k, v in item.items()} for item in data]
+
 @router.get("/chats")
 def get_chats():
     """获取所有会话列表"""
@@ -20,7 +26,7 @@ def get_chats():
     cur.execute("SELECT * FROM chats ORDER BY updated_at DESC")
     data = cur.fetchall()
     conn.close()
-    return data
+    return to_camel_case(data)
 
 @router.get("/chat/{chat_id}/messages")
 def get_chat_messages(chat_id: str):
@@ -33,4 +39,4 @@ def get_chat_messages(chat_id: str):
     cur.execute("SELECT * FROM messages WHERE chat_id = ? ORDER BY message_id", (chat_id,))
     data = cur.fetchall()
     conn.close()
-    return data
+    return to_camel_case(data)
