@@ -2,9 +2,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-right: 15px;  
 }
 
 .menu-item__link {
+  flex: 1;
   padding: 8px 15px 8px 20px;
   color: #333;
   font-size: 16px;
@@ -32,17 +34,21 @@
 }
 
 .menu-item__feature-icon {
+  opacity: 0;
   width: 0.85em;
   height: 0.85em;
-  margin-right: 20px;
+  margin-right: 15px;  
 }
 
-.menu-item:hover {
-  background-color: #EFEFEF;
+.menu-item:has(.menu-item__link:hover) {
+  background-color: #efefef;
   border-radius: 10px;
 }
+.menu-item:hover .menu-item__feature-icon {
+  opacity: 1;                /* 鼠标悬浮时显示 */
+}
 
-.menu-item.selected {
+.menu-item:has(.menu-item__link--selected) {
   background-color: #EAEAEA;
   border-radius: 10px;
 }

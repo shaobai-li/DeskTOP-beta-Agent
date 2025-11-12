@@ -11,10 +11,11 @@
             <div className="menu-item">
                 <Link 
                     to={path} 
-                    className={`menu-item__link ${isSelected && shouldRenderSelected ? 'selected' : ''}`}
+                    className={`menu-item__link ${isSelected && shouldRenderSelected ? 'menu-item__link--selected' : ''}`}
                     onClick={() => handleMenuItemClick(title)}
                 >
-                    <img className="menu-item__icon" src={icon}></img>
+
+                    {icon && <img className="menu-item__icon" src={icon}></img>}
                     <span className="menu-item__text">{title}</span>
                 </Link>
                 {hasFeature && (
