@@ -8,12 +8,16 @@ from datetime import datetime
 from pydantic import BaseModel
 from agents import SearchAgent
 
+from routes.chat_routes import router as chat_router
+
 # 初始化
 app = FastAPI()
 search_agent = SearchAgent()
 UPLOAD_DIR = Path(__file__).parent / "database/uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 TEXT_METADATA_FILE = UPLOAD_DIR / "texts_metadata.json"
+
+app.include_router(chat_router, prefix="/api")
 
 # 定义请求体
 class UserQuery(BaseModel):
