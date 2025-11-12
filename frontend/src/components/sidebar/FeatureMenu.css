@@ -1,0 +1,52 @@
+.feature-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 14px;
+    padding: 8px 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.feature-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.feature-menu-item__button {
+    flex: 1;
+    padding: 8px 15px 8px 20px;
+    color: #333;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 0px 0px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.feature-menu-item__icon {
+    width: 0.9em;
+    height: 0.9em;
+}
+
+.feature-menu-item__text {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 30px;
+}
+
+.feature-menu-item:hover {
+    background-color: #efefef;
+    border-radius: 10px;
+}
+
+.feature-menu-item:has(.feature-menu-item__button--selected) {
+    background-color: #EAEAEA;
+    border-radius: 10px;
+}
