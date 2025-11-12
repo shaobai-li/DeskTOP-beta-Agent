@@ -8,7 +8,9 @@ export default defineConfig({
     proxy: {
       '/generate': 'http://127.0.0.1:8000',
       '/rows': 'http://127.0.0.1:8000',
-      '/upload': 'http://127.0.0.1:8000'
+      '/upload': 'http://127.0.0.1:8000',
+      '/api/chats': 'http://127.0.0.1:8000',
+      '/api/chat/:chat_id/messages': 'http://127.0.0.1:8000',
     }
   }
 })

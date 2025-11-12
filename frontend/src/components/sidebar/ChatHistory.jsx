@@ -16,9 +16,24 @@ const ChatHistory = ({ selectedItem, handleMenuItemClick }) => {
     ? location.pathname.split('/')[2]
     : null;
 
+  // useEffect(() => {
+  //   setChats(mockChatList);
+  // }, []);
+
   useEffect(() => {
-    setChats(mockChatList);
+    async function fetchChats() {
+      try {
+        const response = await fetch("/api/chats");
+        if (!response.ok) throw new Error("网络错误：" + response.status);
+        const data = await response.json();
+        setChats(data);
+      } catch (error) {
+        console.error("加载聊天记录失败：", error);
+      }
+    }
+    fetchChats();
   }, []);
+
 
   return (
     <div className="chat-history">
