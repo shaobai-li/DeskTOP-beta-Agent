@@ -26,9 +26,7 @@ const SidePanel = () => {
                   handleMenuItemClick={handleMenuItemClick}
                   icon={newChatIcon} />
         <ChatHistory selectedItem={selectedItem} handleMenuItemClick={handleMenuItemClick}/>
-        <FeatureMenu 
-                  selectedItem={selectedItem} 
-                  handleMenuItemClick={handleMenuItemClick} />
+
       </aside>
     );
 };

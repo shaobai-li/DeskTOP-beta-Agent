@@ -1,3 +1,10 @@
+.feature-menu-wrapper {
+    /* Portal wrapper - positioned by inline styles */
+    /* 使用 transform 来调整位置偏移 */
+    transform: translate(-24px,5px); /* X轴偏移, Y轴偏移 */
+    margin-top: 10px;    /* 向下偏移 */
+}
+
 .feature-menu {
     display: flex;
     flex-direction: column;
@@ -6,7 +13,8 @@
     border: 1px solid #e0e0e0;
     border-radius: 14px;
     padding: 8px 6px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 120px;
 }
 
 .feature-menu-item {
