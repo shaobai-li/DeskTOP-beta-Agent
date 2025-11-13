@@ -21,7 +21,7 @@ const SidePanel = () => {
                   handleMenuItemClick={handleMenuItemClick}
                   icon={databaseIcon} />
         <MenuItem title="新聊天" 
-                  path="/chat"
+                  path="/"
                   selectedItem={selectedItem} 
                   handleMenuItemClick={handleMenuItemClick}
                   icon={newChatIcon} />

@@ -4,43 +4,46 @@ import AIMessage from "./AIMessage";
 import AgentSwitcher from "./AgentSwitcher";
 import "./ChatPanel.css";
 import { useState, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
 
-export default function ChatPanel() {
-    const { chatId } = useParams();
+export default function ChatPanel({ chatId }) {
     const [messages, setMessages] = useState([]);
-
     const messagesEndRef = useRef(null);
-
     useEffect(() => {
       async function fetchMessages() {
-        try {
-          const response = await fetch(`/api/chat/${chatId}/messages`);
-          if (!response.ok) throw new Error("网络错误：" + response.status);
-    
-          const data = await response.json();
-          if (data && data.length > 0) {
-            // 数据库中存的字段是 role / content，与前端一致
-            setMessages(data);
-          } else {
-            setMessages([
-              { role: "assistant", content: "你好，这里是新的聊天窗口，有什么可以帮你？" },
-            ]);
+          if (chatId === null) {
+              setMessages([
+                  { role: "assistant", content: "你好，这是新的聊天窗口，有什么可以帮你？" }
+              ]);
+              return;
           }
-        } catch (error) {
-          console.error("加载聊天记录失败：", error);
-          setMessages([
-            { role: "assistant", content: "⚠️ 无法加载历史消息，请稍后再试。" },
-          ]);
-        }
+
+          try {
+              const response = await fetch(`/api/chat/${chatId}/messages`);
+              if (!response.ok) throw new Error("网络错误：" + response.status);
+        
+              const data = await response.json();
+        
+              if (Array.isArray(data) && data.length > 0) {
+                  setMessages(data);
+              } else {
+                  setMessages([
+                    { role: "assistant", content: "你好，这是新的聊天窗口，有什么可以帮你？" }
+                  ]);
+              }
+          } catch (error) {
+              console.error("加载聊天记录失败：", error);
+              setMessages([
+                { role: "assistant", content: "⚠️ 无法加载历史消息，请稍后再试。" }
+              ]);
+          }
       }
     
-      if (chatId) fetchMessages();
+      fetchMessages();
     }, [chatId]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, [messages]);
+    }, [messages]);
 
       
     const handleSendMessage = async (message) => {

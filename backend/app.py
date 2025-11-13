@@ -23,10 +23,6 @@ app.include_router(chat_router, prefix="/api")
 class UserQuery(BaseModel):
     topic: str
 
-@app.get("/")
-def root():
-    return {"message": "AI 内容创作助手已启动"}
-
 
 def generate_process(topic: str):
 
