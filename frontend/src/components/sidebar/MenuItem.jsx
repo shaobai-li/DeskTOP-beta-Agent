@@ -13,13 +13,7 @@ export default function MenuItem({ title, path, selectedItem, handleMenuItemClic
     const [showFeatureMenu, setShowFeatureMenu] = useState(false);
     const [isRenaming, setIsRenaming] = useState(false);
     const inputRef = useRef(null);
-
-    useEffect(() => {
-        if (isRenaming && inputRef.current) {
-            inputRef.current.focus();
-            inputRef.current.select();
-        }
-    }, [isRenaming]);
+    const [originalTitle, setOriginalTitle] = useState(title);
 
     const handleFeatureClick = () => {
         if (featureIconRef.current) {
@@ -38,11 +32,29 @@ export default function MenuItem({ title, path, selectedItem, handleMenuItemClic
         setIsRenaming(true)
     }
 
-    const handleBlur = () => {
+    useEffect(() => {
+        if (isRenaming && inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, [isRenaming]);
+
+    const handleRenameSubmit = (text) => {
+        onRename(text);
+        if (text !== originalTitle) {
+            setOriginalTitle(text);
+        }
         setIsRenaming(false);
     }
 
-
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleRenameSubmit(title.trim());
+        } else if (e.key === 'Escape') {
+            handleRenameSubmit(originalTitle);
+        }
+    }
+    
     return (
         
         <div className="menu-item">
@@ -53,7 +65,8 @@ export default function MenuItem({ title, path, selectedItem, handleMenuItemClic
                         className="menu-item__rename-input"
                         value={title}
                         onChange={(e) => onRename(e.target.value)}
-                        onBlur={handleBlur}                        
+                        onBlur={() => handleRenameSubmit(title.trim())}
+                        onKeyDown={handleKeyPress}
                     />
                 ) : (
                     <Link 
