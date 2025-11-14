@@ -3,15 +3,23 @@
   align-items: center;
   justify-content: space-between;
   margin-right: 15px;  
+  cursor: pointer;
 }
 
-.menu-item__link {
+
+.menu-item__main {
+  display: flex;
   flex: 1;
-  padding: 8px 15px 8px 20px;
   color: #333;
   font-size: 16px;
-  cursor: pointer;
-  margin: 0px 0px;
+  min-width: 0;
+}
+
+
+.menu-item__link {
+  padding: 8px 15px 8px 20px;
+  width: 100%;  
+  color: inherit;
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -19,6 +27,18 @@
   gap: 8px;
 }
 
+.menu-item__rename-input {
+  padding: 8px 15px 8px 20px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  width: 100%; 
+  border: none;
+  outline: none;
+  background: transparent;
+  vertical-align: baseline;
+}
 
 .menu-item__icon {
   width: 0.9em;
@@ -27,10 +47,14 @@
 
 .menu-item__text {
   flex: 1;
+  max-width: 100%;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   padding-right: 30px;
+  /* border: 1px solid red; */
+
+  overflow: hidden;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 
 .menu-item__feature-icon {
@@ -48,7 +72,7 @@
   opacity: 1;                /* 鼠标悬浮时显示 */
 }
 
-.menu-item:has(.menu-item__link--selected) {
+.menu-item:has(.menu-item__main--selected) {
   background-color: #EAEAEA;
   border-radius: 10px;
 }

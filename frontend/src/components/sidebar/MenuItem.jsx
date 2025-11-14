@@ -1,19 +1,27 @@
 import { Link } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import featureIcon from '../../assets/icons8-sidebar_ellipsis-h-30.png';
 import './MenuItem.css';
 import FeatureMenu from './FeatureMenu';
 
 
-export default function MenuItem({ title, path, selectedItem, handleMenuItemClick, icon, hasFeature = false }) {
+export default function MenuItem({ title, path, selectedItem, handleMenuItemClick, icon, hasFeature = false, onRename }) {
     const isSelected = selectedItem === title;
     const shouldRenderSelected = title !== '新聊天';
     const featureIconRef = useRef(null);
     const [menuPosition, setMenuPosition] = useState(null);
     const [showFeatureMenu, setShowFeatureMenu] = useState(false);
+    const [isRenaming, setIsRenaming] = useState(false);
+    const inputRef = useRef(null);
 
+    useEffect(() => {
+        if (isRenaming && inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, [isRenaming]);
 
-    const handleFeatureClick = (e) => {
+    const handleFeatureClick = () => {
         if (featureIconRef.current) {
             const rect = featureIconRef.current.getBoundingClientRect();
             setMenuPosition({
@@ -26,19 +34,39 @@ export default function MenuItem({ title, path, selectedItem, handleMenuItemClic
         }
     };
 
+    const handleRename = () => {
+        setIsRenaming(true)
+    }
+
+    const handleBlur = () => {
+        setIsRenaming(false);
+    }
+
 
     return (
         
         <div className="menu-item">
-            <Link 
-                to={path} 
-                className={`menu-item__link ${isSelected && shouldRenderSelected ? 'menu-item__link--selected' : ''}`}
-                onClick={() => handleMenuItemClick(title)}
-            >
-
-                {icon && <img className="menu-item__icon" src={icon}></img>}
-                <span className="menu-item__text">{title}</span>
-            </Link>
+            <div className={`menu-item__main ${isSelected && shouldRenderSelected ? 'menu-item__main--selected' : ''}`}>
+                {isRenaming ? (
+                    <input
+                        ref={inputRef}
+                        className="menu-item__rename-input"
+                        value={title}
+                        onChange={(e) => onRename(e.target.value)}
+                        onBlur={handleBlur}                        
+                    />
+                ) : (
+                    <Link 
+                        to={path} 
+                        className="menu-item__link"
+                        onClick={() => handleMenuItemClick(title)}
+                    >
+                        {icon && <img className="menu-item__icon" src={icon}></img>}
+                        <span className="menu-item__text">{title}</span>
+                    </Link>
+                )}
+                
+            </div>
             {hasFeature && (
                 <div className="menu-item__feature">
                     <img
@@ -51,10 +79,10 @@ export default function MenuItem({ title, path, selectedItem, handleMenuItemClic
             )}
             {showFeatureMenu && menuPosition && (
                 <FeatureMenu
-                    selectedItem={selectedItem}
                     handleMenuItemClick={handleMenuItemClick}
                     position={menuPosition}
                     onClose={() => setShowFeatureMenu(false)}
+                    onRename={handleRename}
                 />
             )}
         </div>

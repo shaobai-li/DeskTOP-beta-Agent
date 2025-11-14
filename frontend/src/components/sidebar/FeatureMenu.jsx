@@ -4,7 +4,7 @@ import './FeatureMenu.css';
 import renameIcon from '../../assets/featuremenu-rename.svg';
 import deleteIcon from '../../assets/featuremenu-delete.svg';
 
-const FeatureMenu = ({ selectedItem, handleMenuItemClick, position, onClose }) => {
+const FeatureMenu = ({ handleMenuItemClick, position, onClose, onRename }) => {
     const menuRef = useRef(null);
 
     useEffect(() => {
@@ -34,7 +34,7 @@ const FeatureMenu = ({ selectedItem, handleMenuItemClick, position, onClose }) =
                     <div 
                         className="feature-menu-item__button"
                         onClick={() => {
-                            handleMenuItemClick('重命名');
+                            onRename();
                             onClose();
                         }}
                     >

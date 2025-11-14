@@ -29,6 +29,13 @@ const ChatHistory = ({ selectedItem, handleMenuItemClick }) => {
     fetchChats();
   }, []);
 
+  const handleRename = (chatId, newTitle) => {
+    setChats(prevChats =>
+      prevChats.map(chat =>
+        chat.chatId === chatId ? { ...chat, title: newTitle } : chat
+      )
+    );
+  };
 
   return (
     <div className="chat-history">
@@ -58,6 +65,7 @@ const ChatHistory = ({ selectedItem, handleMenuItemClick }) => {
               selectedItem={selectedItem}
               handleMenuItemClick={handleMenuItemClick}
               hasFeature={true}
+              onRename={(newTitle) => handleRename(chat.chatId, newTitle)}
             />
           ))}
         </div>
