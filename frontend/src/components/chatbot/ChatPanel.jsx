@@ -4,41 +4,42 @@ import AIMessage from "./AIMessage";
 import AgentSwitcher from "./AgentSwitcher";
 import "./ChatPanel.css";
 import { useState, useRef, useEffect } from "react";
+import { apiGet } from '../../services/apiClient';
 
 export default function ChatPanel({ chatId }) {
     const [messages, setMessages] = useState([]);
     const messagesEndRef = useRef(null);
     useEffect(() => {
-      async function fetchMessages() {
-          if (chatId === null) {
-              setMessages([
-                  { role: "assistant", content: "你好，这是新的聊天窗口，有什么可以帮你？" }
-              ]);
-              return;
-          }
+      async function loadMessages() {
+        
+        if (chatId === null) {
+          setMessages([
+              { role: "assistant", content: "你好，这是新的聊天窗口，有什么可以帮你？" }
+          ]);
+          return;
+        }
 
-          try {
-              const response = await fetch(`/api/chat/${chatId}/messages`);
-              if (!response.ok) throw new Error("网络错误：" + response.status);
+        const { data, error } = await apiGet(`/api/chat/${chatId}/messages`);
+
+        if (error) {
+          console.error("加载聊天记录失败：", error);
+          setMessages([
+              { role: "assistant", content: "⚠️ 无法加载历史消息，请稍后再试。" }
+          ]);
+          return;
+        }
+
         
-              const data = await response.json();
-        
-              if (Array.isArray(data) && data.length > 0) {
-                  setMessages(data);
-              } else {
-                  setMessages([
-                    { role: "assistant", content: "你好，这是新的聊天窗口，有什么可以帮你？" }
-                  ]);
-              }
-          } catch (error) {
-              console.error("加载聊天记录失败：", error);
-              setMessages([
-                { role: "assistant", content: "⚠️ 无法加载历史消息，请稍后再试。" }
-              ]);
-          }
+        if (Array.isArray(data) && data.length > 0) {
+          setMessages(data);
+        } else {
+            setMessages([
+                { role: "assistant", content: "你好，这是新的聊天窗口，有什么可以帮你？" }
+            ]);
+        }
       }
     
-      fetchMessages();
+      loadMessages();
     }, [chatId]);
 
     useEffect(() => {

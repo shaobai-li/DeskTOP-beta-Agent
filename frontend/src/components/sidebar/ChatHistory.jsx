@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import './ChatHistory.css';
 import expandArrowIcon from '../../assets/icons8-expand-arrow-52.png';
 import MenuItem from './MenuItem';
+import { apiGet } from '../../services/apiClient';
 
 const ChatHistory = ({ selectedItem, handleMenuItemClick }) => {
   // 模拟聊天记录（之后可以替换成后端接口或本地存储）
@@ -16,17 +17,17 @@ const ChatHistory = ({ selectedItem, handleMenuItemClick }) => {
     : null;
 
   useEffect(() => {
-    async function fetchChats() {
-      try {
-        const response = await fetch("/api/chats");
-        if (!response.ok) throw new Error("网络错误：" + response.status);
-        const data = await response.json();
-        setChats(data);
-      } catch (error) {
+    async function loadChats() {
+      const { data, error } = await apiGet("/api/chats");
+
+      if (error) {
         console.error("加载聊天记录失败：", error);
+        return;
       }
+      
+      setChats(data);
     }
-    fetchChats();
+    loadChats();
   }, []);
 
   return (
