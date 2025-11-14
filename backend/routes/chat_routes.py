@@ -1,10 +1,9 @@
 import sqlite3
 from pathlib import Path
+from config.settings import DB_DEV_PATH
 from fastapi import APIRouter
 
 router = APIRouter()
-
-DB_PATH = Path(__file__).resolve().parent.parent / "database" / "chatbot.db"
 
 def dict_factory(cursor, row):
     return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
@@ -18,9 +17,9 @@ def to_camel_case(data):
 @router.get("/chats")
 def get_chats():
     """获取所有会话列表"""
-    if not DB_PATH.exists():
-        return {"error": "数据库文件不存在，请先生成 chatbot.db"}
-    conn = sqlite3.connect(DB_PATH)
+    if not DB_DEV_PATH.exists():
+        return {"error": "数据库文件不存在"}
+    conn = sqlite3.connect(DB_DEV_PATH)
     conn.row_factory = dict_factory
     cur = conn.cursor()
     cur.execute("SELECT * FROM chats ORDER BY updated_at DESC")
@@ -31,9 +30,9 @@ def get_chats():
 @router.get("/chat/{chat_id}/messages")
 def get_chat_messages(chat_id: str):
     """获取指定会话的所有消息"""
-    if not DB_PATH.exists():
-        return {"error": "数据库文件不存在，请先生成 chatbot.db"}
-    conn = sqlite3.connect(DB_PATH)
+    if not DB_DEV_PATH.exists():
+        return {"error": "数据库文件不存在"}
+    conn = sqlite3.connect(DB_DEV_PATH)
     conn.row_factory = dict_factory
     cur = conn.cursor()
     cur.execute("SELECT * FROM messages WHERE chat_id = ? ORDER BY message_id", (chat_id,))
