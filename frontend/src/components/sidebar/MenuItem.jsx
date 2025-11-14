@@ -5,7 +5,7 @@ import './MenuItem.css';
 import FeatureMenu from './FeatureMenu';
 
 
-export default function MenuItem({ title, path, selectedItem, handleMenuItemClick, icon, hasFeature = false, onRename }) {
+export default function MenuItem({ title, path, selectedItem, handleMenuItemClick, icon, hasFeature = false }) {
     const isSelected = selectedItem === title;
     const shouldRenderSelected = title !== '新聊天';
     const featureIconRef = useRef(null);
@@ -13,7 +13,8 @@ export default function MenuItem({ title, path, selectedItem, handleMenuItemClic
     const [showFeatureMenu, setShowFeatureMenu] = useState(false);
     const [isRenaming, setIsRenaming] = useState(false);
     const inputRef = useRef(null);
-    const [originalTitle, setOriginalTitle] = useState(title);
+    const [localTitleOriginal, setLocalTitleOriginal] = useState(title);
+    const [localTitle, setLocalTitle] = useState(title);
 
     const handleFeatureClick = () => {
         if (featureIconRef.current) {
@@ -40,18 +41,18 @@ export default function MenuItem({ title, path, selectedItem, handleMenuItemClic
     }, [isRenaming]);
 
     const handleRenameSubmit = (text) => {
-        onRename(text);
-        if (text !== originalTitle) {
-            setOriginalTitle(text);
+        setLocalTitle(text);
+        if (text !== localTitleOriginal) {
+            setLocalTitleOriginal(text);
         }
         setIsRenaming(false);
     }
 
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
-            handleRenameSubmit(title.trim());
+            handleRenameSubmit(localTitle.trim());
         } else if (e.key === 'Escape') {
-            handleRenameSubmit(originalTitle);
+            handleRenameSubmit(localTitleOriginal);
         }
     }
     
@@ -63,19 +64,19 @@ export default function MenuItem({ title, path, selectedItem, handleMenuItemClic
                     <input
                         ref={inputRef}
                         className="menu-item__rename-input"
-                        value={title}
-                        onChange={(e) => onRename(e.target.value)}
-                        onBlur={() => handleRenameSubmit(title.trim())}
+                        value={localTitle}
+                        onChange={(e) => setLocalTitle(e.target.value)}
+                        onBlur={() => handleRenameSubmit(localTitle.trim())}
                         onKeyDown={handleKeyPress}
                     />
                 ) : (
                     <Link 
                         to={path} 
                         className="menu-item__link"
-                        onClick={() => handleMenuItemClick(title)}
+                        onClick={() => handleMenuItemClick(localTitle)}
                     >
                         {icon && <img className="menu-item__icon" src={icon}></img>}
-                        <span className="menu-item__text">{title}</span>
+                        <span className="menu-item__text">{localTitle}</span>
                     </Link>
                 )}
                 
