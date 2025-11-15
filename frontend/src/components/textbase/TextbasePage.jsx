@@ -1,17 +1,22 @@
 import './TextbasePage.css';
 import { useEffect, useState } from "react";
 import TextTable from "./TextTable";
-
+import { getArticles } from "../../services/articlesService";
 
 export default function TextbasePage() {
 
     const [rows, setRows] = useState([]);
 
     useEffect(() => {
-        fetch("/rows")
-          .then((res) => res.json())
-          .then((data) => setRows(data))
-          .catch((err) => console.error("请求失败：", err));
+        async function loadArticles() {
+            const { data, error } = await getArticles();
+            if (error) {
+                console.error("加载文章失败：", error);
+                return;
+            }
+            setRows(data);
+        }
+        loadArticles();
     }, []);
 
     return (
