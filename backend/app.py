@@ -48,11 +48,11 @@ def generate_content(query: UserQuery):
         media_type="application/json"
     )
 
-@app.get("/rows")
-def rows():
-    text = TEXT_METADATA_FILE.read_text(encoding="utf-8")
-    data = json.loads(text)
-    return data
+# @app.get("/rows")
+# def rows():
+#     text = TEXT_METADATA_FILE.read_text(encoding="utf-8")
+#     data = json.loads(text)
+#     return data
 
 
 @app.post("/upload")
