@@ -1,6 +1,7 @@
 import sqlite3
 from pathlib import Path
-from config.settings import DB_DEV_PATH
+from config.settings import DB_DEV_PATH, JSON_DEV_AGENTS_PATH
+import json
 from fastapi import APIRouter
 
 router = APIRouter()
@@ -58,5 +59,17 @@ def get_articles():
 
     data = cur.fetchall()
     conn.close()
+
+    return to_camel_case(data)
+
+
+@router.get("/articles")
+def get_agents():
+    """读取所有知能体数据"""
+    if not JSON_DEV_AGENTS_PATH.exists():
+        return {"error": "知能体数据文件不存在"}
+
+    with open(JSON_DEV_AGENTS_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
 
     return to_camel_case(data)
