@@ -1,8 +1,12 @@
 import { BrowserRouter , Routes, Route, useParams } from "react-router-dom";
 
-import ChatPanel from "./components/chatbot/ChatPanel";
 import SidePanel from "./components/sidebar/SidePanel";
+import ChatPanel from "./components/chatbot/ChatPanel";
 import TextbasePage from "./components/textbase/TextbasePage";
+import AgentPage from "./pages/AgentPage";
+
+
+
 
 //import "./border.css";
 import "./App.css";
@@ -10,6 +14,11 @@ import "./App.css";
 function ChatPanelWrapper() {
     const { chatId } = useParams();
     return <ChatPanel chatId={chatId} key={chatId} />;
+}
+
+function AgentPageWrapper() {
+    const { agentId } = useParams();
+    return <AgentPage key={agentId} />;
 }
 
 function App() {
@@ -20,6 +29,7 @@ function App() {
                 <main className="main-container">
                     <Routes>
                         <Route path="/" element={<ChatPanel chatId={null} key="new"/>} />
+                        <Route path="/agent/:agentId" element={<AgentPageWrapper />} />
                         <Route path="/chat/:chatId" element={<ChatPanelWrapper />} />
                         <Route path="/textbase" element={<TextbasePage />} />
                     </Routes>

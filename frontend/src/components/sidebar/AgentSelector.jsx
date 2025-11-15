@@ -6,17 +6,14 @@ import MenuItem from './MenuItem';
 const AgentSelector = ({ selectedItem, handleMenuItemClick }) => {
   const [isOpen, setIsOpen] = useState(true);
   
-  // 模拟的智能体数据
   const agents = [
-    { id: 1, name: '智能体1' },
-    { id: 2, name: '智能体2' },
-    { id: 3, name: '智能体3' }
+    { id: 'agent_1', name: '知能体1' }
   ];
 
   return (
     <div className="agent-selector">
       <div className="agent-selector__header" onClick={() => setIsOpen((prev) => !prev)}>
-        <h4 className="agent-selector__header-title">智能体库</h4>
+        <h4 className="agent-selector__header-title">知能体库</h4>
         <span
           className={`agent-selector__header-icon ${isOpen ? 'agent-selector__header-icon--expanded' : 'agent-selector__header-icon--collapsed'}`}
           style={{
@@ -36,7 +33,7 @@ const AgentSelector = ({ selectedItem, handleMenuItemClick }) => {
             <MenuItem
               key={agent.id}
               title={agent.name}
-              path="#"
+              path={`/agent/${agent.id}`}
               icon={null} 
               selectedItem={selectedItem}
               handleMenuItemClick={handleMenuItemClick}

@@ -31,7 +31,7 @@ const SidePanel = () => {
                   handleMenuItemClick={handleMenuItemClick}
                   icon={databaseIcon} />
         <MenuItem title="新建知能体" 
-                  path="#"
+                  path="/agent/new"
                   selectedItem={selectedItem} 
                   handleMenuItemClick={handleMenuItemClick}
                   icon={newAgentIcon} />
