@@ -2,24 +2,11 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import './AgentPage.css'
 import PromptInput from '../components/PromptInput'
-<<<<<<< HEAD
-
-function AgentPage() {
-  const [agent, setAgent] = useState({
-    agentId: '',
-    title: '',
-    profile: '',
-    quadrantPrompt: '',
-    scriptGenerationPrompt: '',
-    languageStylePrompt: ''
-  })
-=======
 import { mockAgent } from '../temp/mockAgent'
 
 function AgentPage() {
   const { agentId } = useParams()
   const [agent, setAgent] = useState(mockAgent.find(agent => agent.agentId === agentId))
->>>>>>> 011fad6 (feat(frontend_agentpage): add mock agent data, prefill AgentPage fields, and display agent title)
 
   const handleChange = (field) => (e) => {
     setAgent(prev => ({
@@ -31,6 +18,8 @@ function AgentPage() {
   return (
     <div className="app">
       <div className="container">
+        <h1 className="agent-title">{agent.title}</h1>
+        <hr className="agent-title-divider" />
         <PromptInput
           title="人设"
           value={agent.profile}
