@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import './AgentSelector.css';
 import expandArrowIcon from '../../assets/icons8-expand-arrow-52.png';
 import MenuItem from './MenuItem';
+import { mockAgent } from '../../temp/mockAgent';
 
 const AgentSelector = ({ selectedItem, handleMenuItemClick }) => {
   const [isOpen, setIsOpen] = useState(true);
-  
-  const agents = [
-    { id: 'agent_1', name: '知能体1' }
-  ];
+  const [agents, setAgents] = useState(mockAgent);
+
 
   return (
     <div className="agent-selector">
@@ -31,9 +30,9 @@ const AgentSelector = ({ selectedItem, handleMenuItemClick }) => {
         <div className="agent-selector__list">
           {agents.map((agent) => (
             <MenuItem
-              key={agent.id}
-              title={agent.name}
-              path={`/agent/${agent.id}`}
+              key={agent.agentId}
+              title={agent.title}
+              path={`/agent/${agent.agentId}`}
               icon={null} 
               selectedItem={selectedItem}
               handleMenuItemClick={handleMenuItemClick}

@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useParams } from 'react-router-dom'
 import './AgentPage.css'
 import PromptInput from '../components/PromptInput'
+<<<<<<< HEAD
 
 function AgentPage() {
   const [agent, setAgent] = useState({
@@ -11,6 +13,13 @@ function AgentPage() {
     scriptGenerationPrompt: '',
     languageStylePrompt: ''
   })
+=======
+import { mockAgent } from '../temp/mockAgent'
+
+function AgentPage() {
+  const { agentId } = useParams()
+  const [agent, setAgent] = useState(mockAgent.find(agent => agent.agentId === agentId))
+>>>>>>> 011fad6 (feat(frontend_agentpage): add mock agent data, prefill AgentPage fields, and display agent title)
 
   const handleChange = (field) => (e) => {
     setAgent(prev => ({
