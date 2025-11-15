@@ -1,0 +1,48 @@
+  .agent-selector__list {
+    margin-top: 8px;
+    padding: 0;
+    overflow-y: auto;
+    max-height: 300px;
+  }
+  
+  .agent-selector__header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    margin: 30px 8px 4px 20px;
+    cursor: pointer;
+    user-select: none;
+    color: #aaa;
+  }
+  
+  .agent-selector__header-title {
+    color: #aaa;
+    font-size: inherit;
+    font-weight: normal;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  /* 头部箭头图标 */
+  .agent-selector__header-icon {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background-color: currentColor;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .agent-selector__header:hover .agent-selector__header-icon {
+    opacity: 1;
+  }
+  
+  .agent-selector__header-icon--collapsed {
+    transform: rotate(-90deg);
+  }
+  
+  .agent-selector__header-icon--expanded {
+    transform: rotate(0deg);
+  }
