@@ -1,11 +1,8 @@
-import os
+
 import json
 import faiss
-import openai
 from sentence_transformers import SentenceTransformer
-
-from dotenv import load_dotenv
-load_dotenv()
+from agents.utils.llm_client import create_llm_client
 
 SYSTEM_PROMPT_CONTENT_TOPIC = """
 你是一个内容选题智能体，专门用于分析自媒体文案文本，提取其中的核心信息、趋势洞察和潜在选题灵感。
@@ -62,18 +59,6 @@ SYSTEM_PROMPT_CONTENT_TOPIC = """
 - 形成具体可执行的内容选题清单。
 """
 
-def get_llm_client(choice="chatgpt"):
-    if choice == "chatgpt":
-        return openai.OpenAI(
-            api_key=os.environ.get("OPENAI_API_KEY")
-            )
-    elif choice == "deepseek":
-        return openai.OpenAI(
-            api_key=os.environ.get("DEEPSEEK_API_KEY"), 
-            base_url=os.environ.get("DEEPSEEK_BASE_URL")
-            )
-    else:
-        raise ValueError(f"Undefined model choice '{choice}'")
 
 class SearchAgent:
     
@@ -86,8 +71,8 @@ class SearchAgent:
         self.topic = ""
         self.texts_retrieved = ""
         self.content_framework_module = {
-            "llm_client": openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY")),
-            "llm_model": "gpt-4o-2024-08-06"
+            "llm_client": create_llm_client("deepseek"),
+            "llm_model": "deepseek-chat"
         }
 
     def local_search(self, queries, k):
@@ -109,7 +94,7 @@ class SearchAgent:
             ]
         print("Sending messages to LLM...")
         response = self.content_framework_module["llm_client"].chat.completions.create(
-            model="gpt-4o-2024-08-06",
+            model=self.content_framework_module["llm_model"],
             messages=messages
             )
         print("Received response from LLM...")
