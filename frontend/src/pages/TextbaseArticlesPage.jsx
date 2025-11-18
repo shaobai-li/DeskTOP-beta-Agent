@@ -1,9 +1,9 @@
 import './TextbasePage.css';
 import { useEffect, useState } from "react";
-import TextTable from "./TextTable";
-import { getArticles } from "../../services/articlesService";
+import TextTable from "../components/textbase/TextTable";
+import { getArticles } from "../services/articlesService";
 
-export default function TextbasePage() {
+export default function TextbaseArticlesPage() {
 
     const [rows, setRows] = useState([]);
 
@@ -20,14 +20,13 @@ export default function TextbasePage() {
     }, []);
 
     return (
-        <div className="textbase-page">
-            <div className="textbase-header">
-                <h1>我的文本库</h1>
-                <p className="textbase-subtitle">管理并查看你的文本资料</p>
+        <div className="textbase-articles">
+            <div className="textbase-articles__header">
             </div>
-
-            <div className="textbase-content">
+            <div className="textbase-article__content">
                 <TextTable rows={rows} />
+            </div>
+            <div className="textbase-article__footer">
             </div>
         </div>
     )

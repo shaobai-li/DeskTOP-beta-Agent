@@ -1,0 +1,36 @@
+.textbase {
+    height: 100%;
+    background-color: #fff;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.textbase__header {
+    color: #1a1a1a;
+}
+
+.textbase__navbar {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+  
+.textbase__nav-item {
+
+    color: #666666;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+}
+  
+.textbase__nav-item:hover {
+    color: #333333;
+}
+  
+.textbase__nav-item.active {
+    color: #000000;
+}

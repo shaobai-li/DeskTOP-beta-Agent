@@ -1,4 +1,4 @@
-.textbase-page {
+.textbase-articles {
     flex: 1; /* 占满右侧空间 */
     display: flex;
     flex-direction: column;
@@ -9,25 +9,7 @@
     overflow-y: auto;
 }
 
-.textbase-header {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 30px;    
-}
-
-.textbase-header h1 {
-    font-size: 26px;
-    font-weight: 600;
-    color: #222;
-    margin-bottom: 8px;
-}
-
-.textbase-subtitle {
-font-size: 14px;
-color: #666;
-}
-
-.textbase-content {  
+.textbase-article__content {  
     flex: 1;
     display: flex;
     /* align-items: center; */
