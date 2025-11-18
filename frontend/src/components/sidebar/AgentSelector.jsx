@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AgentSelector.css';
 import expandArrowIcon from '../../assets/icons8-expand-arrow-52.png';
 import MenuItem from './MenuItem';
-import { mockAgent } from '../../temp/mockAgent';
+import { getAgents } from '../../services/agentsService';
 
 const AgentSelector = ({ selectedItem, handleMenuItemClick }) => {
   const [isOpen, setIsOpen] = useState(true);
-  const [agents, setAgents] = useState(mockAgent);
+  const [agents, setAgents] = useState([]);
 
+  useEffect(() => {
+    async function loadAgents() {
+      const { data, error } = await getAgents();
+      if (error) {
+        console.error("加载知能体失败：", error);
+        return;
+      }
+      setAgents(data);
+    }
+    loadAgents();
+  }, []);
 
   return (
     <div className="agent-selector">
