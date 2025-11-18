@@ -1,6 +1,7 @@
 import sqlite3
 from pathlib import Path
-from config.settings import DB_DEV_PATH, JSON_DEV_AGENTS_PATH
+from tarfile import data_filter
+from config.settings import DB_DEV_PATH, JSON_DEV_AGENTS_PATH, JSON_DEV_TAGS_PATH
 import json
 from fastapi import APIRouter
 
@@ -63,7 +64,7 @@ def get_articles():
     return to_camel_case(data)
 
 
-@router.get("/articles")
+@router.get("/agents")
 def get_agents():
     """读取所有知能体数据"""
     if not JSON_DEV_AGENTS_PATH.exists():
@@ -71,5 +72,17 @@ def get_agents():
 
     with open(JSON_DEV_AGENTS_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
+    
+    data_agents = data.get("agents", [])
+    return to_camel_case(data_agents)
 
-    return to_camel_case(data)
+@router.get("/tags")
+def get_tags():
+    if not JSON_DEV_TAGS_PATH.exists():
+        return {"error": "标签数据文件不存在"}
+    
+    with open(JSON_DEV_TAGS_PATH, "r", encoding="utf-8") as f:
+        data= json.load(f)
+
+    data_tags = data.get("tags", [])
+    return to_camel_case(data_tags)
