@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import './AgentPage.css'
 import PromptInput from '../components/PromptInput'
-import { mockAgent } from '../temp/mockAgent'
+import { getAgents } from '../services/agentsService'
 
 function AgentPage() {
   const { agentId } = useParams()
-  const [agent, setAgent] = useState(mockAgent.find(agent => agent.agentId === agentId))
+  const [agent, setAgent] = useState([])
 
   const handleChange = (field) => (e) => {
     setAgent(prev => ({
@@ -14,6 +14,23 @@ function AgentPage() {
       [field]: e.target.value
     }))
   }
+
+  useEffect(() => {
+    async function loadAgent(agentId) {
+      const { data, error } = await getAgents()
+      if (error) {
+        console.error("加载知能体失败：", error)
+        return
+      }
+      const agent = data.find(agent => agent.agentId === agentId)
+      if (!agent) {
+        console.error("知能体不存在：", agentId)
+        return
+      }
+      setAgent(agent)
+    }
+    loadAgent(agentId)
+  }, [agentId])
 
   return (
     <div className="app">
