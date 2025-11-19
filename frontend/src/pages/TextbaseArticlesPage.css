@@ -2,11 +2,16 @@
     flex: 1; /* 占满右侧空间 */
     display: flex;
     flex-direction: column;
-    padding: 40px 60px; /* 左右留白更舒适 */
-    background-color: #fafafa;
+    background-color: #ffffff;
     min-height: 100vh;
     box-sizing: border-box;
     overflow-y: auto;
+}
+
+.textbase-articles__header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
 
 .textbase-article__content {  
