@@ -1,10 +1,8 @@
-import './Input.css';
-
 function Input({ placeholder, value, onChange }) {
     return (
         <input
             type="text"
-            className="input"
+            className="px-4 py-1 border border-[#e0e0e0] rounded-lg text-sm outline-none text-[#333] w-[280px]"
             placeholder={placeholder}
             value={value}
             onChange={onChange}
@@ -13,4 +11,3 @@ function Input({ placeholder, value, onChange }) {
 }
 
 export default Input;
-
