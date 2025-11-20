@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import "./NewAgentModal.css";
-import lightBulbIcon from "../../assets/light-bulb.svg";
-import Button from "../common/Button";
-import Input from "../common/Input";
+import lightBulbIcon from "@assets/light-bulb.svg";
+import Button from "@components/common/Button";
+import Input from "@components/common/Input";
 
 const NewAgentModal = ({ onClose }) => {
   const [agentName, setAgentName] = useState("");
