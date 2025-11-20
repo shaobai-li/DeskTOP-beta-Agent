@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import "./NewAgentModal.css";
 import lightBulbIcon from "../../assets/light-bulb.svg";
+import Button from "../common/Button";
+import Input from "../common/Input";
 
 const NewAgentModal = ({ onClose }) => {
   const [agentName, setAgentName] = useState("");
@@ -27,8 +29,7 @@ const NewAgentModal = ({ onClose }) => {
           <button className="pm-close-btn" onClick={onClose}>✕</button>
         </div>
 
-        <input 
-          className="pm-input" 
+        <Input 
           placeholder="" 
           value={agentName}
           onChange={(e) => setAgentName(e.target.value)}
@@ -42,10 +43,8 @@ const NewAgentModal = ({ onClose }) => {
         </div>
 
         <div className="pm-button-wrapper">
-          <button className="pm-create-btn" disabled>
-            创建知能体
-          </button>
-        </div>
+          <Button text="创建知能体" onClick={handleCreate} />
+        </div>  
       </div>
     </div>
   );
