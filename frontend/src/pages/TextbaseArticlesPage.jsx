@@ -1,10 +1,10 @@
 import './TextbaseArticlesPage.css';
 import { useEffect, useState } from "react";
-import TextTable from "../components/textbase/TextTable";
-import Pagination from "../components/layout/Pagination";
-import { getArticles } from "../services/articlesService";
-import Input from "../components/common/Input";
-import Button from "../components/common/Button";
+import ArticlesTable from "@components/layout/ArticlesTable";
+import Pagination from "@components/layout/Pagination";
+import { getArticles } from "@services/articlesService";
+import Input from "@components/common/Input";
+import Button from "@components/common/Button";
 
 export default function TextbaseArticlesPage() {
     const [rows, setRows] = useState([]);
@@ -45,7 +45,7 @@ export default function TextbaseArticlesPage() {
                 <Button onClick={handleAddClick} text="添加" />
             </div>
             <div className="textbase-article__content">
-                <TextTable rows={currentRows} />
+                <ArticlesTable articles={currentRows} />
             </div>
             <div className="textbase-article__footer">
                 <Pagination
