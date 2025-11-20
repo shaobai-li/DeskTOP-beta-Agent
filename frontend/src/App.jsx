@@ -1,9 +1,10 @@
 import { BrowserRouter, Routes, Route, useParams, Navigate } from "react-router-dom";
-import SidePanel from "./components/sidebar/SidePanel";
-import ChatPanel from "./components/chatbot/ChatPanel";
-import TextbasePage from "./pages/TextbasePage";
-import TextbaseArticlesPage from "./pages/TextbaseArticlesPage";
-import AgentPage from "./pages/AgentPage";
+import SidePanel from "@components/sidebar/SidePanel";
+import ChatPanel from "@components/chatbot/ChatPanel";
+import TextbasePage from "@pages/TextbasePage";
+import TextbaseArticlesPage from "@pages/TextbaseArticlesPage";
+import TextbaseTagsPage from "@pages/TextbaseTagsPage";
+import AgentPage from "@pages/AgentPage";
 import "./App.css";
 
 function ChatPanelWrapper() {
@@ -41,7 +42,7 @@ function App() {
                         <Route path="/textbase/" element={<TextbasePage />}>
                             <Route index element={<Navigate to="articles" replace />} />
                             <Route path="articles" element={<TextbaseArticlesPage />} />
-                            <Route path="tags" element={<Tags />} />
+                            <Route path="tags" element={<TextbaseTagsPage />} />
                         </Route>
                     </Routes>
                 </main>

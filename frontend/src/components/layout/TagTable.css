@@ -1,0 +1,76 @@
+/* Table.css —— 表格外层容器样式 */
+.table-wrapper {
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid #e5e5e5;
+    overflow: hidden;
+}
+  
+
+  
+  /* 表格基础结构 */
+.simple-table {
+    width: 100%;
+    border-spacing: 0;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    font-size: 14px;
+    font-weight: normal;
+    border-collapse: collapse;
+}
+
+.simple-table th,
+.simple-table td {
+    border-bottom: 1px solid #e5e5e5;
+    text-align: left;
+    padding: 0 0 0 15px;
+}
+
+.simple-table tr {
+    height: 35px;
+
+}
+  /* 核心：hover 变灰（放这里最合适！） */
+.simple-table tr:hover {
+    background-color: #f9f9f9 !important;
+    transition: background-color 0.15s ease;
+}
+
+.action-cell {
+    width: 48px;
+    padding: 0;
+    text-align: center;
+}
+
+.more-icon {
+    display: block;
+    margin: 0 auto;
+    cursor: pointer;
+    padding: 9px 8px;       
+    border-radius: 6px;       
+    transition: background-color 0.15s ease;
+    width: 13px !important;  
+    height: 13px !important;
+}
+
+.name-tag {
+    display: inline-block;
+    padding: 3px 9px;
+    background: #A5AAA3;     
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 4px;
+  }
+
+/* 关键：hover 时背景色就是 #f5f5f5 */
+.more-icon:hover {
+    background-color: #f5f5f5 !important;
+}
+
+.simple-table tbody tr:last-child th,
+.simple-table tbody tr:last-child td {
+    border-bottom: none;
+}
