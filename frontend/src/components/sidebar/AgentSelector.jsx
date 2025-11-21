@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './AgentSelector.css';
-import expandArrowIcon from '../../assets/icons8-expand-arrow-52.png';
+import expandArrowIcon from '@assets/icon-ui-arrow-expand.png';
 import MenuItem from './MenuItem';
 import { getAgents } from '../../services/agentsService';
 

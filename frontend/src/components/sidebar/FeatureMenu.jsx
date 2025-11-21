@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import './FeatureMenu.css';
-import renameIcon from '../../assets/featuremenu-rename.svg';
-import deleteIcon from '../../assets/featuremenu-delete.svg';
+import renameIcon from '@assets/icon-action-rename.svg';
+import deleteIcon from '@assets/icon-action-delete.svg';
 
 const FeatureMenu = ({ handleMenuItemClick, position, onClose, onRename }) => {
     const menuRef = useRef(null);

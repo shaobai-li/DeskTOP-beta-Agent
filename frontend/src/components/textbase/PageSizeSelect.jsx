@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import expandArrow from '../../assets/icons8-expand-arrow-52.png';
-import checkMark from './icons8-done.svg'
+import expandArrow from '@assets/icon-ui-arrow-expand.png';
+import checkMark from '@assets/icon-ui-check.svg'
 import './PageSizeSelect.css'
 
 

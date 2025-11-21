@@ -1,6 +1,6 @@
 import React from 'react';
 import './TableBody.css';
-import moreIcon from '@assets/icons8-sidebar_ellipsis-h-30.png'
+import moreIcon from '@assets/icon-ui-ellipsis-horizontal.png'
 
 function TableBody({ data }) {
   return (

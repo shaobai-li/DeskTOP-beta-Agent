@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './AgentSwitcher.css';
-import expandArrow from '../../assets/icons8-expand-arrow-52.png';
-import checkmark from '../../assets/icons8-checkmark.svg';
-import robotIcon from '../../assets/icons8-robot-24.svg';
+import expandArrow from '@assets/icon-ui-arrow-expand.png';
+import checkmark from '@assets/icon-ui-check.svg';
+import robotIcon from '@assets/icon-ui-robot.svg';
 
 export default function AgentSwitcher() {
   const [selectedAgent, setSelectedAgent] = useState('Agent 1');

@@ -4,10 +4,10 @@ import MenuItem from './MenuItem';
 import ChatHistory from './ChatHistory';
 import AgentSelector from './AgentSelector';
 import NewAgentModal from '../layout/NewAgentModal';
-import databaseIcon from '../../assets/sidebar_database-16.png';
-import newChatIcon from '../../assets/sidebar_new-chat-24.png';
-import newAgentIcon from '../../assets/sidebar_new-agent.svg';
-import logo from '../../assets/logo.png';
+import databaseIcon from '@assets/icon-nav-database.png';
+import newChatIcon from '@assets/icon-nav-new-chat.png';
+import newAgentIcon from '@assets/icon-nav-new-agent.svg';
+import logo from '@assets/icon-brand-logo.png';
 
 const SidePanel = () => {
     const [selectedItem, setSelectedItem] = useState(null);

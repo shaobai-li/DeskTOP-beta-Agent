@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './ChatHistory.css';
-import expandArrowIcon from '../../assets/icons8-expand-arrow-52.png';
+import expandArrowIcon from '@assets/icon-ui-arrow-expand.png';
 import MenuItem from './MenuItem';
 import { apiGet } from '../../services/apiClient';
 

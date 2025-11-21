@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
-import featureIcon from '../../assets/icons8-sidebar_ellipsis-h-30.png';
+import featureIcon from '@assets/icon-ui-ellipsis-horizontal.png';
 import './MenuItem.css';
 import FeatureMenu from './FeatureMenu';
 

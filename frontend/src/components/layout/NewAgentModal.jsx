@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import "./NewAgentModal.css";
-import lightBulbIcon from "@assets/light-bulb.svg";
+import lightBulbIcon from "@assets/icon-ui-light-bulb.svg";
 import Button from "@components/common/Button";
 import Input from "@components/common/Input";
 
