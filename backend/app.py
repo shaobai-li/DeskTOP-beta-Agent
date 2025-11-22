@@ -7,12 +7,14 @@ from fastapi.responses import StreamingResponse
 from datetime import datetime
 from pydantic import BaseModel
 from agents import SearchAgent
+from agents import TopicAnalysisAgent
 
 from routes.chat_routes import router as chat_router
 
 # 初始化
 app = FastAPI()
 search_agent = SearchAgent()
+topic_analysis_agent = TopicAnalysisAgent()
 UPLOAD_DIR = Path(__file__).parent / "database/uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 TEXT_METADATA_FILE = UPLOAD_DIR / "texts_metadata.json"
@@ -34,11 +36,23 @@ def generate_process(topic: str):
     }) + "\n"
 
     ai_content = search_agent.content_framework(chunks)
-    yield json.dumps({
-        "stage": 2,
-        "topic": topic,
-        "generated_content": ai_content
-    }) + "\n"
+    # yield json.dumps({
+    #     "stage": 2,
+    #     "topic": topic,
+    #     "generated_content": ai_content
+    # }) + "\n"
+
+    topic_items = topic_analysis_agent.get_topic(ai_content)
+    for i, topic_item in enumerate(topic_items):
+        print(f"topic {i+1}")
+        result = json.dumps({
+            "stage": 2,
+            "topic": topic,
+            "generated_content": f"{topic_item}",
+        }, ensure_ascii=False)
+        print(result)
+        yield result + "\n"
+
 
 @app.post("/generate")
 def generate_content(query: UserQuery):

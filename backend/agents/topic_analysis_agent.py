@@ -1,4 +1,4 @@
-from agents.utils.llm_client import create_llm_client
+from agents.utils.llm_client import *
 
 
 
@@ -61,6 +61,13 @@ class TopicAnalysisAgent:
             "llm_model": "deepseek-chat"
         }
 
+    def get_topic(self, output_from_topic_agent):
+        print("Entering get_topic...")
+        print(output_from_topic_agent)
+        content = clean_json_tags(output_from_topic_agent)
+        topic_items = json.loads(content)
+        return topic_items
+
     def analyze_topic(self, topic):
         print("Entering analyze_topic...")
         messages=[
@@ -80,15 +87,17 @@ class TopicAnalysisAgent:
 def main():
     topic_analysis_agent = TopicAnalysisAgent()
     topic = """
-<topic>
-<title>【选题1】标题：如何平衡AI技术应用中的虚假信息风险？</title>
-<subtitle>
-- 灵感来源：AI模型在信息生成中的幻觉现象（<text>, <text 7>, <text 8>）
-- 核心观点：AI生成内容中存在虚假信息的风险，这些信息可能快速传播并影响舆论环境。
-- 内容方向：分析AI生成虚假信息的原理，探讨解决方案如多重信息验证、引入AI质检。
-- 受众价值：提高公众对AI内容的鉴别意识，帮助开发者和应用者更好地管理AI输出质量。
-</subtitle>
-</topic>
+{
+    "topic": {
+        "title": "【选题1】非技术背景如何零基础高效学习AI？",
+        "subtitle": {
+            "灵感来源": "<text 2>, <text 4>, <text 3>",
+            "核心观点": "非理工背景学习AI不等于转码，关键在于理解技术原理、边界和应用场景，文科生在AI行业更适合做产品和市场方向。",
+            "内容方向": "设计零基础AI学习路径：从原理理解→日常使用→信息追踪→实践项 目；探讨文科生在AI时代的独特优势。",
+            "受众价值": "为非技术背景人群提供可行的AI学习方案，消除'转码焦虑'，明确职业发展方向。"
+        }
+    }
+}
 """
     result = topic_analysis_agent.analyze_topic(topic)
     print(result)

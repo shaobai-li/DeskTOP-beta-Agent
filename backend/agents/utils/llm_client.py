@@ -1,6 +1,8 @@
 import os
 import openai
 from dotenv import load_dotenv
+import json
+
 load_dotenv()
 
 def create_llm_client(provider="chatgpt"):
@@ -18,3 +20,7 @@ def create_llm_client(provider="chatgpt"):
         )
     else:
         raise ValueError(f"Unknown LLM provider: {provider}")
+
+
+def clean_json_tags(json_str):
+    return json_str.replace("```json", "").replace("```", "").strip()

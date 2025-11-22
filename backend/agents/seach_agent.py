@@ -23,6 +23,7 @@ SYSTEM_PROMPT_CONTENT_TOPIC = """
 5. 受众价值：说明为什么这个选题可能吸引受众，解决了什么问题或提供了什么价值。
 
 【输出格式示例】
+```json
 [
     {
         "topic": {
@@ -45,9 +46,20 @@ SYSTEM_PROMPT_CONTENT_TOPIC = """
             "受众价值": "帮助创作者思考如何与AI共创而非被替代。"
             }
         }
+    },
+    {
+        "topic": {
+            "title": "【选题3】标题：AI写作会取代自媒体人吗？",
+            "subtitle": {
+            "灵感来源": "<text 1>, <text 4>",
+            "核心观点": "AI工具带来高效内容生产，但缺乏个性与情绪共鸣。",
+            "内容方向": "比较AI与人类创作的差异，探讨\"创作人格\"在内容时代的重要性。",
+            "受众价值": "帮助创作者思考如何与AI共创而非被替代。"
+            }
+        }
     }
 ]
-
+```
 【分析与思考要求】
 - 你必须基于提供的 <text> 内容生成洞察，**不要编造不存在的信息**。  
 - 尽量总结出内容背后的趋势、矛盾点、情绪共鸣或受众痛点。  
@@ -102,5 +114,4 @@ class SearchAgent:
             )
         print("Received response from LLM...")
         completion = response.choices[0].message.content
-        print(completion)
         return completion
