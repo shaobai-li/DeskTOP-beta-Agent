@@ -15,46 +15,37 @@ const parseTopicList = (raw) => {
 
 // 主组件
 export default function AIMessage({ message }) {
-  const topicListRegex = /<topic_list[^>]*>([\s\S]*?)<\/topic_list>/gi;
-  const parts = [];
-  let lastIndex = 0;
+  // const topicListRegex = /<topic_list[^>]*>([\s\S]*?)<\/topic_list>/gi;
+  // const parts = [];
+  // let lastIndex = 0;
 
-  // 按 <topic_list> 分割消息
-  for (const match of message.matchAll(topicListRegex)) {
-    const start = match.index;
-    const end = start + match[0].length;
+  // // 按 <topic_list> 分割消息
+  // for (const match of message.matchAll(topicListRegex)) {
+  //   const start = match.index;
+  //   const end = start + match[0].length;
 
-    // 追加 topic_list 前的文本
-    const before = message.slice(lastIndex, start).trim();
-    if (before) parts.push({ type: "text", content: before });
+  //   // 追加 topic_list 前的文本
+  //   const before = message.slice(lastIndex, start).trim();
+  //   if (before) parts.push({ type: "text", content: before });
 
-    // 解析 topic_list 内容
-    parts.push({
-      type: "topic_list",
-      cardContents: parseTopicList(match[1]),
-    });
+  //   // 解析 topic_list 内容
+  //   parts.push({
+  //     type: "topic_list",
+  //     cardContents: parseTopicList(match[1]),
+  //   });
 
-    lastIndex = end;
-  }
+  //   lastIndex = end;
+  // }
 
-  // 追加剩余文本
-  const tail = message.slice(lastIndex).trim();
-  if (tail) parts.push({ type: "text", content: tail });
-
-  // 无匹配时直接渲染整段
-  if (parts.length === 0) parts.push({ type: "text", content: message });
+  // // 追加剩余文本
+  // const tail = message.slice(lastIndex).trim();
+  // if (tail) parts.push({ type: "text", content: tail });
 
   return (
     <div className="ai-message" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-      {parts.map((p, i) =>
-        p.type === "topic_list" ? (
-          <VerticalTabs key={`topic-${i}`} cardContents={p.cardContents} />
-        ) : (
-          <div key={`text-${i}`} className="ai-message-bubble">
-            <ReactMarkdown>{p.content}</ReactMarkdown>
-          </div>
-        )
-      )}
+      <div className="ai-message-bubble">
+        <ReactMarkdown>{message}</ReactMarkdown>
+      </div>
     </div>
   );
 }
