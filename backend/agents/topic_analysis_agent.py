@@ -1,5 +1,5 @@
 from agents.utils.llm_client import create_llm_client
-
+from agents.utils.xml_parser import parse_topic_list
 
 
 SYSTEM_PROMPT_TOPIC_ANALYSIS = """
@@ -38,13 +38,12 @@ SYSTEM_PROMPT_TOPIC_ANALYSIS = """
 
 你得到的输入格式如下
 [
-【选题】
-标题：<title>
-灵感来源：<text1>、<text2>（可无）
-核心观点：<1-3 句>
-内容方向：<预期要展开的方向/模块>
-受众价值：<受众能得到的好处>
-（可选附加：目标平台/主任务KPI/投放计划）
+{
+    "topic": {
+        "title": "标题",
+        "subtitle": "灵感来源：<text1>、<text2>（可无）\n核心观点：<1-3 句>\n内容方向：<预期要展开的方向/模块>\n受众价值：<受众能得到的好处>\n（可选附加：目标平台/主任务KPI/投放计划）"
+    }
+}
 ]
 
 你的输出要求（只输出 JSON，不要额外说明）
@@ -76,6 +75,15 @@ class TopicAnalysisAgent:
         completion = response.choices[0].message.content
         print(completion)
         return completion
+
+    def analyze_topic_list(self, xml_topic_list):
+        print("Starting to analyze topic list...")
+        topics = parse_topic_list(xml_topic_list)
+        print(f"Found {len(topics)} topics to analyze...")
+        for i, topic in enumerate(topics):
+            print(f"Analyzing topic: {i+1}/{len(topics)}")
+            result = self.analyze_topic(topic)
+            
 
 def main():
     topic_analysis_agent = TopicAnalysisAgent()

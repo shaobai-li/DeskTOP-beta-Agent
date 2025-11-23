@@ -1,8 +1,6 @@
 import json
 import re
 
-
-
 def parse_one_topic(block: str) -> dict:
     # title
     title_match = re.search(r"<title>(.*?)</title>", block, re.S)
@@ -52,7 +50,6 @@ def main():
 """ 
 
     topics = parse_topic_list(xml_text)
-
     # 以你想要的 JSON 结构输出
     print(json.dumps(topics, ensure_ascii=False, indent=4))
 
