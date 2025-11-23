@@ -23,7 +23,6 @@ SYSTEM_PROMPT_CONTENT_TOPIC = """
 5. 受众价值：说明为什么这个选题可能吸引受众，解决了什么问题或提供了什么价值。
 
 【输出格式示例】
-<topic_list>
 <topic>
 <title>【选题1】标题：为什么越来越多年轻人开始反向旅游？</title>
 <subtitle>
@@ -43,7 +42,6 @@ SYSTEM_PROMPT_CONTENT_TOPIC = """
 - 受众价值：帮助创作者思考如何与AI共创而非被替代。  
 </subtitle>
 </topic>
-</topic_list>
 
 【分析与思考要求】
 - 你必须基于提供的 <text> 内容生成洞察，**不要编造不存在的信息**。  

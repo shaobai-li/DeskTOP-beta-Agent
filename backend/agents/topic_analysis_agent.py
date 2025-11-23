@@ -1,6 +1,6 @@
 from agents.utils.llm_client import create_llm_client
-from agents.utils.xml_parser import parse_topic_list
-
+from agents.utils.xml_parser import parse_topic_list, build_topic_xml
+from agents.utils.text_cleaner import clean_json_tags
 
 SYSTEM_PROMPT_TOPIC_ANALYSIS = """
 你是一名资深自媒体策划与选题评审官。
@@ -73,7 +73,6 @@ class TopicAnalysisAgent:
             )
         print("Received response from LLM...")
         completion = response.choices[0].message.content
-        print(completion)
         return completion
 
     def analyze_topic_list(self, xml_topic_list):
@@ -83,7 +82,11 @@ class TopicAnalysisAgent:
         for i, topic in enumerate(topics):
             print(f"Analyzing topic: {i+1}/{len(topics)}")
             result = self.analyze_topic(topic)
-            
+            result = clean_json_tags(result)
+            topic["topic"]["subtitle"] = '\n'.join([topic["topic"]["subtitle"], result])
+            print(topic["topic"]["subtitle"])
+            xml_topic = build_topic_xml(topic)
+            yield xml_topic
 
 def main():
     topic_analysis_agent = TopicAnalysisAgent()

@@ -34,14 +34,25 @@ def generate_process(topic: str):
         "generated_content": chunks
     }) + "\n"
 
-    topic_list = search_agent.content_framework(chunks)
     yield json.dumps({
         "stage": 2,
         "topic": topic,
-        "generated_content": topic_list
+        "generated_content": "正在构思的选题列表"
     }) + "\n"
 
-    topic_analysis_agent.analyze_topic_list(topic_list)
+    topic_list = search_agent.content_framework(chunks)
+    yield json.dumps({
+        "stage": 3,
+        "topic": topic,
+        "generated_content": "正在分析选题列表"
+    }) + "\n"
+
+    for xml_topic in topic_analysis_agent.analyze_topic_list(topic_list):
+        yield json.dumps({
+            "stage": 4,
+            "topic": topic,
+            "generated_content": xml_topic
+        }) + "\n"
 
 
 @app.post("/generate")

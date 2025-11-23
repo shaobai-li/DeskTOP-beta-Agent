@@ -24,6 +24,28 @@ def parse_topic_list(xml: str):
     return [parse_one_topic(block) for block in topic_blocks]
 
 
+def build_topic_xml(topic: dict) -> str:
+    topic_data = topic.get("topic", {})
+
+    title = topic_data.get("title", "").strip()
+    subtitle_raw = topic_data.get("subtitle", "").strip()
+
+    # 保证 subtitle 每行缩进 & 格式保持一致
+    subtitle_block = "\n".join(
+        f"{line}" for line in subtitle_raw.splitlines()
+    )
+
+    xml = f"""<topic_list>
+<topic>
+<title>{title}</title>
+<subtitle>
+{subtitle_block}
+</subtitle>
+</topic>
+</topic_list>"""
+
+    return xml
+
 def main():
     xml_text = """
 <topic_list>
