@@ -35,20 +35,17 @@ def build_topic_xml(topic: dict) -> str:
         f"{line}" for line in subtitle_raw.splitlines()
     )
 
-    xml = f"""<topic_list>
-<topic>
+    xml = f"""<topic>
 <title>{title}</title>
 <subtitle>
 {subtitle_block}
 </subtitle>
-</topic>
-</topic_list>"""
+</topic>"""
 
     return xml
 
 def main():
     xml_text = """
-<topic_list>
 <topic>
 <title>【选题1】标题：为什么越来越多年轻人开始反向旅游？</title>
 <subtitle>
@@ -68,7 +65,6 @@ def main():
 - 受众价值：帮助创作者思考如何与AI共创而非被替代。  
 </subtitle>
 </topic>
-</topic_list>
 """ 
 
     topics = parse_topic_list(xml_text)

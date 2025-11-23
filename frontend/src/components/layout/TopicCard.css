@@ -1,0 +1,12 @@
+.topiccard-container {
+  border: 2px solid #000000;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.topiccard-container.selected {
+  border-color: #4096ff;
+  background: #e6f4ff;
+}
