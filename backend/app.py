@@ -25,35 +25,42 @@ class UserQuery(BaseModel):
     topic: str
 
 
+JOURNEY = 0
 def generate_process(topic: str):
-
-    chunks = search_agent.local_search(topic, 4)
-    yield json.dumps({
-        "stage": 1,
-        "topic": topic,
-        "generated_content": chunks
-    }) + "\n"
-
-    yield json.dumps({
-        "stage": 2,
-        "topic": topic,
-        "generated_content": "正在构思的选题列表"
-    }) + "\n"
-
-    topic_list = search_agent.content_framework(chunks)
-    yield json.dumps({
-        "stage": 3,
-        "topic": topic,
-        "generated_content": "正在分析选题列表"
-    }) + "\n"
-
-    for xml_topic in topic_analysis_agent.analyze_topic_list(topic_list):
+    global JOURNEY
+    if JOURNEY == 0:
+        chunks = search_agent.local_search(topic, 4)
         yield json.dumps({
-            "stage": 4,
+            "stage": 1,
             "topic": topic,
-            "generated_content": xml_topic
+            "generated_content": chunks
         }) + "\n"
 
+        yield json.dumps({
+            "stage": 2,
+            "topic": topic,
+            "generated_content": "正在构思的选题列表"
+        }) + "\n"
+
+        topic_list = search_agent.content_framework(chunks)
+        yield json.dumps({
+            "stage": 3,
+            "topic": topic,
+            "generated_content": "正在分析选题列表"
+        }) + "\n"
+
+        for xml_topic in topic_analysis_agent.analyze_topic_list(topic_list):
+            yield json.dumps({
+                "stage": 4,
+                "topic": topic,
+                "generated_content": xml_topic
+            }) + "\n"
+        JOURNEY = 1
+    elif JOURNEY == 1:
+        # 具体步骤
+        JOURNEY = 0
+    else:
+        raise ValueError("Invalid journey")
 
 @app.post("/generate")
 def generate_content(query: UserQuery):
@@ -62,13 +69,6 @@ def generate_content(query: UserQuery):
         generate_process(topic),
         media_type="application/json"
     )
-
-# @app.get("/rows")
-# def rows():
-#     text = TEXT_METADATA_FILE.read_text(encoding="utf-8")
-#     data = json.loads(text)
-#     return data
-
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
