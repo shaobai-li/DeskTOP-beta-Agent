@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import './AgentPage.css'
 import PromptInput from '../components/PromptInput'
 import { getAgents } from '../services/agentsService'
 
@@ -33,29 +32,14 @@ function AgentPage() {
   }, [agentId])
 
   return (
-    <div className="app">
-      <div className="container">
-        <h1 className="agent-title">{agent.title}</h1>
-        <hr className="agent-title-divider" />
+    <div className="agent-page flex flex-col h-full">
+      <div className="agent-page-header text-4xl font-bold px-8 py-8">{agent.title}</div>
+      <div className="agent-page-body flex-grow px-8 py-8">
         <PromptInput
           title="人设"
           value={agent.profile}
           onChange={handleChange('profile')}
           placeholder="请输入知能体的人设描述..."
-        />
-        
-        <PromptInput
-          title="选题四象限提示词"
-          value={agent.quadrantPrompt}
-          onChange={handleChange('quadrantPrompt')}
-          placeholder="请输入选题四象限提示词..."
-        />
-        
-        <PromptInput
-          title="文字稿提示词"
-          value={agent.scriptGenerationPrompt}
-          onChange={handleChange('scriptGenerationPrompt')}
-          placeholder="请输入文字稿提示词..."
         />
         
         <PromptInput
@@ -65,6 +49,7 @@ function AgentPage() {
           placeholder="请输入语言风格提示词..."
         />
       </div>
+      {/* <div className="agent-page-footer">agent页面页脚</div> */}
     </div>
   )
 }
