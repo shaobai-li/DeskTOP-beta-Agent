@@ -1,7 +1,12 @@
-function Button({ onClick, text }) {
+const themeStyles = {
+    black: "bg-neutral-900 text-neutral-50",
+    white: "bg-white text-neutral-900 border border-neutral-200 shadow-sm",
+};
+
+function Button({ onClick, text, theme = "black" }) {
     return (
         <button
-            className="flex items-center justify-center px-3 py-1 bg-[#1a1a1a] text-white rounded-lg text-sm"
+            className={`flex items-center justify-center px-5 py-1 rounded-lg text-sm ${themeStyles[theme]}`}
             onClick={onClick}
         >
             {text}
