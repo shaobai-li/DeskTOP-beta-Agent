@@ -1,3 +1,4 @@
+import { ChatContext } from "@contexts/ChatContext";
 import ChatInput from "./ChatInput";
 import UserMessage from "./UserMessage";
 import AIMessage from "./AIMessage";
@@ -115,24 +116,26 @@ export default function ChatPanel({ chatId }) {
     };
 
     return (
-        <div className="chat-panel">
-            <AgentSwitcher />
-            <div className="messages-container">
-                <div className="messages-list">
-                    {messages.map((message, index) => {
-                        if (message.role === "user") {
-                            return <UserMessage key={index} message={message.content} />;
-                        } else {
-                            return <AIMessage key={index} message={message.content} />;
-                        }
-                    })}
-                    <div ref={messagesEndRef} />
+        <ChatContext.Provider value={{ handleSendMessage }}>
+            <div className="chat-panel">
+                <AgentSwitcher />
+                <div className="messages-container">
+                    <div className="messages-list">
+                        {messages.map((message, index) => {
+                            if (message.role === "user") {
+                                return <UserMessage key={index} message={message.content} />;
+                            } else {
+                                return <AIMessage key={index} message={message.content} />;
+                            }
+                        })}
+                        <div ref={messagesEndRef} />
+                    </div>
+                </div>
+                <div className="input-container">
+                    <ChatInput onSendMessage={handleSendMessage} />
+                    <p className="input-footer-text"> Powered by 知能新体 — 提升你的自媒体内容生产效率</p>
                 </div>
             </div>
-            <div className="input-container">
-                <ChatInput onSendMessage={handleSendMessage} />
-                <p className="input-footer-text"> Powered by 知能新体 — 提升你的自媒体内容生产效率</p>
-            </div>
-        </div>
+        </ChatContext.Provider>
     )
 }

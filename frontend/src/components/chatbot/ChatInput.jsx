@@ -7,6 +7,7 @@ export default function ChatInput({ onSendMessage }) {
 
   const handleSendMessage = () => {
     if (inputValue.trim()) {
+      console.log("flag1");
       onSendMessage(inputValue.trim());
       setInputValue('');
     }

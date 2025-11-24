@@ -62,7 +62,7 @@ export default function AIMessage({ message }) {
         p.type === "topic" ? (
           <TopicCard
             key={`topic-${i}`}
-            cardContents={[p.topicData]}
+            cardContents={p.topicData}
             isSelected={selectedTopicIndex === i}
             onSelect={() =>
               setSelectedTopicIndex((prev) => (prev === i ? null : i))

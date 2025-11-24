@@ -1,13 +1,22 @@
 import "./TopicCard.css";
+import { useContext } from "react";
 import ReactMarkdown from "react-markdown";
 import Button from "../common/Button";
+import { ChatContext } from "@contexts/ChatContext";
 
-function TopicCard({ cardContents = [], isSelected = false, onSelect }) {
+function TopicCard({ cardContents, isSelected = false, onSelect }) {
 
+  const { handleSendMessage } = useContext(ChatContext);
   // cardContents 只会有 1 个内容
-  const content = cardContents[0] || {};
+  const content = cardContents || {};
   const title = `💡 ${content.title || ""}`;
   const description = content.subtitle || "";
+
+  const handleClick = (e) => {
+    console.log(cardContents);
+    handleSendMessage(JSON.stringify(cardContents));
+    e.stopPropagation();
+  }
 
   return (
     <div
@@ -23,9 +32,7 @@ function TopicCard({ cardContents = [], isSelected = false, onSelect }) {
         <div className="flex justify-end mt-3 w-full">
           <Button
             text="确认"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
+            onClick={handleClick}
           />
         </div>
       )}
