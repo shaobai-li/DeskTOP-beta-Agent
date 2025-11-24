@@ -6,7 +6,8 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import StreamingResponse
 from datetime import datetime
 from pydantic import BaseModel
-from agents import SearchAgent, TopicAnalysisAgent
+from agents import SearchAgent, TopicAnalysisAgent, DraftAgent
+from typing import Dict
 
 from routes.chat_routes import router as chat_router
 
@@ -14,6 +15,7 @@ from routes.chat_routes import router as chat_router
 app = FastAPI()
 search_agent = SearchAgent()
 topic_analysis_agent = TopicAnalysisAgent()
+draft_agent = DraftAgent()
 UPLOAD_DIR = Path(__file__).parent / "database/uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 TEXT_METADATA_FILE = UPLOAD_DIR / "texts_metadata.json"
@@ -25,10 +27,20 @@ class UserQuery(BaseModel):
     topic: str
 
 
-JOURNEY = 0
-def generate_process(topic: str):
-    global JOURNEY
-    if JOURNEY == 0:
+STATE_STORE: Dict[str, int] = {}
+
+def get_state(chat_id: str):
+    return STATE_STORE.get(chat_id, 0)
+
+def set_state(chat_id: str, state: int):
+    STATE_STORE[chat_id] = state
+
+def generate_process(chat_id: str, topic: str):
+
+    state = get_state(chat_id)
+
+
+    if state == 0:
         chunks = search_agent.local_search(topic, 4)
         yield json.dumps({
             "stage": 1,
@@ -55,18 +67,24 @@ def generate_process(topic: str):
                 "topic": topic,
                 "generated_content": xml_topic
             }) + "\n"
-        JOURNEY = 1
-    elif JOURNEY == 1:
-        # 具体步骤
-        JOURNEY = 0
+        set_state(chat_id, 1)
+    elif state == 1:
+        generated_draft = draft_agent.draft(topic)
+        yield json.dumps({
+            "stage": 5,
+            "topic": topic,
+            "generated_content": generated_draft
+        }) + "\n"
+        set_state(chat_id, 0)
     else:
         raise ValueError("Invalid journey")
 
 @app.post("/generate")
 def generate_content(query: UserQuery):
     topic = query.topic
+    chat_id = "7e2c41f2-540d-4a37-a169-05ec4e398f5a"
     return StreamingResponse(
-        generate_process(topic),
+        generate_process(chat_id, topic),
         media_type="application/json"
     )
 
