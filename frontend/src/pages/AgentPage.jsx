@@ -1,19 +1,22 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import PromptInput from '@components/layout/PromptInput'
-import { getAgents } from '@services/agentsService'
+import { getAgents, updateAgent } from '@services/agentsService'
 
 function AgentPage() {
   const { agentId } = useParams()
   const [agent, setAgent] = useState([])
-  const [savedValues, setSavedValues] = useState([])
-  const [modifiedFields, setModifiedFields] = useState({
-    profile: false,
-    languageStylePrompt: false
-  })
 
   const handleConfirm = (field) => (newValue) => {
-    // 和数据库通讯存新的提示词
+    updateAgent(agentId, { [field]: newValue })
+    if (error) {
+      console.error("更新知能体失败：", error)
+      return
+    }
+    setAgent(prev => ({
+      ...prev,
+      [field]: newValue
+    }))
   }
 
   useEffect(() => {
