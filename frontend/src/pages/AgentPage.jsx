@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import PromptInput from '../components/PromptInput'
-import { getAgents } from '../services/agentsService'
+import PromptInput from '@components/layout/PromptInput'
+import { getAgents } from '@services/agentsService'
 
 function AgentPage() {
   const { agentId } = useParams()
   const [agent, setAgent] = useState([])
+  const [savedValues, setSavedValues] = useState([])
+  const [modifiedFields, setModifiedFields] = useState({
+    profile: false,
+    languageStylePrompt: false
+  })
 
-  const handleChange = (field) => (e) => {
-    setAgent(prev => ({
-      ...prev,
-      [field]: e.target.value
-    }))
+  const handleConfirm = (field) => (newValue) => {
+    // 和数据库通讯存新的提示词
   }
 
   useEffect(() => {
@@ -38,15 +40,15 @@ function AgentPage() {
         <PromptInput
           title="人设"
           value={agent.profile}
-          onChange={handleChange('profile')}
           placeholder="请输入知能体的人设描述..."
+          onConfirm={handleConfirm('profile')}
         />
         
         <PromptInput
           title="语言风格提示词"
           value={agent.languageStylePrompt}
-          onChange={handleChange('languageStylePrompt')}
           placeholder="请输入语言风格提示词..."
+          onConfirm={handleConfirm('languageStylePrompt')}
         />
       </div>
       {/* <div className="agent-page-footer">agent页面页脚</div> */}

@@ -6,11 +6,23 @@
   flex: 1;
 }
 
+.prompt-input-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .prompt-input-label {
   font-size: 16px;
   font-weight: 500;
   color: #333;
   flex-shrink: 0;
+}
+
+.prompt-input-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .prompt-input-textarea {
