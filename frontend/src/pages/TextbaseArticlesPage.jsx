@@ -1,4 +1,3 @@
-import './TextbaseArticlesPage.css';
 import { useEffect, useState } from "react";
 import ArticlesTable from "@components/layout/ArticlesTable";
 import Pagination from "@components/layout/Pagination";
@@ -37,17 +36,17 @@ export default function TextbaseArticlesPage() {
 
     return (
         <div className="textbase-articles">
-            <div className="textbase-articles__header">
+            <div className="textbase-articles__header flex justify-between px-8 py-2">
                 <Input 
                     value={searchValue}
                     onChange={handleSearchChange}
                 />
                 <Button onClick={handleAddClick} text="添加" />
             </div>
-            <div className="textbase-article__content">
+            <div className="textbase-article__content flex flex-col px-8">
                 <ArticlesTable articles={currentRows} />
             </div>
-            <div className="textbase-article__footer">
+            <div className="textbase-article__footer flex px-8 justify-end">
                 <Pagination
                     totalItems={rows.length}
                     currentPage={currentPage}
