@@ -38,7 +38,9 @@ function AgentPage() {
 
   return (
     <div className="agent-page flex flex-col h-full">
-      <div className="agent-page-header text-4xl font-bold px-8 py-8">{agent.title}</div>
+      <div className="agent-page-header text-4xl font-bold px-8 py-8">
+        <h1 className="agent-page__title">{agent.title}</h1>
+      </div>
       <div className="agent-page-body flex-grow px-8 py-8">
         <PromptInput
           title="人设"
