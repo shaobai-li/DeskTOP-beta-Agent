@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import './ChatHistory.css';
 import expandArrowIcon from '@assets/icon-ui-arrow-expand.png';
 import MenuItem from './MenuItem';
-import { apiGet } from '../../services/apiClient';
+import { apiGet } from '@services/apiClient';
+import { updateChat } from '@services/chatsService';
 
 const ChatHistory = ({ selectedItem, handleMenuItemClick }) => {
   // 模拟聊天记录（之后可以替换成后端接口或本地存储）
@@ -29,6 +30,15 @@ const ChatHistory = ({ selectedItem, handleMenuItemClick }) => {
     }
     loadChats();
   }, []);
+
+  const handleChatRename = (chatId) => async (newTitle) => {
+    const { error } = await updateChat(chatId, { title: newTitle });
+    if (error) {
+      console.error("重命名聊天记录失败：", error);
+      return;
+    }
+    setChats(prev => prev.map(chat => chat.chatId === chatId ? { ...chat, title: newTitle } : chat));
+  }
 
   return (
     <div className="chat-history">
@@ -57,6 +67,7 @@ const ChatHistory = ({ selectedItem, handleMenuItemClick }) => {
               icon={null} 
               selectedItem={selectedItem}
               handleMenuItemClick={handleMenuItemClick}
+              onRename={handleChatRename(chat.chatId)}
               hasFeature={true}
             />
           ))}

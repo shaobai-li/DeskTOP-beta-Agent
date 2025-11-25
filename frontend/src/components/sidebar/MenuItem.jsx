@@ -5,7 +5,7 @@ import './MenuItem.css';
 import FeatureMenu from './FeatureMenu';
 
 
-export default function MenuItem({ title, path, selectedItem, handleMenuItemClick, icon, hasFeature = false }) {
+export default function MenuItem({ title, path, selectedItem, handleMenuItemClick, icon, onRename = null, hasFeature = false }) {
     const isSelected = selectedItem === title;
     const shouldRenderSelected = title !== '新聊天';
     const featureIconRef = useRef(null);
@@ -41,10 +41,11 @@ export default function MenuItem({ title, path, selectedItem, handleMenuItemClic
     }, [isRenaming]);
 
     const handleRenameSubmit = (text) => {
-        setLocalTitle(text);
         if (text !== localTitleOriginal) {
-            setLocalTitleOriginal(text);
-        }
+            onRename?.(text);
+        }        
+        setLocalTitle(text);
+        setLocalTitleOriginal(text);
         setIsRenaming(false);
     }
 

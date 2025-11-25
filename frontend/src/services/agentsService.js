@@ -4,6 +4,6 @@ export function getAgents() {
     return apiGet("/api/agents");
 }
 
-export function updateAgent(agentId, updateData) {
-    return apiPatch(`/api/agents/${agentId}`, updateData);
+export function updateAgent(agentId, body) {
+    return apiPatch(`/api/agents/${agentId}`, body);
 }

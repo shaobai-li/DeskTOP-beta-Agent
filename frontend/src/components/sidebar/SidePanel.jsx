@@ -9,7 +9,7 @@ import newChatIcon from '@assets/icon-nav-new-chat.png';
 import newAgentIcon from '@assets/icon-nav-new-agent.svg';
 import logo from '@assets/icon-brand-logo.png';
 
-const SidePanel = () => {
+export default function SidePanel() {
     const [selectedItem, setSelectedItem] = useState(null);
     const [showNewAgentModal, setShowNewAgentModal] = useState(false);
 
@@ -54,5 +54,3 @@ const SidePanel = () => {
       </>
     )
 };
-
-export default SidePanel;
