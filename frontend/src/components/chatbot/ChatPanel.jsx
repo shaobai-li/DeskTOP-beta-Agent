@@ -118,7 +118,6 @@ export default function ChatPanel({ chatId }) {
     return (
         <ChatContext.Provider value={{ handleSendMessage }}>
             <div className="chat-panel">
-                <AgentSwitcher />
                 <div className="messages-container">
                     <div className="messages-list">
                         {messages.map((message, index) => {
