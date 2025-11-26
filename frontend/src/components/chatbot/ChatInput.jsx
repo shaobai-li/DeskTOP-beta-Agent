@@ -5,10 +5,9 @@ import agentIcon from '@assets/icon-ui-robot.svg';
 import Button from '../common/Button';
 import PopupMenu from '@components/common/PopupMenu';
 
-export default function ChatInput({ onSendMessage }) {
+export default function ChatInput({ onSendMessage, agentId, setAgentId, availableAgents }) {
   const [inputValue, setInputValue] = useState('');
   const [showAgentMenu, setShowAgentMenu] = useState(false);
-  const [selectedAgent, setSelectedAgent] = useState('Agent 1');
   const [anchorRect, setAnchorRect] = useState(null);
 
   const handleSendMessage = () => {
@@ -30,6 +29,11 @@ export default function ChatInput({ onSendMessage }) {
     setAnchorRect(rect);
     setShowAgentMenu(true);
   };
+
+  const handleClick = (agentId ) => {
+      setAgentId(agentId);
+      setShowAgentMenu(false);
+  }
 
   return (
     <div className="chat-input">
@@ -53,9 +57,14 @@ export default function ChatInput({ onSendMessage }) {
             position={anchorRect}
             onClose={() => setShowAgentMenu(false)}
           >
-            <div className="px-2 py-2 cursor-pointer">Agent 1</div>
-            <div className="px-2 py-2 cursor-pointer">Agent 2</div>
-            <div className="px-2 py-2 cursor-pointer">Agent 3</div>
+            {availableAgents.map((agent) => (
+              <div 
+              key={agent.agentId} 
+              className={`px-2 py-2 rounded-md cursor-pointer hover:bg-neutral-100 ${agentId === agent.agentId ? "bg-neutral-100" : ""}`} 
+              onClick={() => handleClick(agent.agentId)}>
+                {agent.title}
+              </div>
+            ))}
           </PopupMenu>
         )}
         <Button 
