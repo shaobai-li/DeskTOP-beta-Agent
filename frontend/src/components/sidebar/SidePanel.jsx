@@ -8,6 +8,7 @@ import newChatIcon from '@assets/icon-nav-new-chat.png';
 import newAgentIcon from '@assets/icon-nav-new-agent.svg';
 import logo from '@assets/icon-brand-logo.png';
 import { getChats, updateChat } from '@services/chatsService';
+import { getAgents, createAgent } from '@services/agentsService';
 
 export default function SidePanel() {
     const [selectedItem, setSelectedItem] = useState(null);
@@ -18,6 +19,7 @@ export default function SidePanel() {
     const [chats, setChats] = useState([]);
 
     const [showNewAgentModal, setShowNewAgentModal] = useState(false);
+    
 
     useEffect(() => {
       async function loadChats() {
@@ -31,6 +33,20 @@ export default function SidePanel() {
         setChats(data);
       }
       loadChats();
+    }, []);
+
+    useEffect(() => {
+      async function loadAgents() {
+        const { data, error } = await getAgents();
+  
+        if (error) {
+          console.error("加载知能体失败：", error);
+          return;
+        }
+        
+        setAgents(data);
+      }
+      loadAgents();
     }, []);
   
     const handleChatRename = (chatId) => async (newTitle) => {
@@ -50,6 +66,28 @@ export default function SidePanel() {
         setShowNewAgentModal(true);
     };
 
+    const handleCreateAgent = async (agentTitle) => {
+      if (!agentTitle.trim()) {
+        return;
+      }
+
+      
+      const { data, error } = await createAgent({ title: agentTitle.trim() });
+      
+
+      if (error) {
+        console.error("创建知能体失败：", error);
+        return;
+      }
+
+      console.log("创建知能体成功：", data);
+      // 将新创建的知能体添加到列表
+      setAgents(prev => [...prev, data.agent]);
+      // 关闭模态框并重置表单
+    };
+    const handleCloseModal = () => {
+      setShowNewAgentModal(false);
+    };  
     return (
       <>
         <aside className="side-panel">
@@ -74,11 +112,26 @@ export default function SidePanel() {
           <MenuGroupHeader title="知能体库"
                            isOpen={isOpenAgents}
                            onToggle={() => setIsOpenAgents(prev => !prev)} />
+                                     { isOpenAgents && (
+            <div className="mt-2 p-0 overflow-y-auto max-h-[300px]">
+                {agents.map((agent) => (
+                  <MenuItem
+                    key={agent.agentId}
+                    title={agent.title}
+                    path={`/agent/${agent.agentId}`}
+                    icon={null} 
+                    selectedItem={selectedItem}
+                    handleMenuItemClick={handleMenuItemClick}
+                    hasFeature={true}
+                  />
+                ))}
+              </div>
+          )}
           <MenuGroupHeader title="聊天"
                            isOpen={isOpenChats}
                            onToggle={() => setIsOpenChats(prev => !prev)} />
           { isOpenChats && (
-            <div className="chat-history__list">
+            <div className="mt-2 p-0 overflow-y-auto max-h-[300px]">
                 {chats.map((chat) => (
                   <MenuItem
                     key={chat.chatId}
@@ -97,7 +150,10 @@ export default function SidePanel() {
         </aside>
         {
           showNewAgentModal && (
-            <NewAgentModal onClose={() => setShowNewAgentModal(false)} />
+            <NewAgentModal 
+              onClose={handleCloseModal}
+              onCreate={handleCreateAgent}
+            />
           )
         }
       </>
