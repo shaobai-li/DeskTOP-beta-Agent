@@ -44,11 +44,8 @@ def create_tag(tag: TagCreate):
     if any(t["name"].lower() == tag.name.strip().lower() for t in tags):
         raise HTTPException(status_code=400, detail="标签名已存在")
 
-    # 生成 tag_id
-    nums = [int(t["tag_id"].split("_")[1]) for t in tags if t["tag_id"].startswith("tag_") and t["tag_id"].split("_")[1].isdigit()]
-    next_num = max(nums, default=0) + 1
     new_tag = {
-        "tag_id": f"tag_{next_num:02d}",
+        "tag_id": uuid7(),
         "name": tag.name.strip(),
         "description": tag.description.strip(),
         "origin_note": tag.origin_note.strip(),
