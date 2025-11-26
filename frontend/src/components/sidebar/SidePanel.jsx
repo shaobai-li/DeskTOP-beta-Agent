@@ -8,7 +8,7 @@ import newChatIcon from '@assets/icon-nav-new-chat.png';
 import newAgentIcon from '@assets/icon-nav-new-agent.svg';
 import logo from '@assets/icon-brand-logo.png';
 import { getChats, updateChat } from '@services/chatsService';
-import { getAgents, createAgent, updateAgent } from '@services/agentsService';
+import { getAgentsMenu, createAgent, updateAgent } from '@services/agentsService';
 
 export default function SidePanel() {
 
@@ -42,7 +42,7 @@ export default function SidePanel() {
     };
 
     const loadAgents = async () => {
-        const { data, error } = await getAgents();
+        const { data, error } = await getAgentsMenu();
         if (error) {
             console.error("加载知能体失败：", error);
             return;

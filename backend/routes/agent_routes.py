@@ -16,6 +16,34 @@ def get_agents():
 
     return to_camel_case(data.get("agents", []))
 
+@router.get("/agents/{agent_id}")
+def get_agent(agent_id: str):
+    """读取指定知能体数据"""
+    if not JSON_DEV_AGENTS_PATH.exists():
+        return {"error": "知能体数据文件不存在"}
+    
+    with open(JSON_DEV_AGENTS_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    
+    agents = data.get("agents", [])
+    
+    agent = next((a for a in agents if a.get("agent_id") == agent_id), None)
+
+    return to_camel_case(agent)
+
+@router.get("/agents/menu")
+def get_agents_menu():
+    with open(JSON_DEV_AGENTS_PATH, "r", encoding="utf-8") as f:
+        agents = json.load(f).get("agents", [])
+
+    return to_camel_case([
+        {
+            "agent_id": agent.get("agent_id"),
+            "title": agent.get("title"),
+        }
+        for agent in agents
+    ])
+
 @router.patch("/agents/{agent_id}")
 def update_agent(agent_id: str, update_data: dict):
     """部分更新知能体数据"""
@@ -49,13 +77,10 @@ def create_agent(agent_data: dict):
     
     agents = data.get("agents", [])
 
-    import time
-    new_agent_id = f"agent_{int(time.time())}"
-
     snake_data = to_snake_case(agent_data)
 
     new_agent = {
-        "agent_id": new_agent_id,
+        "agent_id": uuid7(),
         "title": snake_data.get("title", "未命名智能体"),
         "profile": "",
         "quadrant_prompt": "",

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import PromptInput from '@components/layout/PromptInput'
-import { getAgents, updateAgent } from '@services/agentsService'
+import { getAgent, updateAgent } from '@services/agentsService'
 
 function AgentPage() {
   const { agentId } = useParams()
@@ -21,17 +21,12 @@ function AgentPage() {
 
   useEffect(() => {
     async function loadAgent(agentId) {
-      const { data, error } = await getAgents()
+      const { data, error } = await getAgent(agentId)
       if (error) {
         console.error("加载知能体失败：", error)
         return
       }
-      const agent = data.find(agent => agent.agentId === agentId)
-      if (!agent) {
-        console.error("知能体不存在：", agentId)
-        return
-      }
-      setAgent(agent)
+      setAgent(data)
     }
     loadAgent(agentId)
   }, [agentId])

@@ -4,6 +4,14 @@ export function getAgents() {
     return apiGet("/api/agents");
 }
 
+export function getAgentsMenu() {
+    return apiGet("/api/agents/menu");
+}
+
+export function getAgent(agentId) {
+    return apiGet(`/api/agents/${agentId}`);
+}
+
 export function updateAgent(agentId, body) {
     return apiPatch(`/api/agents/${agentId}`, body);
 }
