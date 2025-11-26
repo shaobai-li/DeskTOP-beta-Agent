@@ -8,55 +8,69 @@ import newChatIcon from '@assets/icon-nav-new-chat.png';
 import newAgentIcon from '@assets/icon-nav-new-agent.svg';
 import logo from '@assets/icon-brand-logo.png';
 import { getChats, updateChat } from '@services/chatsService';
-import { getAgents, createAgent } from '@services/agentsService';
+import { getAgents, createAgent, updateAgent } from '@services/agentsService';
 
 export default function SidePanel() {
+
     const [selectedItem, setSelectedItem] = useState(null);
 
     const [isOpenAgents, setIsOpenAgents] = useState(true);
-    const [isOpenChats, setIsOpenChats] = useState(true);
     const [agents, setAgents] = useState([]);
-    const [chats, setChats] = useState([]);
-
     const [showNewAgentModal, setShowNewAgentModal] = useState(false);
     
+    const [isOpenChats, setIsOpenChats] = useState(true);
+    const [chats, setChats] = useState([]);
 
-    useEffect(() => {
-      async function loadChats() {
+    
+    
+    const loadChats = async () => {
         const { data, error } = await getChats();
-  
         if (error) {
-          console.error("加载聊天记录失败：", error);
-          return;
+            console.error("加载聊天记录失败：", error);
+            return;
         }
-        
         setChats(data);
-      }
-      loadChats();
-    }, []);
+    };
 
-    useEffect(() => {
-      async function loadAgents() {
-        const { data, error } = await getAgents();
-  
+    const renameChat = (chatId) => async (newTitle) => {
+        const { error } = await updateChat(chatId, { title: newTitle });
         if (error) {
-          console.error("加载知能体失败：", error);
-          return;
+            console.error("重命名聊天记录失败：", error);
+            return;
         }
-        
+        setChats(prev => prev.map(chat => chat.chatId === chatId ? { ...chat, title: newTitle } : chat));
+    };
+
+    const loadAgents = async () => {
+        const { data, error } = await getAgents();
+        if (error) {
+            console.error("加载知能体失败：", error);
+            return;
+        }
         setAgents(data);
-      }
-      loadAgents();
-    }, []);
-  
-    const handleChatRename = (chatId) => async (newTitle) => {
-      const { error } = await updateChat(chatId, { title: newTitle });
-      if (error) {
-        console.error("重命名聊天记录失败：", error);
-        return;
-      }
-      setChats(prev => prev.map(chat => chat.chatId === chatId ? { ...chat, title: newTitle } : chat));
-    }
+    };
+    
+    const renameAgent = (agentId) => async (newTitle) => {
+        const { error } = await updateAgent(agentId, { title: newTitle });
+        if (error) {
+            console.error("重命名知能体失败：", error);
+            return;   
+        }
+        setAgents(prev => prev.map(agent => agent.agentId === agentId ? { ...agent, title: newTitle } : agent));
+    };
+
+    const newAgent = async (agentTitle) => {
+        if (!agentTitle.trim()) {
+            return;
+        }
+        const { data, error } = await createAgent({ title: agentTitle.trim() });
+        if (error) {
+            console.error("创建知能体失败：", error);
+            return;
+        }
+        console.log("创建知能体成功：", data);
+        setAgents(prev => [...prev, data.agent]);
+    };
 
     const handleMenuItemClick = (itemName) => {
         setSelectedItem(itemName);
@@ -66,28 +80,13 @@ export default function SidePanel() {
         setShowNewAgentModal(true);
     };
 
-    const handleCreateAgent = async (agentTitle) => {
-      if (!agentTitle.trim()) {
-        return;
-      }
-
-      
-      const { data, error } = await createAgent({ title: agentTitle.trim() });
-      
-
-      if (error) {
-        console.error("创建知能体失败：", error);
-        return;
-      }
-
-      console.log("创建知能体成功：", data);
-      // 将新创建的知能体添加到列表
-      setAgents(prev => [...prev, data.agent]);
-      // 关闭模态框并重置表单
-    };
     const handleCloseModal = () => {
-      setShowNewAgentModal(false);
+         setShowNewAgentModal(false);
     };  
+
+    useEffect(() => {loadAgents();}, []);
+    useEffect(() => {loadChats();}, []);
+
     return (
       <>
         <aside className="side-panel">
@@ -122,6 +121,7 @@ export default function SidePanel() {
                     icon={null} 
                     selectedItem={selectedItem}
                     handleMenuItemClick={handleMenuItemClick}
+                    onRename={renameAgent(agent.agentId)}
                     hasFeature={true}
                   />
                 ))}
@@ -140,7 +140,7 @@ export default function SidePanel() {
                     icon={null} 
                     selectedItem={selectedItem}
                     handleMenuItemClick={handleMenuItemClick}
-                    onRename={handleChatRename(chat.chatId)}
+                    onRename={renameChat(chat.chatId)}
                     hasFeature={true}
                   />
                 ))}
@@ -152,7 +152,7 @@ export default function SidePanel() {
           showNewAgentModal && (
             <NewAgentModal 
               onClose={handleCloseModal}
-              onCreate={handleCreateAgent}
+              onCreate={newAgent}
             />
           )
         }
