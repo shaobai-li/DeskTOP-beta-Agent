@@ -16,6 +16,19 @@ def get_agents():
 
     return to_camel_case(data.get("agents", []))
 
+
+@router.get("/agents/menu")
+def get_agents_menu():
+    with open(JSON_DEV_AGENTS_PATH, "r", encoding="utf-8") as f:
+        agents = json.load(f).get("agents", [])
+    
+    agents = [{
+        "agent_id": agent.get("agent_id"),
+        "title": agent.get("title"),
+    } for agent in agents]
+
+    return to_camel_case(agents)
+
 @router.get("/agents/{agent_id}")
 def get_agent(agent_id: str):
     """读取指定知能体数据"""
@@ -31,18 +44,6 @@ def get_agent(agent_id: str):
 
     return to_camel_case(agent)
 
-@router.get("/agents/menu")
-def get_agents_menu():
-    with open(JSON_DEV_AGENTS_PATH, "r", encoding="utf-8") as f:
-        agents = json.load(f).get("agents", [])
-
-    return to_camel_case([
-        {
-            "agent_id": agent.get("agent_id"),
-            "title": agent.get("title"),
-        }
-        for agent in agents
-    ])
 
 @router.patch("/agents/{agent_id}")
 def update_agent(agent_id: str, update_data: dict):
