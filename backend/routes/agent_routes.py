@@ -38,3 +38,35 @@ def update_agent(agent_id: str, update_data: dict):
         json.dump(data, f, ensure_ascii=False, indent=4)
 
     return {"message": "更新成功", "agent": target_agent}
+
+@router.post("/agents")
+def create_agent(agent_data: dict):
+    """创建知能体"""
+    if not JSON_DEV_AGENTS_PATH.exists():
+        return {"error": "知能体数据文件不存在"}
+    with open(JSON_DEV_AGENTS_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    
+    agents = data.get("agents", [])
+
+    import time
+    new_agent_id = f"agent_{int(time.time())}"
+
+    snake_data = to_snake_case(agent_data)
+
+    new_agent = {
+        "agent_id": new_agent_id,
+        "title": snake_data.get("title", "未命名智能体"),
+        "profile": "",
+        "quadrant_prompt": "",
+        "script_generation_prompt": "",
+        "language_style_prompt": ""
+    }
+
+    agents.append(new_agent)
+    data["agents"] = agents
+
+    with open(JSON_DEV_AGENTS_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+    return {"message": "创建成功", "agent": to_camel_case(new_agent)}
