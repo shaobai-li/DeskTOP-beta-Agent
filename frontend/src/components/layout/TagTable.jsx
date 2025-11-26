@@ -1,5 +1,5 @@
 import React from 'react';
-import './TagTable.css'
+// import './TagTable.css'
 import TableHeader from './TableHeader';   
 import TableBody from './TableBody';
 

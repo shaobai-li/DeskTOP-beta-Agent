@@ -1,5 +1,4 @@
 import React from 'react';
-import './TableHeader.css';
 function TableHeader({ headers }) {
   return (
     <thead>
