@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, useParams, Navigate } from "react-router-dom";
-import SidePanel from "@components/sidebar/SidePanel";
-import ChatPanel from "@components/chatbot/ChatPanel";
+import Sidebar from "@pages/Sidebar";
+import ChatPanel from "@pages/ChatPage";
 import TextbasePage from "@pages/TextbasePage";
 import TextbaseArticlesPage from "@pages/TextbaseArticlesPage";
 import TextbaseTagsPage from "@pages/TextbaseTagsPage";
@@ -35,7 +35,7 @@ function App() {
         <BrowserRouter>
             <ChatsProvider>
             <div className="app-container">
-                <SidePanel />
+                <Sidebar />
                 <main className="main-container">
                     <Routes>
                         <Route path="/" element={<ChatPanel chatId={null} key="new"/>} />

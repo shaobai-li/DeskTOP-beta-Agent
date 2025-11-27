@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import './SidePanel.css';
-import MenuItem from './MenuItem';
+import './Sidebar.css';
+import MenuItem from '../components/sidebar/MenuItem';
 import MenuGroupHeader from '@components/common/MenuGroupHeader';
 import NewAgentModal from '@components/layout/NewAgentModal';
 import databaseIcon from '@assets/icon-nav-database.png';

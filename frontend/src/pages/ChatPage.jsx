@@ -2,7 +2,7 @@ import { SendMessageContext } from "@contexts/SendMessageContext";
 import ChatInput from "@components/chatbot/ChatInput";
 import UserMessage from "@components/chatbot/UserMessage";
 import AIMessage from "@components/chatbot/AIMessage";
-import "./ChatPanel.css";
+import "./ChatPage.css";
 import { useChatSend } from "@hooks/useChatSend";
 import { useChatMessages } from "@hooks/useChatMessages";
 import { useChatAgents } from "@hooks/useChatAgents";
