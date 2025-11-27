@@ -1,12 +1,13 @@
 import { SendMessageContext } from "@contexts/SendMessageContext";
+import { useChats } from "@contexts/ChatsContext";
 import ChatInput from "./ChatInput";
 import UserMessage from "./UserMessage";
 import AIMessage from "./AIMessage";
-import AgentSwitcher from "./AgentSwitcher";
 import "./ChatPanel.css";
 import { useState, useRef, useEffect } from "react";
 import { apiGet } from '../../services/apiClient';
 import { getAgentsMenu } from '@services/agentsService';
+import { beginChat } from '@services/messagesService';
 
 function processStreamChunk(jsonStr, setMessages) {
     try {
@@ -37,6 +38,9 @@ function processStreamChunk(jsonStr, setMessages) {
 
 
 export default function ChatPanel({ chatId }) {
+
+    const { addChat } = useChats();
+
     const [messages, setMessages] = useState([]);
     const [availableAgents, setAvailableAgents] = useState([]);
     const [selectedAgentId, setSelectedAgentId] = useState(null);
@@ -92,7 +96,7 @@ export default function ChatPanel({ chatId }) {
         loadAvailableAgents();
     }, []);
 
-    const handleSendMessage = async (message) => {
+    const handleSendMessage_old = async (message) => {
         // 先显示用户输入
         setMessages((prev) => [...prev, { role: "user", content: message }]);
         console.log({ topic: message, agent_id: selectedAgentId, chat_id: chatId })
@@ -131,6 +135,29 @@ export default function ChatPanel({ chatId }) {
             ]);
         }
     };
+
+    const handleSendMessage = async (message) => {
+
+        setMessages((prev) => [...prev, { role: "user", content: message }]);
+        
+        const { data, error } = await beginChat(
+            { 
+                topic: message, 
+                agent_id: selectedAgentId, 
+                chat_id: chatId 
+            }
+        );
+
+        if (error) {
+            console.error("开始聊天失败：", error);
+            return;
+        }
+        
+        addChat({
+            chatId: data.chatId,
+            title: data.title,
+        });
+    }
 
     return (
         <SendMessageContext.Provider value={{ handleSendMessage }}>

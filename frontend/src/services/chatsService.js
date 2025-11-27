@@ -7,3 +7,4 @@ export function getChats() {
 export function updateChat(chatId, body) {
     return apiPatch(`/api/chat/${chatId}`, body);
 }
+

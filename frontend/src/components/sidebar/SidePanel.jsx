@@ -83,19 +83,24 @@ export default function SidePanel() {
                   <div className="side-panel__logo-container">
             <img src={logo} alt="logo" className="side-panel__sidebar-logo" />
           </div>
-          <MenuItem title="新建聊天" 
+          <MenuItem title="新建聊天"
+                    itemId={"item-new-chat"}
                     path="/"
-                    selectedItem={selectedItem} 
+                    selectedItem={selectedItem}
+                    renderOnSelected={false}
                     handleMenuItemClick={handleMenuItemClick}
                     icon={newChatIcon} />
           <MenuItem title="我的知识库" 
+                    itemId={"item-textbase"}
                     path="/textbase"
                     selectedItem={selectedItem} 
                     handleMenuItemClick={handleMenuItemClick}
                     icon={databaseIcon} />
           <MenuItem title="新建知能体" 
+                    itemId={"item-new-agent"}
                     path="#"
-                    selectedItem={selectedItem} 
+                    selectedItem={selectedItem}
+                    renderOnSelected={false}
                     handleMenuItemClick={handleNewAgentClick}
                     icon={newAgentIcon} />
           <MenuGroupHeader title="知能体库"
@@ -107,6 +112,7 @@ export default function SidePanel() {
                   <MenuItem
                     key={agent.agentId}
                     title={agent.title}
+                    itemId={agent.agentId}
                     path={`/agent/${agent.agentId}`}
                     icon={null} 
                     selectedItem={selectedItem}
@@ -126,6 +132,7 @@ export default function SidePanel() {
                   <MenuItem
                     key={chat.chatId}
                     title={chat.title}
+                    itemId={chat.chatId}
                     path={`/chat/${chat.chatId}`}
                     icon={null} 
                     selectedItem={selectedItem}

@@ -5,9 +5,8 @@ import './MenuItem.css';
 import FeatureMenu from './FeatureMenu';
 
 
-export default function MenuItem({ title, path, selectedItem, handleMenuItemClick, icon, onRename = null, hasFeature = false }) {
-    const isSelected = selectedItem === title;
-    const shouldRenderSelected = title !== '新聊天';
+export default function MenuItem({ title, path, itemId, selectedItem, handleMenuItemClick, icon, onRename = null, hasFeature = false, renderOnSelected = true }) {
+    const isSelected = itemId === selectedItem;
     const featureIconRef = useRef(null);
     const [menuPosition, setMenuPosition] = useState(null);
     const [showFeatureMenu, setShowFeatureMenu] = useState(false);
@@ -60,7 +59,7 @@ export default function MenuItem({ title, path, selectedItem, handleMenuItemClic
     return (
         
         <div className="menu-item">
-            <div className={`menu-item__main ${isSelected && shouldRenderSelected ? 'menu-item__main--selected' : ''}`}>
+            <div className={`menu-item__main ${isSelected && renderOnSelected? 'menu-item__main--selected' : ''}`}>
                 {isRenaming ? (
                     <input
                         ref={inputRef}
@@ -74,7 +73,7 @@ export default function MenuItem({ title, path, selectedItem, handleMenuItemClic
                     <Link 
                         to={path} 
                         className="menu-item__link"
-                        onClick={() => handleMenuItemClick(localTitle)}
+                        onClick={() => handleMenuItemClick(itemId)}
                     >
                         {icon && <img className="menu-item__icon" src={icon}></img>}
                         <span className="menu-item__text">{localTitle}</span>

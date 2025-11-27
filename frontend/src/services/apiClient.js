@@ -35,8 +35,7 @@ export async function apiPatch(url, body) {
         return { data: null, error };
     }
 }
-
-export async function apiPost(url, body) {
+export async function apiPost(url, body, { stream = false } = {}) {
     try {
         const response = await fetch(url, {
             method: 'POST',
@@ -48,6 +47,10 @@ export async function apiPost(url, body) {
 
         if (!response.ok) {
             throw new Error(`网络错误：${response.status}`);
+        }
+
+        if (stream) {
+            return response; // 直接返回 Response 对象
         }
 
         const data = await response.json();
