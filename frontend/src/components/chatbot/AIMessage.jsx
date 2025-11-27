@@ -1,6 +1,6 @@
 import "./AIMessage.css";
 import ReactMarkdown from "react-markdown";
-import TopicCard from "../layout/TopicCard";
+import TopicCard from "@components/layout/TopicCard";
 import { useState } from "react";
 
 // 解析单个 <topic>

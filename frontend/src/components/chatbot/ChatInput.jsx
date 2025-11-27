@@ -2,7 +2,7 @@ import './ChatInput.css';
 import { useState, useRef, useEffect } from 'react';
 import sendButton from '@assets/icon-action-send.png';
 import agentIcon from '@assets/icon-ui-robot.svg';
-import Button from '../common/Button';
+import Button from '@components/common/Button';
 import PopupMenu from '@components/common/PopupMenu';
 
 export default function ChatInput({ onSendMessage, agentId, setAgentId, availableAgents }) {

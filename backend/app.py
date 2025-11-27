@@ -37,54 +37,7 @@ class UserQuery(BaseModel):
 
 STATE_STORE: Dict[str, int] = {}
 
-def create_chat(title: str = None) -> str:
-    """创建新的聊天记录，返回 chat_id"""
-    if not DB_DEV_PATH.exists():
-        raise Exception("数据库文件不存在")
-    
-    conn = sqlite3.connect(DB_DEV_PATH)
-    cur = conn.cursor()
-    
-    chat_id = uuid7()
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    # 如果没有提供标题，使用默认标题（可以基于第一条消息生成）
-    if title is None:
-        title = "新对话"
-    
-    cur.execute(
-        "INSERT INTO chats (chat_id, title, created_at, updated_at) VALUES (?, ?, ?, ?)",
-        (chat_id, title, now, now)
-    )
-    conn.commit()
-    conn.close()
-    
-    return chat_id
 
-def save_message(chat_id: str, content: str, role: str):
-    """保存消息到数据库"""
-    if not DB_DEV_PATH.exists():
-        raise Exception("数据库文件不存在")
-    
-    conn = sqlite3.connect(DB_DEV_PATH)
-    cur = conn.cursor()
-    
-    message_id = uuid7()
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    cur.execute(
-        "INSERT INTO messages (message_id, chat_id, role, content, created_at) VALUES (?, ?, ?, ?, ?)",
-        (message_id, chat_id, role, content, now)
-    )
-    
-    # 更新 chat 的 updated_at
-    cur.execute(
-        "UPDATE chats SET updated_at = ? WHERE chat_id = ?",
-        (now, chat_id)
-    )
-    
-    conn.commit()
-    conn.close()
 
 def get_state(chat_id: str):
     return STATE_STORE.get(chat_id, 0)
@@ -98,7 +51,6 @@ def generate_content(query: UserQuery):
     topic = query.topic
     chat_id = query.chat_id
  
-    save_message(chat_id, topic, "user")
 
     def generate_and_save():
         ai_reply_parts = []

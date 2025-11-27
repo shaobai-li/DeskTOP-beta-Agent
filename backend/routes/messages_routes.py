@@ -38,6 +38,31 @@ def create_chat(title: str = None) -> str:
     
     return chat_id
 
+def save_message(chat_id: str, content: str, role: str):
+    """保存消息到数据库"""
+    if not DB_DEV_PATH.exists():
+        raise Exception("数据库文件不存在")
+    
+    conn = sqlite3.connect(DB_DEV_PATH)
+    cur = conn.cursor()
+    
+    message_id = uuid7()
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    cur.execute(
+        "INSERT INTO messages (message_id, chat_id, role, content, created_at) VALUES (?, ?, ?, ?, ?)",
+        (message_id, chat_id, role, content, now)
+    )
+    
+    # 更新 chat 的 updated_at
+    cur.execute(
+        "UPDATE chats SET updated_at = ? WHERE chat_id = ?",
+        (now, chat_id)
+    )
+    
+    conn.commit()
+    conn.close()
+    return message_id
 
 @router.post("/messages/begin")
 def begin_chat(request: BeginChatRequest):
@@ -48,21 +73,21 @@ def begin_chat(request: BeginChatRequest):
     try:
         chat_id = create_chat(request.topic)
         
-        # 查询创建的聊天记录
-        conn = sqlite3.connect(DB_DEV_PATH)
-        conn.row_factory = dict_factory
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM chats WHERE chat_id = ?", (chat_id,))
-        chat_data = cur.fetchone()
-        conn.close()
+        # # 查询创建的聊天记录
+        # conn = sqlite3.connect(DB_DEV_PATH)
+        # conn.row_factory = dict_factory
+        # cur = conn.cursor()
+        # cur.execute("SELECT * FROM chats WHERE chat_id = ?", (chat_id,))
+        # chat_data = cur.fetchone()
+        # conn.close()
         
-        if chat_data:
-            return to_camel_case(chat_data)
-        else:
-            return {
-                "chatId": chat_id,
-                "title": request.topic or "新对话"
-            }
+        message_id = save_message(chat_id, request.topic, "user")
+
+        return {
+            "chatId": chat_id,
+            "messageId": message_id,
+            "title": request.topic or "新对话"
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"创建会话失败: {str(e)}")
 
