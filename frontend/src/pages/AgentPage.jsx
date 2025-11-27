@@ -7,16 +7,13 @@ function AgentPage() {
   const { agentId } = useParams()
   const [agent, setAgent] = useState([])
 
-  const handleConfirm = (field) => (newValue) => {
-    updateAgent(agentId, { [field]: newValue })
+  const handleConfirm = (field) => async (newValue) => {
+    const { error, data } = await updateAgent(agentId, { [field]: newValue })
     if (error) {
       console.error("更新知能体失败：", error)
-      return
+    } else {
+      setAgent(data)
     }
-    setAgent(prev => ({
-      ...prev,
-      [field]: newValue
-    }))
   }
 
   useEffect(() => {
