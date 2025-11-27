@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from agents import SearchAgent, TopicAnalysisAgent, DraftAgent
 from typing import Dict, Optional
 
-from routes import chat_router, article_router, agent_router, tag_router
+from routes import chat_router, article_router, agent_router, tag_router, messages_router
 from routes.utils import uuid7, dict_factory
 from config.settings import DB_DEV_PATH
 # 初始化
@@ -26,6 +26,7 @@ app.include_router(chat_router, prefix="/api")
 app.include_router(article_router, prefix="/api")
 app.include_router(agent_router, prefix="/api")
 app.include_router(tag_router, prefix="/api")
+app.include_router(messages_router, prefix="/api")
 
 # 定义请求体
 class UserQuery(BaseModel):
@@ -96,18 +97,9 @@ def generate_content(query: UserQuery):
     """处理聊天消息生成请求"""
     topic = query.topic
     chat_id = query.chat_id
-    
-    # 如果 chat_id 为 null，创建新的聊天记录
-    if chat_id is None:
-        # 使用用户消息的前30个字符作为标题（如果消息太长）
-        title = topic[:30] if len(topic) <= 30 else topic[:30] + "..."
-        chat_id = create_chat(title)
-    
-    # 保存用户消息
+ 
     save_message(chat_id, topic, "user")
-    
-    # 生成 AI 回复（分块返回）
-    # 由于 StreamingResponse 需要生成器，我们需要一个包装器来收集完整回复
+
     def generate_and_save():
         ai_reply_parts = []
         state = get_state(chat_id)
