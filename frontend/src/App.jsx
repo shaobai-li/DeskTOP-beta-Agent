@@ -5,6 +5,7 @@ import TextbasePage from "@pages/TextbasePage";
 import TextbaseArticlesPage from "@pages/TextbaseArticlesPage";
 import TextbaseTagsPage from "@pages/TextbaseTagsPage";
 import AgentPage from "@pages/AgentPage";
+import ChatsProvider from "@contexts/ChatsContext";
 import "./App.css";
 
 function ChatPanelWrapper() {
@@ -32,6 +33,7 @@ function Tags() {
 function App() {
     return (
         <BrowserRouter>
+            <ChatsProvider>
             <div className="app-container">
                 <SidePanel />
                 <main className="main-container">
@@ -47,6 +49,7 @@ function App() {
                     </Routes>
                 </main>
             </div>    
+            </ChatsProvider>
         </BrowserRouter>
     )
 }

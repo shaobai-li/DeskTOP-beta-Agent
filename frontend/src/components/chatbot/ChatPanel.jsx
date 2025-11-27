@@ -1,4 +1,4 @@
-import { ChatContext } from "@contexts/ChatContext";
+import { SendMessageContext } from "@contexts/SendMessageContext";
 import ChatInput from "./ChatInput";
 import UserMessage from "./UserMessage";
 import AIMessage from "./AIMessage";
@@ -133,7 +133,7 @@ export default function ChatPanel({ chatId }) {
     };
 
     return (
-        <ChatContext.Provider value={{ handleSendMessage }}>
+        <SendMessageContext.Provider value={{ handleSendMessage }}>
             <div className="chat-panel">
                 <div className="messages-container">
                     <div className="messages-list">
@@ -152,6 +152,6 @@ export default function ChatPanel({ chatId }) {
                     <p className="input-footer-text"> Powered by 知能新体 — 提升你的自媒体内容生产效率</p>
                 </div>
             </div>
-        </ChatContext.Provider>
+        </SendMessageContext.Provider>
     )
 }

@@ -7,8 +7,9 @@ import databaseIcon from '@assets/icon-nav-database.png';
 import newChatIcon from '@assets/icon-nav-new-chat.png';
 import newAgentIcon from '@assets/icon-nav-new-agent.svg';
 import logo from '@assets/icon-brand-logo.png';
-import { getChats, updateChat } from '@services/chatsService';
+import { updateChat } from '@services/chatsService';
 import { getAgentsMenu, createAgent, updateAgent } from '@services/agentsService';
+import { useChats } from '@contexts/ChatsContext';
 
 export default function SidePanel() {
 
@@ -19,18 +20,8 @@ export default function SidePanel() {
     const [showNewAgentModal, setShowNewAgentModal] = useState(false);
     
     const [isOpenChats, setIsOpenChats] = useState(true);
-    const [chats, setChats] = useState([]);
 
-    
-    
-    const loadChats = async () => {
-        const { data, error } = await getChats();
-        if (error) {
-            console.error("加载聊天记录失败：", error);
-            return;
-        }
-        setChats(data);
-    };
+    const { chats, updateChatTitle } = useChats();
 
     const renameChat = (chatId) => async (newTitle) => {
         const { error } = await updateChat(chatId, { title: newTitle });
@@ -38,7 +29,7 @@ export default function SidePanel() {
             console.error("重命名聊天记录失败：", error);
             return;
         }
-        setChats(prev => prev.map(chat => chat.chatId === chatId ? { ...chat, title: newTitle } : chat));
+        updateChatTitle(chatId, newTitle);
     };
 
     const loadAgents = async () => {
@@ -85,7 +76,6 @@ export default function SidePanel() {
     };  
 
     useEffect(() => {loadAgents();}, []);
-    useEffect(() => {loadChats();}, []);
 
     return (
       <>

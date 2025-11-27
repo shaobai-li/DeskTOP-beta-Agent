@@ -2,11 +2,11 @@ import "./TopicCard.css";
 import { useContext } from "react";
 import ReactMarkdown from "react-markdown";
 import Button from "../common/Button";
-import { ChatContext } from "@contexts/ChatContext";
+import { SendMessageContext } from "@contexts/SendMessageContext";
 
 function TopicCard({ cardContents, isSelected = false, onSelect }) {
 
-  const { handleSendMessage } = useContext(ChatContext);
+  const { handleSendMessage } = useContext(SendMessageContext);
   // cardContents 只会有 1 个内容
   const content = cardContents || {};
   const title = `💡 ${content.title || ""}`;
