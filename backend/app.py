@@ -1,15 +1,18 @@
 # backend.py
 import os
 import json
+import sqlite3
 from pathlib import Path
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import StreamingResponse
 from datetime import datetime
 from pydantic import BaseModel
 from agents import SearchAgent, TopicAnalysisAgent, DraftAgent
-from typing import Dict
+from typing import Dict, Optional
 
 from routes import chat_router, article_router, agent_router, tag_router
+from routes.utils import uuid7, dict_factory
+from config.settings import DB_DEV_PATH
 # 初始化
 app = FastAPI()
 search_agent = SearchAgent()
@@ -27,9 +30,60 @@ app.include_router(tag_router, prefix="/api")
 # 定义请求体
 class UserQuery(BaseModel):
     topic: str
+    chat_id: Optional[str] = None
+    agent_id: Optional[str] = None
 
 
 STATE_STORE: Dict[str, int] = {}
+
+def create_chat(title: str = None) -> str:
+    """创建新的聊天记录，返回 chat_id"""
+    if not DB_DEV_PATH.exists():
+        raise Exception("数据库文件不存在")
+    
+    conn = sqlite3.connect(DB_DEV_PATH)
+    cur = conn.cursor()
+    
+    chat_id = uuid7()
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # 如果没有提供标题，使用默认标题（可以基于第一条消息生成）
+    if title is None:
+        title = "新对话"
+    
+    cur.execute(
+        "INSERT INTO chats (chat_id, title, created_at, updated_at) VALUES (?, ?, ?, ?)",
+        (chat_id, title, now, now)
+    )
+    conn.commit()
+    conn.close()
+    
+    return chat_id
+
+def save_message(chat_id: str, content: str, role: str):
+    """保存消息到数据库"""
+    if not DB_DEV_PATH.exists():
+        raise Exception("数据库文件不存在")
+    
+    conn = sqlite3.connect(DB_DEV_PATH)
+    cur = conn.cursor()
+    
+    message_id = uuid7()
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    cur.execute(
+        "INSERT INTO messages (message_id, chat_id, role, content, created_at) VALUES (?, ?, ?, ?, ?)",
+        (message_id, chat_id, role, content, now)
+    )
+    
+    # 更新 chat 的 updated_at
+    cur.execute(
+        "UPDATE chats SET updated_at = ? WHERE chat_id = ?",
+        (now, chat_id)
+    )
+    
+    conn.commit()
+    conn.close()
 
 def get_state(chat_id: str):
     return STATE_STORE.get(chat_id, 0)
@@ -37,56 +91,82 @@ def get_state(chat_id: str):
 def set_state(chat_id: str, state: int):
     STATE_STORE[chat_id] = state
 
-def generate_process(chat_id: str, topic: str):
-
-    state = get_state(chat_id)
-
-
-    if state == 0:
-        chunks = search_agent.local_search(topic, 4)
-        yield json.dumps({
-            "stage": 1,
-            "topic": topic,
-            "generated_content": chunks
-        }) + "\n"
-
-        yield json.dumps({
-            "stage": 2,
-            "topic": topic,
-            "generated_content": "正在构思的选题列表"
-        }) + "\n"
-
-        topic_list = search_agent.content_framework(chunks)
-        yield json.dumps({
-            "stage": 3,
-            "topic": topic,
-            "generated_content": "正在分析选题列表"
-        }) + "\n"
-
-        for xml_topic in topic_analysis_agent.analyze_topic_list(topic_list):
-            yield json.dumps({
-                "stage": 4,
-                "topic": topic,
-                "generated_content": xml_topic
-            }) + "\n"
-        set_state(chat_id, 1)
-    elif state == 1:
-        generated_draft = draft_agent.draft(topic)
-        yield json.dumps({
-            "stage": 5,
-            "topic": topic,
-            "generated_content": generated_draft
-        }) + "\n"
-        set_state(chat_id, 0)
-    else:
-        raise ValueError("Invalid journey")
-
 @app.post("/generate")
 def generate_content(query: UserQuery):
+    """处理聊天消息生成请求"""
     topic = query.topic
-    chat_id = "7e2c41f2-540d-4a37-a169-05ec4e398f5a"
+    chat_id = query.chat_id
+    
+    # 如果 chat_id 为 null，创建新的聊天记录
+    if chat_id is None:
+        # 使用用户消息的前30个字符作为标题（如果消息太长）
+        title = topic[:30] if len(topic) <= 30 else topic[:30] + "..."
+        chat_id = create_chat(title)
+    
+    # 保存用户消息
+    save_message(chat_id, topic, "user")
+    
+    # 生成 AI 回复（分块返回）
+    # 由于 StreamingResponse 需要生成器，我们需要一个包装器来收集完整回复
+    def generate_and_save():
+        ai_reply_parts = []
+        state = get_state(chat_id)
+        
+        if state == 0:
+            chunks = search_agent.local_search(topic, 4)
+            chunk_str = json.dumps({
+                "stage": 1,
+                "topic": topic,
+                "generated_content": chunks
+            }) + "\n"
+            ai_reply_parts.append(str(chunks))
+            yield chunk_str
+
+            status_msg = "正在构思的选题列表"
+            yield json.dumps({
+                "stage": 2,
+                "topic": topic,
+                "generated_content": status_msg
+            }) + "\n"
+            ai_reply_parts.append(status_msg)
+
+            topic_list = search_agent.content_framework(chunks)
+            status_msg2 = "正在分析选题列表"
+            yield json.dumps({
+                "stage": 3,
+                "topic": topic,
+                "generated_content": status_msg2
+            }) + "\n"
+            ai_reply_parts.append(status_msg2)
+
+            for xml_topic in topic_analysis_agent.analyze_topic_list(topic_list):
+                chunk_str = json.dumps({
+                    "stage": 4,
+                    "topic": topic,
+                    "generated_content": xml_topic
+                }) + "\n"
+                ai_reply_parts.append(str(xml_topic))
+                yield chunk_str
+            set_state(chat_id, 1)
+        elif state == 1:
+            generated_draft = draft_agent.draft(topic)
+            chunk_str = json.dumps({
+                "stage": 5,
+                "topic": topic,
+                "generated_content": generated_draft
+            }) + "\n"
+            ai_reply_parts.append(str(generated_draft))
+            yield chunk_str
+            set_state(chat_id, 0)
+        else:
+            raise ValueError("Invalid journey")
+        
+        # 所有块发送完毕后，保存完整的 AI 回复
+        ai_reply = "\n".join(ai_reply_parts)
+        save_message(chat_id, ai_reply, "assistant")
+    
     return StreamingResponse(
-        generate_process(chat_id, topic),
+        generate_and_save(),
         media_type="application/json"
     )
 
