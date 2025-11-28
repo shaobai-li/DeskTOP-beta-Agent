@@ -6,12 +6,13 @@ import TableBody from './TableBody';
 function TagTable({ tags }) {
   
   const headers = ['标签名称', '标签描述', '创建时间', '更新时间'];
+  const fields = ['name', 'description', 'createdAt', 'updatedAt'];
 
     return (
         <div className="table-wrapper">
           <table className="simple-table">
             <TableHeader headers={headers} />
-            <TableBody data={tags} />
+            <TableBody data={tags} fields={fields} />
           </table>
         </div>
     );

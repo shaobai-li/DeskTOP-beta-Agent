@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import ArticlesTable from "@components/layout/ArticlesTable";
 import Pagination from "@components/layout/Pagination";
-import { getArticles } from "@services/articlesService";
+import { getArticles, createArticle } from "@services/articlesService";
 import Input from "@components/common/Input";
 import Button from "@components/common/Button";
+import ArticleModal from "@components/layout/ArticleModal";
 
 export default function TextbaseArticlesPage() {
     const [rows, setRows] = useState([]);
     const [searchValue, setSearchValue] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(20);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         async function loadArticles() {
@@ -28,6 +30,31 @@ export default function TextbaseArticlesPage() {
     };
 
     const handleAddClick = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
+    // 处理文章提交
+    const handleArticleSubmit = async (formData) => {
+        console.log("提交的表单数据：", formData);
+        
+        const { data, error } = await createArticle(formData);
+        if (error) {
+            console.error("创建文章失败：", error);
+            return;
+        }
+        
+        console.log("文章创建成功！", data);
+        
+        // 创建成功后重新加载文章列表
+        const { data: articles, error: loadError } = await getArticles();
+        if (!loadError) {
+            setRows(articles);
+            console.log("文章列表已更新");
+        }
     };
 
     const startIndex = (currentPage - 1) * rowsPerPage;
@@ -55,6 +82,11 @@ export default function TextbaseArticlesPage() {
                     onRowsPerPageChange={setRowsPerPage}
                 />
             </div>
+            <ArticleModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                onSubmit={handleArticleSubmit}
+            />
         </div>
     )
 }
