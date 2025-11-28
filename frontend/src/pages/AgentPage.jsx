@@ -2,31 +2,17 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import PromptInput from '@components/layout/PromptInput'
 import { getAgent, updateAgent } from '@services/agentsService'
-
+import { useChat } from '@contexts/ChatContext'
 function AgentPage() {
   const { agentId } = useParams()
-  const [agent, setAgent] = useState([])
+
+  const { actions } = useChat()
+  const agent = actions.getAgentById(agentId)
+  console.log("agent", agent)
 
   const handleConfirm = (field) => async (newValue) => {
-    const { error, data } = await updateAgent(agentId, { [field]: newValue })
-    if (error) {
-      console.error("更新知能体失败：", error)
-    } else {
-      setAgent(data)
-    }
+    actions.updateAgentByField(agentId, field, newValue)
   }
-
-  useEffect(() => {
-    async function loadAgent(agentId) {
-      const { data, error } = await getAgent(agentId)
-      if (error) {
-        console.error("加载知能体失败：", error)
-        return
-      }
-      setAgent(data)
-    }
-    loadAgent(agentId)
-  }, [agentId])
 
   return (
     <div className="agent-page flex flex-col h-full">

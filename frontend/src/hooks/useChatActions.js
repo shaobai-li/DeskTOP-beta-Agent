@@ -1,5 +1,5 @@
 import { apiGet } from "@services/apiClient";
-import { getChats } from "@services/chatsService";
+import { getChats, updateChat } from "@services/chatsService";
 import { getAgents, createAgent, updateAgent } from "@services/agentsService";
 
 export function useChatActions(state) {
@@ -18,12 +18,18 @@ export function useChatActions(state) {
         state.setChats(prev => [chat, ...prev]);
     };
 
-    const updateChatByTitle = (chatId, newTitle) => {
+    const updateChatByTitle = async (chatId, newTitle) => {
         state.setChats(prev =>
             prev.map(chat =>
                 chat.chatId === chatId ? { ...chat, title: newTitle } : chat
             )
         );
+
+        const { error } = await updateChat(chatId, { title: newTitle });
+        if (error) {
+            console.error("更新聊天记录标题失败：", error);
+            return;
+        }
     };
 
     const loadMessages = async (chatId) => {
@@ -66,12 +72,18 @@ export function useChatActions(state) {
     }
 
     const updateAgentByField = async (agentId, field, newValue) => {
-        const { data, error } = await updateAgent(agentId, { [field]: newValue })
+        state.setAgents(prev => 
+            prev.map(agent => 
+                agent.agentId === agentId ? { ...agent, [field]: newValue } : agent
+            )
+        );
+
+        const { error } = await updateAgent(agentId, { [field]: newValue })
         if (error) {
             console.error("更新知能体失败：", error);
             return;
         }
-        state.setAgents(prev => prev.map(agent => agent.agentId === agentId ? data : agent));
+
     }
 
     const getSelectedAgentId = (chatId) => {
@@ -82,6 +94,11 @@ export function useChatActions(state) {
         state.setChats(prev => prev.map(chat => chat.chatId === chatId ? { ...chat, selectedAgent: agentId } : chat));
     }
     
+
+    const getAgentById = (agentId) => {
+        return state.agents.find(agent => agent.agentId === agentId) ?? null;
+    }
+
     return { 
         loadChats, 
         addChat, 
@@ -91,6 +108,7 @@ export function useChatActions(state) {
         addAgent, 
         updateAgentByField,
         getSelectedAgentId, 
-        setSelectedAgentId 
+        setSelectedAgentId,
+        getAgentById
     };
 }

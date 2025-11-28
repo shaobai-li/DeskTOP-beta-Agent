@@ -76,7 +76,7 @@ export default function SidePanel() {
           <MenuGroupHeader title="知能体库"
                            isOpen={isOpenAgents}
                            onToggle={() => setIsOpenAgents(prev => !prev)} />
-                                     { isOpenAgents && (
+          { isOpenAgents && (
             <div className="mt-2 p-0 overflow-y-auto max-h-[300px]">
                 {state.agents.map((agent) => (
                   <MenuItem

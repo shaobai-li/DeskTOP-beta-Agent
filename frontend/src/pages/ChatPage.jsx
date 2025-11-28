@@ -17,10 +17,10 @@ export default function ChatPage() {
 
     const { chatId } = useParams();
     const { state, actions } = useChat();
-    const { handleSendMessage } = useChatStreaming(state, actions, chatId);
+    
+    const selectedAgentId = actions.getSelectedAgentId(chatId); 
 
-    // const selectedAgentId = actions.getSelectedAgentId(chatId);
-    const selectedAgentId = actions.getSelectedAgentId(chatId);
+    const { handleSendMessage } = useChatStreaming(state, actions, {chatId, selectedAgentId});
 
     const setSelectedAgentId = (agentId) => {
         actions.setSelectedAgentId(chatId, agentId);
