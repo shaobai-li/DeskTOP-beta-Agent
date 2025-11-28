@@ -24,6 +24,7 @@ class SearchAgent:
         }
 
     def local_search(self, queries, k):
+        print("Entering local_search...")
         self.topic = queries
         queries_embedded = self.embedding_model.encode([queries])
         _, I = self.cg_chunks_index.search(queries_embedded, k=10)
