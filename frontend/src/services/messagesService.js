@@ -1,4 +1,4 @@
-import { apiPost } from "./apiClient";
+import { apiPost, apiGet } from "./apiClient";
 
 export function beginChat(body) {
     return apiPost("/api/messages/begin", body);

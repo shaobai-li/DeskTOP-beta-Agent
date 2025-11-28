@@ -1,22 +1,17 @@
 import { BrowserRouter, Routes, Route, useParams, Navigate } from "react-router-dom";
 import Sidebar from "@pages/Sidebar";
-import ChatPanel from "@pages/ChatPage";
+import ChatPage from "@pages/ChatPage";
 import TextbasePage from "@pages/TextbasePage";
 import TextbaseArticlesPage from "@pages/TextbaseArticlesPage";
 import TextbaseTagsPage from "@pages/TextbaseTagsPage";
 import AgentPage from "@pages/AgentPage";
-import ChatsProvider from "@contexts/ChatsContext";
+import ChatProvider from "@contexts/ChatContext";
 import "./App.css";
 
-function ChatPanelWrapper() {
-    const { chatId } = useParams();
-    return <ChatPanel chatId={chatId} key={chatId} />;
-}
-
-function AgentPageWrapper() {
-    const { agentId } = useParams();
-    return <AgentPage key={agentId} />;
-}
+// function ChatPageWrapper() {
+//     const { chatId } = useParams();
+//     return <ChatPage chatId={chatId} key={chatId} />;
+// }
 
 function Tags() {
     return (
@@ -33,14 +28,14 @@ function Tags() {
 function App() {
     return (
         <BrowserRouter>
-            <ChatsProvider>
+            <ChatProvider>
             <div className="app-container">
                 <Sidebar />
                 <main className="main-container">
                     <Routes>
-                        <Route path="/" element={<ChatPanel chatId={null} key="new"/>} />
-                        <Route path="/agent/:agentId" element={<AgentPageWrapper />} />
-                        <Route path="/chat/:chatId" element={<ChatPanelWrapper />} />
+                        <Route path="/" element={<ChatPage chatId={null} key="new"/>} />
+                        <Route path="/agent/:agentId" element={<AgentPage />} />
+                        <Route path="/chat/:chatId" element={<ChatPage />} />
                         <Route path="/textbase/" element={<TextbasePage />}>
                             <Route index element={<Navigate to="articles" replace />} />
                             <Route path="articles" element={<TextbaseArticlesPage />} />
@@ -49,7 +44,7 @@ function App() {
                     </Routes>
                 </main>
             </div>    
-            </ChatsProvider>
+            </ChatProvider>
         </BrowserRouter>
     )
 }

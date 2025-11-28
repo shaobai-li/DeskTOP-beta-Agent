@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Sidebar.css';
 import MenuItem from '../components/sidebar/MenuItem';
 import MenuGroupHeader from '@components/common/MenuGroupHeader';
@@ -7,60 +7,32 @@ import databaseIcon from '@assets/icon-nav-database.png';
 import newChatIcon from '@assets/icon-nav-new-chat.png';
 import newAgentIcon from '@assets/icon-nav-new-agent.svg';
 import logo from '@assets/icon-brand-logo.png';
-import { updateChat } from '@services/chatsService';
-import { getAgentsMenu, createAgent, updateAgent } from '@services/agentsService';
-import { useChats } from '@contexts/ChatsContext';
+import { useChat } from '@contexts/ChatContext';
 
 export default function SidePanel() {
 
     const [selectedItem, setSelectedItem] = useState(null);
 
     const [isOpenAgents, setIsOpenAgents] = useState(true);
-    const [agents, setAgents] = useState([]);
     const [showNewAgentModal, setShowNewAgentModal] = useState(false);
     
     const [isOpenChats, setIsOpenChats] = useState(true);
 
-    const { chats, updateChatTitle } = useChats();
+    const { state, actions } = useChat();
 
     const renameChat = (chatId) => async (newTitle) => {
-        const { error } = await updateChat(chatId, { title: newTitle });
-        if (error) {
-            console.error("重命名聊天记录失败：", error);
-            return;
-        }
-        updateChatTitle(chatId, newTitle);
+        actions.updateChatByTitle(chatId, newTitle);
     };
 
-    const loadAgents = async () => {
-        const { data, error } = await getAgentsMenu();
-        if (error) {
-            console.error("加载知能体失败：", error);
-            return;
-        }
-        setAgents(data);
-    };
-    
     const renameAgent = (agentId) => async (newTitle) => {
-        const { error } = await updateAgent(agentId, { title: newTitle });
-        if (error) {
-            console.error("重命名知能体失败：", error);
-            return;   
-        }
-        setAgents(prev => prev.map(agent => agent.agentId === agentId ? { ...agent, title: newTitle } : agent));
+        actions.updateAgentByField(agentId, "title", newTitle);
     };
 
     const newAgent = async (agentTitle) => {
         if (!agentTitle.trim()) {
             return;
         }
-        const { data, error } = await createAgent({ title: agentTitle.trim() });
-        if (error) {
-            console.error("创建知能体失败：", error);
-            return;
-        }
-        console.log("创建知能体成功：", data);
-        setAgents(prev => [...prev, data.agent]);
+        actions.addAgent(agentTitle.trim());
     };
 
     const handleMenuItemClick = (itemName) => {
@@ -74,8 +46,6 @@ export default function SidePanel() {
     const handleCloseModal = () => {
          setShowNewAgentModal(false);
     };  
-
-    useEffect(() => {loadAgents();}, []);
 
     return (
       <>
@@ -108,7 +78,7 @@ export default function SidePanel() {
                            onToggle={() => setIsOpenAgents(prev => !prev)} />
                                      { isOpenAgents && (
             <div className="mt-2 p-0 overflow-y-auto max-h-[300px]">
-                {agents.map((agent) => (
+                {state.agents.map((agent) => (
                   <MenuItem
                     key={agent.agentId}
                     title={agent.title}
@@ -128,7 +98,7 @@ export default function SidePanel() {
                            onToggle={() => setIsOpenChats(prev => !prev)} />
           { isOpenChats && (
             <div className="mt-2 p-0 overflow-y-auto max-h-[300px]">
-                {chats.map((chat) => (
+                {state.chats.map((chat) => (
                   <MenuItem
                     key={chat.chatId}
                     title={chat.title}
@@ -151,8 +121,7 @@ export default function SidePanel() {
               onClose={handleCloseModal}
               onCreate={newAgent}
             />
-          )
-        }
-      </>
-    )
-};
+      )}
+    </>
+  );
+}

@@ -1,13 +1,20 @@
 import "./TopicCard.css";
-import { useContext } from "react";
 import ReactMarkdown from "react-markdown";
 import Button from "../common/Button";
-import { SendMessageContext } from "@contexts/SendMessageContext";
+import { useChatStreaming } from "@hooks/useChatStreaming";
+import { useChat } from "@contexts/ChatContext";
+
+import { useChatPageContext } from "@pages/ChatPage";
+
 
 function TopicCard({ cardContents, isSelected = false, onSelect }) {
 
-  const { handleSendMessage } = useContext(SendMessageContext);
-  // cardContents 只会有 1 个内容
+  const { state, actions } = useChat();
+
+  const { chatId, selectedAgentId } = useChatPageContext();
+  const { handleSendMessage } = useChatStreaming(state, actions, {chatId, selectedAgentId});
+
+
   const content = cardContents || {};
   const title = `💡 ${content.title || ""}`;
   const description = content.subtitle || "";

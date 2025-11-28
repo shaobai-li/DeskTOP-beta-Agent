@@ -3,7 +3,6 @@ import { getAgentsMenu } from '@services/agentsService';
 
 export const useChatAgents = () => {
     const [availableAgents, setAvailableAgents] = useState([]);
-    const [selectedAgentId, setSelectedAgentId] = useState(null);
 
     useEffect(() => {
         async function loadAvailableAgents() {

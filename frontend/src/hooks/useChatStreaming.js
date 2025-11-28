@@ -1,9 +1,6 @@
-import { useRef } from "react";
+import { beginChat, streamChat } from "@services/messagesService";
 import { useNavigate } from "react-router-dom";
-import { beginChat, streamChat } from '@services/messagesService';
-import { useChat } from "@contexts/ChatContext";
 
-// 辅助函数：处理流式数据块
 const processStreamChunk = (jsonStr, setMessages) => {
     try {
         const { stage, generated_content } = JSON.parse(jsonStr);
@@ -25,20 +22,20 @@ const processStreamChunk = (jsonStr, setMessages) => {
     }
 };
 
-export const useChatSend = (chatId, selectedAgentId, addChat, setMessages) => {
+export const useChatStreaming = (state, actions, {chatId = null, selectedAgentId = null}) => {
     const navigate = useNavigate();
 
     const handleSendMessage = async (message) => {
         // 乐观更新 UI
-        setMessages((prev) => [...prev, { role: "user", content: message }]);
+        state.setMessages((prev) => [...prev, { role: "user", content: message }]);
 
         let currentChatId = chatId;
 
         if (!currentChatId) {
             const { data, error } = await beginChat({
                 topic: message,
-                agent_id: selectedAgentId,
-                chat_id: null
+                chat_id: currentChatId,
+                selected_agent: selectedAgentId,
             });
 
             if (error) {
@@ -48,15 +45,15 @@ export const useChatSend = (chatId, selectedAgentId, addChat, setMessages) => {
             }
 
             currentChatId = data.chatId
-            addChat(data.chat);
+            actions.addChat(data);
             navigate(`/chat/${currentChatId}`);
         } 
 
         try {
-            const response = await fetch("/api/messages/generate", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ topic: message, agent_id: selectedAgentId, chat_id: currentChatId })
+            const response = await streamChat({
+                topic: message,
+                chat_id: currentChatId,
+                selected_agent: selectedAgentId,
             });
 
             if (!response.ok) throw new Error("Failed to fetch data");
@@ -75,12 +72,12 @@ export const useChatSend = (chatId, selectedAgentId, addChat, setMessages) => {
 
                 for (const jsonStr of parts) {
                     if (!jsonStr.trim()) continue;
-                    processStreamChunk(jsonStr, setMessages);
+                    processStreamChunk(jsonStr, state.setMessages);
                 }
             }
         } catch (error) {
             console.error("Streaming Error:", error);
-            setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ 连接中断，请重试。" }]);
+            state.setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ 连接中断，请重试。" }]);
         }
     };
 

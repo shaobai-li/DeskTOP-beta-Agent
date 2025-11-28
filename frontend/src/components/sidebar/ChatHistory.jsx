@@ -17,19 +17,6 @@ const ChatHistory = ({ selectedItem, handleMenuItemClick }) => {
     ? location.pathname.split('/')[2]
     : null;
 
-  useEffect(() => {
-    async function loadChats() {
-      const { data, error } = await apiGet("/api/chats");
-
-      if (error) {
-        console.error("加载聊天记录失败：", error);
-        return;
-      }
-      
-      setChats(data);
-    }
-    loadChats();
-  }, []);
 
   const handleChatRename = (chatId) => async (newTitle) => {
     const { error } = await updateChat(chatId, { title: newTitle });

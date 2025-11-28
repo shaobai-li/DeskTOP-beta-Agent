@@ -1,24 +1,47 @@
-import { SendMessageContext } from "@contexts/SendMessageContext";
 import ChatInput from "@components/chatbot/ChatInput";
 import UserMessage from "@components/chatbot/UserMessage";
 import AIMessage from "@components/chatbot/AIMessage";
 import "./ChatPage.css";
-import { useChatSend } from "@hooks/useChatSend";
-import { useChatMessages } from "@hooks/useChatMessages";
-import { useChatAgents } from "@hooks/useChatAgents";
+import { useChat } from "@contexts/ChatContext";
+import { useRef, useEffect, useState } from "react";
+import { useChatStreaming } from "@hooks/useChatStreaming";
+import { useParams } from "react-router-dom";
+import { createContext, useContext } from "react";
 
-export default function ChatPanel({ chatId }) {
+const ChatPageContext = createContext(null);
+export function useChatPageContext() {
+    return useContext(ChatPageContext);
+}
 
-    const { availableAgents, selectedAgentId, setSelectedAgentId } = useChatAgents();
-    const { messages, setMessages, messagesEndRef } = useChatMessages(chatId);
-    const { handleSendMessage } = useChatSend(chatId, selectedAgentId, setMessages);
+export default function ChatPage() {
+
+    const { chatId } = useParams();
+    const { state, actions } = useChat();
+    const { handleSendMessage } = useChatStreaming(state, actions, chatId);
+
+    // const selectedAgentId = actions.getSelectedAgentId(chatId);
+    const selectedAgentId = actions.getSelectedAgentId(chatId);
+
+    const setSelectedAgentId = (agentId) => {
+        actions.setSelectedAgentId(chatId, agentId);
+    }
+
+    const messagesEndRef = useRef(null);
+
+    useEffect(() => {
+        actions.loadMessages(chatId);
+    }, [chatId]);
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [state.messages]);
 
     return (
-        <SendMessageContext.Provider value={{ handleSendMessage }}>
+        <ChatPageContext.Provider value={{ chatId, selectedAgentId }}>
             <div className="chat-panel">
                 <div className="messages-container">
                     <div className="messages-list">
-                        {messages.map((message, index) => {
+                        {state.messages.map((message, index) => {
                             if (message.role === "user") {
                                 return <UserMessage key={index} message={message.content} />;
                             } else {
@@ -29,10 +52,11 @@ export default function ChatPanel({ chatId }) {
                     </div>
                 </div>
                 <div className="input-container">
-                    <ChatInput onSendMessage={handleSendMessage} agentId={selectedAgentId} setAgentId={setSelectedAgentId} availableAgents={availableAgents} />
+                    <ChatInput onSendMessage={handleSendMessage} setAgentId={setSelectedAgentId} availableAgents={state.agents} />
                     <p className="input-footer-text"> Powered by 知能新体 — 提升你的自媒体内容生产效率</p>
+                        
                 </div>
             </div>
-        </SendMessageContext.Provider>
-    )
+        </ChatPageContext.Provider>
+    );
 }
