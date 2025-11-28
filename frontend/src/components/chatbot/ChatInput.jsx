@@ -4,18 +4,25 @@ import sendButton from '@assets/icon-action-send.png';
 import agentIcon from '@assets/icon-ui-robot.svg';
 import Button from '@components/common/Button';
 import PopupMenu from '@components/common/PopupMenu';
-import { useChatPageContext } from '@pages/ChatPage';
+import { useChat } from '@contexts/ChatContext';
+import { useChatStreaming } from '@hooks/useChatStreaming';
+import { useParams } from 'react-router-dom';
 
-export default function ChatInput({ onSendMessage, setAgentId, availableAgents }) {
+export default function ChatInput() {
+
+  const { state, actions } = useChat();
+  const { chatId } = useParams();
+  const [selectedAgentId, setSelectedAgentId] = useState(actions.getSelectedAgentId(chatId));
+  
+  const { handleSendMessage } = useChatStreaming(state, actions, {chatId, selectedAgentId});
   const [inputValue, setInputValue] = useState('');
   const [showAgentMenu, setShowAgentMenu] = useState(false);
   const [anchorRect, setAnchorRect] = useState(null);
-  const { selectedAgentId } = useChatPageContext();
 
-
-  const handleSendMessage = () => {
+  const handleSendMessageStream = () => {
     if (inputValue.trim()) {
-      onSendMessage(inputValue.trim());
+      console.log("flag");
+      handleSendMessage(inputValue.trim());
       setInputValue('');
     }
   }
@@ -23,18 +30,20 @@ export default function ChatInput({ onSendMessage, setAgentId, availableAgents }
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      handleSendMessageStream();
     }
   }
 
   const handleToggle = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     setAnchorRect(rect);
+    console.log("selectedAgentId -1 ", selectedAgentId);
     setShowAgentMenu(true);
   };
 
-  const handleClick = (agentId ) => {
-      setAgentId(agentId);
+    const handleClick = (agentId ) => {
+      setSelectedAgentId(agentId);
+      console.log("selectedAgentId -2 ", agentId);
       setShowAgentMenu(false);
   }
 
@@ -60,7 +69,7 @@ export default function ChatInput({ onSendMessage, setAgentId, availableAgents }
             position={anchorRect}
             onClose={() => setShowAgentMenu(false)}
           >
-            {availableAgents.map((agent) => (
+            {state.agents.map((agent) => (
               <div 
               key={agent.agentId} 
               className={`px-2 py-2 rounded-md cursor-pointer hover:bg-neutral-100 ${selectedAgentId === agent.agentId ? "bg-neutral-100" : ""}`} 
@@ -72,7 +81,7 @@ export default function ChatInput({ onSendMessage, setAgentId, availableAgents }
         )}
         <Button 
           className="send-button"
-          onClick={handleSendMessage}
+          onClick={handleSendMessageStream}
           icon={sendButton}
           theme="blackCircle"
         />

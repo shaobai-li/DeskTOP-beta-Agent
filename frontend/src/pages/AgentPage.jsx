@@ -1,20 +1,22 @@
-import { useState, useEffect } from 'react'
+
 import { useParams } from 'react-router-dom'
 import PromptInput from '@components/layout/PromptInput'
-import { getAgent, updateAgent } from '@services/agentsService'
 import { useChat } from '@contexts/ChatContext'
+
 function AgentPage() {
   const { agentId } = useParams()
-
   const { actions } = useChat()
+  
   const agent = actions.getAgentById(agentId)
-  console.log("agent", agent)
+
+  
 
   const handleConfirm = (field) => async (newValue) => {
     actions.updateAgentByField(agentId, field, newValue)
   }
 
-  return (
+
+  return (!agent) ? <div>加载中...</div> : (
     <div className="agent-page flex flex-col h-full">
       <div className="agent-page-header text-4xl font-bold px-8 py-8">
         <h1 className="agent-page__title">{agent.title}</h1>

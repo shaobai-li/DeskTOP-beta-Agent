@@ -3,15 +3,15 @@ import ReactMarkdown from "react-markdown";
 import Button from "../common/Button";
 import { useChatStreaming } from "@hooks/useChatStreaming";
 import { useChat } from "@contexts/ChatContext";
-
-import { useChatPageContext } from "@pages/ChatPage";
+import { useParams } from 'react-router-dom';
 
 
 function TopicCard({ cardContents, isSelected = false, onSelect }) {
 
   const { state, actions } = useChat();
 
-  const { chatId, selectedAgentId } = useChatPageContext();
+  const { chatId } = useParams();
+  const selectedAgentId = actions.getSelectedAgentId(chatId);
   const { handleSendMessage } = useChatStreaming(state, actions, {chatId, selectedAgentId});
 
 

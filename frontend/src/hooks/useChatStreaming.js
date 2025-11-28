@@ -25,11 +25,16 @@ const processStreamChunk = (jsonStr, setMessages) => {
 export const useChatStreaming = (state, actions, {chatId = null, selectedAgentId = null}) => {
     const navigate = useNavigate();
 
+
     const handleSendMessage = async (message) => {
         // 乐观更新 UI
         state.setMessages((prev) => [...prev, { role: "user", content: message }]);
 
         let currentChatId = chatId;
+
+        console.log("topic", message);
+        console.log("chat_id", currentChatId);
+        console.log("selected_agent", selectedAgentId);
 
         if (!currentChatId) {
             const { data, error } = await beginChat({
