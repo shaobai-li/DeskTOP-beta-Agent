@@ -1,4 +1,4 @@
-import { apiGet, apiPatch, apiPost } from "./apiClient";
+import { apiGet, apiPatch, apiPost, apiDelete } from "./apiClient";
 
 export function getAgents() {
     return apiGet("/api/agents");
@@ -18,4 +18,8 @@ export function updateAgent(agentId, body) {
 
 export function createAgent(body) {
     return apiPost("/api/agents", body);
+}
+
+export function deleteAgent(agentId) {
+    return apiDelete(`/api/agents/${agentId}`);
 }

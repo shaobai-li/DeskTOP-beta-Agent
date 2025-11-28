@@ -28,6 +28,18 @@ export default function SidePanel() {
         actions.updateAgentByField(agentId, "title", newTitle);
     };
 
+    const deleteAgentHandler = (agentId) => async () => {
+        if (window.confirm('确定要删除这个智能体吗？')) {
+            await actions.deleteAgentById(agentId);
+        }
+    };
+
+    const deleteChatHandler = (chatId) => async () => {
+        if (window.confirm('确定要删除这条聊天记录吗？')) {
+            await actions.deleteChatById(chatId);
+        }
+    };
+
     const newAgent = async (agentTitle) => {
         if (!agentTitle.trim()) {
             return;
@@ -88,6 +100,7 @@ export default function SidePanel() {
                     selectedItem={selectedItem}
                     handleMenuItemClick={handleMenuItemClick}
                     onRename={renameAgent(agent.agentId)}
+                    onDelete={deleteAgentHandler(agent.agentId)}
                     hasFeature={true}
                   />
                 ))}
@@ -108,6 +121,7 @@ export default function SidePanel() {
                     selectedItem={selectedItem}
                     handleMenuItemClick={handleMenuItemClick}
                     onRename={renameChat(chat.chatId)}
+                    onDelete={deleteChatHandler(chat.chatId)}
                     hasFeature={true}
                   />
                 ))}

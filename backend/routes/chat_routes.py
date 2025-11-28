@@ -71,3 +71,37 @@ def update_chat(chat_id: str, update_data: ChatUpdate):
 
     conn.close()
     return to_camel_case(updated_row)
+
+@router.delete("/chat/{chat_id}")
+def delete_chat(chat_id: str):
+    """
+    删除指定的聊天记录及其相关消息
+    """
+    if not DB_DEV_PATH.exists():
+        return {"error": "数据库文件不存在"}
+    
+    conn = sqlite3.connect(DB_DEV_PATH)
+    conn.row_factory = dict_factory
+    cur = conn.cursor()
+    
+    # 先查询要删除的聊天记录
+    cur.execute("SELECT * FROM chats WHERE chat_id = ?", (chat_id,))
+    deleted_chat = cur.fetchone()
+    
+    if deleted_chat is None:
+        conn.close()
+        return {"error": f"聊天记录 {chat_id} 不存在"}
+    
+    # 删除相关的消息记录
+    cur.execute("DELETE FROM messages WHERE chat_id = ?", (chat_id,))
+    
+    # 删除聊天记录
+    cur.execute("DELETE FROM chats WHERE chat_id = ?", (chat_id,))
+    
+    conn.commit()
+    conn.close()
+    
+    return {
+        "message": "删除成功",
+        "deleted_chat": to_camel_case(deleted_chat)
+    }

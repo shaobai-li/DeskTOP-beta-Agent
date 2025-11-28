@@ -4,7 +4,7 @@ import './FeatureMenu.css';
 import renameIcon from '@assets/icon-action-rename.svg';
 import deleteIcon from '@assets/icon-action-delete.svg';
 
-const FeatureMenu = ({ handleMenuItemClick, position, onClose, onRename }) => {
+const FeatureMenu = ({ handleMenuItemClick, position, onClose, onRename, onDelete }) => {
     const menuRef = useRef(null);
 
     useEffect(() => {
@@ -42,18 +42,20 @@ const FeatureMenu = ({ handleMenuItemClick, position, onClose, onRename }) => {
                         <span className="feature-menu-item__text">重命名</span>
                     </div>
                 </div>
-                <div className="feature-menu-item">
-                    <div 
-                        className="feature-menu-item__button"
-                        onClick={() => {
-                            handleMenuItemClick('删除');
-                            onClose();
-                        }}
-                    >
-                        <img className="feature-menu-item__icon" src={deleteIcon} alt="删除" />
-                        <span className="feature-menu-item__text">删除</span>
+                {onDelete && (
+                    <div className="feature-menu-item">
+                        <div 
+                            className="feature-menu-item__button"
+                            onClick={() => {
+                                onDelete();
+                                onClose();
+                            }}
+                        >
+                            <img className="feature-menu-item__icon" src={deleteIcon} alt="删除" />
+                            <span className="feature-menu-item__text">删除</span>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>,
         document.body

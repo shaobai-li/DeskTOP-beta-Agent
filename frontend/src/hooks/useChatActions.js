@@ -1,6 +1,6 @@
 import { apiGet } from "@services/apiClient";
-import { getChats, updateChat } from "@services/chatsService";
-import { getAgents, createAgent, updateAgent } from "@services/agentsService";
+import { getChats, updateChat, deleteChat } from "@services/chatsService";
+import { getAgents, createAgent, updateAgent, deleteAgent } from "@services/agentsService";
 
 export function useChatActions(state) {
 
@@ -30,6 +30,15 @@ export function useChatActions(state) {
             console.error("更新聊天记录标题失败：", error);
             return;
         }
+    };
+
+    const deleteChatById = async (chatId) => {
+        const { error } = await deleteChat(chatId);
+        if (error) {
+            console.error("删除聊天记录失败：", error);
+            return;
+        }
+        state.setChats(prev => prev.filter(chat => chat.chatId !== chatId));
     };
 
     const loadMessages = async (chatId) => {
@@ -86,6 +95,15 @@ export function useChatActions(state) {
 
     }
 
+    const deleteAgentById = async (agentId) => {
+        const { error } = await deleteAgent(agentId);
+        if (error) {
+            console.error("删除知能体失败：", error);
+            return;
+        }
+        state.setAgents(prev => prev.filter(agent => agent.agentId !== agentId));
+    }
+
     const getSelectedAgentId = (chatId) => {
         return state.chats.find(chat => chat.chatId === chatId)?.selectedAgent;
     }
@@ -102,11 +120,13 @@ export function useChatActions(state) {
     return { 
         loadChats, 
         addChat, 
-        updateChatByTitle, 
+        updateChatByTitle,
+        deleteChatById,
         loadMessages, 
         loadAgents, 
         addAgent, 
         updateAgentByField,
+        deleteAgentById,
         getSelectedAgentId, 
         setSelectedAgentId,
         getAgentById

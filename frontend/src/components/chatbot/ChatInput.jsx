@@ -1,12 +1,35 @@
 import './ChatInput.css';
 import { useState, useRef, useEffect, use } from 'react';
 import sendButton from '@assets/icon-action-send.png';
+import addIcon from '@assets/icon-ui-add.svg';
 import agentIcon from '@assets/icon-ui-robot.svg';
+import closeIcon from '@assets/icon-ui-chatinput-close.svg';
 import Button from '@components/common/Button';
 import PopupMenu from '@components/common/PopupMenu';
 import { useChat } from '@contexts/ChatContext';
 import { useChatStreaming } from '@hooks/useChatStreaming';
 import { useParams } from 'react-router-dom';
+
+export function AgentLabel({ text, }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div
+      className="group h-10 inline-flex items-center justify-center rounded-full px-4 text-sm font-medium
+                 text-blue-600 bg-blue-50 hover:bg-blue-100"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <span>
+        {hovered
+          ? <img src={closeIcon} alt="" className="w-4 h-4 mr-2"/>
+          : <img src={agentIcon} alt="" className="w-4 h-4 mr-2"/>
+        }
+      </span>
+      {text}
+    </div>
+  );
+}
+
 
 export default function ChatInput() {
 
@@ -14,6 +37,7 @@ export default function ChatInput() {
   const { chatId } = useParams();
   const [selectedAgentId, setSelectedAgentId] = useState(actions.getSelectedAgentId(chatId));
   
+  const selectedAgent = actions.getAgentById(selectedAgentId)
   const { handleSendMessage } = useChatStreaming(state, actions, {chatId, selectedAgentId});
   const [inputValue, setInputValue] = useState('');
   const [showAgentMenu, setShowAgentMenu] = useState(false);
@@ -57,12 +81,18 @@ export default function ChatInput() {
         onKeyDown={handleKeyDown}
       />
       <div className="flex flex-row justify-between px-2 py-2 gap-2">
-        <Button 
-          className="agent-selector-button"
-          onClick={handleToggle}
-          icon={agentIcon}
-          theme="whiteCircle"
-        />
+        <div className="flex items-center gap-2">
+            <Button 
+              className="agent-selector-button"
+              onClick={handleToggle}
+              icon={addIcon}
+              theme="whiteCircle"
+            />
+            {
+             selectedAgent && <AgentLabel text={selectedAgent.title} />
+            }
+          </div>
+
         {showAgentMenu && anchorRect && (
           <PopupMenu
             direction="top"

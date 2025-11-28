@@ -5,7 +5,7 @@ import './MenuItem.css';
 import FeatureMenu from './FeatureMenu';
 
 
-export default function MenuItem({ title, path, itemId, selectedItem, handleMenuItemClick, icon, onRename = null, hasFeature = false, renderOnSelected = true }) {
+export default function MenuItem({ title, path, itemId, selectedItem, handleMenuItemClick, icon, onRename = null, onDelete = null, hasFeature = false, renderOnSelected = true }) {
     const isSelected = itemId === selectedItem;
     const featureIconRef = useRef(null);
     const [menuPosition, setMenuPosition] = useState(null);
@@ -97,6 +97,7 @@ export default function MenuItem({ title, path, itemId, selectedItem, handleMenu
                     position={menuPosition}
                     onClose={() => setShowFeatureMenu(false)}
                     onRename={handleRename}
+                    onDelete={onDelete}
                 />
             )}
         </div>
