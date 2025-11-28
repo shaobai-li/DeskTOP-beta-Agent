@@ -1,5 +1,5 @@
 import json
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 from config.settings import JSON_DEV_AGENTS_PATH
 from .utils import *
 
@@ -96,3 +96,46 @@ def create_agent(agent_data: dict):
         json.dump(data, f, ensure_ascii=False, indent=4)
 
     return {"message": "创建成功", "agent": to_camel_case(new_agent)}
+
+@router.delete("/agents/{agent_id}")
+def delete_agent(agent_id: str):
+    """
+    删除指定的知能体
+    """
+    if not JSON_DEV_AGENTS_PATH.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="知能体数据文件不存在"
+        )
+
+    # 读取现有数据
+    with open(JSON_DEV_AGENTS_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    agents = data.get("agents", [])
+
+    # 查找目标 agent 的索引
+    target_index = None
+    for i, agent in enumerate(agents):
+        if agent.get("agent_id") == agent_id:
+            target_index = i
+            break
+
+    if target_index is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"知能体 {agent_id} 不存在"
+        )
+
+    # 执行删除
+    deleted_agent = agents.pop(target_index)
+    data["agents"] = agents
+
+    # 写回文件
+    with open(JSON_DEV_AGENTS_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+    return {
+        "message": "删除成功",
+        "deleted_agent": to_camel_case(deleted_agent)
+    }
