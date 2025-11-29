@@ -86,7 +86,7 @@ export default function ArticleModal({ isOpen, onClose, onSubmit }) {
             </div>
 
             <div>
-              <label>作者标签</label>
+              <label>原平台标签</label>
               <input
                 name="tags_by_author"
                 value={formData.tags_by_author}

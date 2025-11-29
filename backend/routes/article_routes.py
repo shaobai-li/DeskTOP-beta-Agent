@@ -23,7 +23,7 @@ class ArticleUpdate(BaseModel):
 
 @router.get("/articles")
 def get_articles():
-    """读取所有文章数据"""
+    """读取所有文章数据（包含关联的标签）"""
     if not DB_DEV_PATH.exists():
         return {"error": "数据库文件不存在"}
 
@@ -31,16 +31,27 @@ def get_articles():
     conn.row_factory = dict_factory
     cur = conn.cursor()
 
+    # 获取所有文章
     cur.execute("""
         SELECT article_id, title, date, source_platform, author_name, tags_by_author
         FROM articles
         ORDER BY article_id DESC
     """)
+    articles = cur.fetchall()
 
-    data = cur.fetchall()
+    # 为每篇文章获取关联的标签名称
+    for article in articles:
+        cur.execute("""
+            SELECT t.name
+            FROM tags t
+            INNER JOIN article_tags at ON t.tag_id = at.tag_id
+            WHERE at.article_id = ?
+        """, (article['article_id'],))
+        tags = cur.fetchall()
+        article['tags'] = ', '.join([tag['name'] for tag in tags]) if tags else ''
+
     conn.close()
-
-    return to_camel_case(data)
+    return to_camel_case(articles)
 
 @router.post("/articles", status_code=status.HTTP_201_CREATED)
 def create_article(article: ArticleCreate):

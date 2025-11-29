@@ -3,8 +3,8 @@ import TableHeader from "./TableHeader";
 import TableBody from "./TableBody";
 
 function ArticlesTable({ articles, onDelete }) {
-    const headers = ['标题', '日期', '来源平台', '作者', '标签'];
-    const fields = ['title', 'date', 'sourcePlatform', 'authorName', 'tagsByAuthor'];
+    const headers = ['标题', '日期', '来源平台', '作者', '原平台标签', '标签'];
+    const fields = ['title', 'date', 'sourcePlatform', 'authorName', 'tagsByAuthor', 'tags'];
     
     return (
         <div className="table-wrapper">

@@ -5,8 +5,8 @@ from .utils import *
 from pydantic import BaseModel, Field
 from typing import List
 from datetime import datetime
-from models.tag import Tag
-from database import get_db
+from .models.tag import Tag
+from .database import get_db
 from typing import Optional
 
 router = APIRouter()

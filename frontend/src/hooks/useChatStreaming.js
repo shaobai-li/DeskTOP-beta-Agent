@@ -50,9 +50,12 @@ export const useChatStreaming = (state, actions, {chatId = null, selectedAgentId
             }
 
             currentChatId = data.chatId
+            //actions.setSelectedAgentId(currentChatId, selectedAgentId);
             actions.addChat(data);
+            console.log("chat data returned", data);
             navigate(`/chat/${currentChatId}`);
         } 
+
 
         try {
             const response = await streamChat({

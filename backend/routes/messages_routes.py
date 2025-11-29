@@ -95,7 +95,8 @@ def begin_chat(request: UserQuery):
         return {
             "chatId": chat_id,
             "messageId": message_id,
-            "title": request.topic or "新对话"
+            "title": request.topic or "新对话",
+            "selectedAgent": request.selected_agent
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"创建会话失败: {str(e)}")
@@ -119,7 +120,7 @@ def generate_content(query: UserQuery):
             }) + "\n"
             yield chunk_str
             
-            save_message(chat_id, journey_state=journey_state, content="\n".join(chunks), role="assistant")
+            save_message(chat_id, journey_state=journey_state, content=chunks, role="assistant")
 
             status_msg = "正在构思的选题列表"
             yield json.dumps({
