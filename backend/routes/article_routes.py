@@ -32,9 +32,9 @@ def get_articles():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT title, date, source_platform, author_name, tags_by_author
+        SELECT article_id, title, date, source_platform, author_name, tags_by_author
         FROM articles
-        ORDER BY article_id ASC
+        ORDER BY article_id DESC
     """)
 
     data = cur.fetchall()
@@ -172,3 +172,28 @@ def update_article(article_id: int, update_data: ArticleUpdate):
     except Exception as e:
         conn.close()
         raise HTTPException(status_code=500, detail=f"更新失败: {str(e)}")
+
+@router.delete("/articles/{article_id}", status_code=status.HTTP_200_OK)
+def delete_article(article_id: int):
+    """删除指定 article_id 的文章"""
+    if not DB_DEV_PATH.exists():
+        raise HTTPException(status_code=500, detail="数据库文件不存在")
+
+    conn = sqlite3.connect(DB_DEV_PATH)
+    conn.row_factory = dict_factory
+    cur = conn.cursor()
+
+    # 检查文章是否存在
+    cur.execute("SELECT article_id FROM articles WHERE article_id = ?", (article_id,))
+    if not cur.fetchone():
+        conn.close()
+        raise HTTPException(status_code=404, detail=f"文章 {article_id} 不存在")
+
+    try:
+        cur.execute("DELETE FROM articles WHERE article_id = ?", (article_id,))
+        conn.commit()
+        conn.close()
+        return {"message": f"文章 {article_id} 已删除"}
+    except Exception as e:
+        conn.close()
+        raise HTTPException(status_code=500, detail=f"删除失败: {str(e)}")

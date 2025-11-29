@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ArticlesTable from "@components/layout/ArticlesTable";
 import Pagination from "@components/layout/Pagination";
-import { getArticles, createArticle } from "@services/articlesService";
+import { getArticles, createArticle, deleteArticle } from "@services/articlesService";
 import Input from "@components/common/Input";
 import Button from "@components/common/Button";
 import ArticleModal from "@components/layout/ArticleModal";
@@ -35,6 +35,17 @@ export default function TextbaseArticlesPage() {
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
+    };
+
+    // 处理文章删除
+    const handleDeleteArticle = async (articleId) => {
+        const { error } = await deleteArticle(articleId);
+        if (error) {
+            console.error("删除文章失败：", error);
+            return;
+        }
+        console.log("文章删除成功！");
+        setRows(prev => prev.filter(row => row.articleId !== articleId));
     };
 
     // 处理文章提交
@@ -71,7 +82,7 @@ export default function TextbaseArticlesPage() {
                 <Button onClick={handleAddClick} text="添加" />
             </div>
             <div className="textbase-article__content flex flex-col px-8">
-                <ArticlesTable articles={currentRows} />
+                <ArticlesTable articles={currentRows} onDelete={handleDeleteArticle} />
             </div>
             <div className="textbase-article__footer flex px-8 justify-end">
                 <Pagination

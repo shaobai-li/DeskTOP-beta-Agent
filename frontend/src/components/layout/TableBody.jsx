@@ -3,7 +3,7 @@ import MoreButton from '@components/common/MoreButton';
 import PopupMenu from '@components/common/PopupMenu';
 
 
-function TableBody({ data, fields }) {
+function TableBody({ data, fields, onDelete }) {
     const [menuState, setMenuState] = useState({ show: false, position: null, rowIndex: null });
 
     const handleMoreClick = (e, rowIndex) => {
@@ -21,6 +21,16 @@ function TableBody({ data, fields }) {
 
     const handleCloseMenu = () => {
         setMenuState({ show: false, position: null, rowIndex: null });
+    };
+
+    const handleDelete = () => {
+        if (menuState.rowIndex !== null && data[menuState.rowIndex]) {
+            const articleId = data[menuState.rowIndex].articleId;
+            if (articleId && onDelete) {
+                onDelete(articleId);
+            }
+        }
+        handleCloseMenu();
     };
 
     return (
@@ -56,7 +66,10 @@ function TableBody({ data, fields }) {
                         <div className="px-3 py-2 cursor-pointer hover:bg-neutral-100 rounded">
                             编辑
                         </div>
-                        <div className="px-3 py-2 cursor-pointer hover:bg-neutral-100 rounded">
+                        <div 
+                            className="px-3 py-2 cursor-pointer hover:bg-neutral-100 rounded text-red-500"
+                            onClick={handleDelete}
+                        >
                             删除
                         </div>
                     </div>
