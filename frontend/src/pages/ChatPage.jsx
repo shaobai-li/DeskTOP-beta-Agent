@@ -4,7 +4,7 @@ import AIMessage from "@components/chatbot/AIMessage";
 import "./ChatPage.css";
 import { useChat } from "@contexts/ChatContext";
 import { useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import { createContext, useContext } from "react";
 
 const ChatPageContext = createContext(null);
@@ -19,6 +19,9 @@ export default function ChatPage() {
 
     const messagesEndRef = useRef(null);
 
+    // 检查聊天是否存在（仅当 chatId 有值时才检查）
+    const chatExists = !chatId || state.chats.some(chat => chat.chatId === chatId);
+
     useEffect(() => {
         actions.loadMessages(chatId);
     }, [chatId]);
@@ -26,6 +29,11 @@ export default function ChatPage() {
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [state.messages]);
+
+    // 如果聊天不存在，跳转到首页（新建聊天页面）
+    if (!chatExists) {
+        return <Navigate to="/" replace />
+    }
 
     return (    
         <div className="chat-panel">

@@ -1,5 +1,4 @@
-
-import { useParams } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 import PromptInput from '@components/layout/PromptInput'
 import { useChat } from '@contexts/ChatContext'
 
@@ -15,8 +14,7 @@ function AgentPage() {
     actions.updateAgentByField(agentId, field, newValue)
   }
 
-
-  return (!agent) ? <div>加载中...</div> : (
+  return (!agent) ? <Navigate to="/" replace /> : (
     <div className="agent-page flex flex-col h-full">
       <div className="agent-page-header text-4xl font-bold px-8 py-8">
         <h1 className="agent-page__title">{agent.title}</h1>
