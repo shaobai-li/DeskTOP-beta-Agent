@@ -48,14 +48,13 @@ export default function ChatInput() {
     }, [chatId, actions]);
 
     const selectedAgent = actions.getAgentById(selectedAgentId)
-    const { handleSendMessage } = useChatStreaming(state, actions, {chatId, selectedAgentId});
+    const { handleSendMessage } = useChatStreaming(chatId, selectedAgentId);
     const [inputValue, setInputValue] = useState('');
     const [showAgentMenu, setShowAgentMenu] = useState(false);
     const [anchorRect, setAnchorRect] = useState(null);
 
     const handleSendMessageStream = () => {
         if (inputValue.trim()) {
-        console.log("flag");
         handleSendMessage(inputValue.trim());
         setInputValue('');
         }
@@ -106,7 +105,7 @@ export default function ChatInput() {
                 /> : <AgentLabel 
                     text={selectedAgent.title} 
                     onClick={() => updateSelectedAgentId(null)}
-                    isFixed={chatId}
+                    isFixed={chatId !== "new"}
                 />}
             </div>
 
@@ -126,15 +125,13 @@ export default function ChatInput() {
                 ))}
             </PopupMenu>
             )}
-            <Tooltip text={!selectedAgent ? "先选择一个智能体" : "发送消息"}>
-                <Button 
-                    disabled={!selectedAgent}
-                    className="send-button"
-                    onClick={handleSendMessageStream}
-                    icon={sendButton}
-                    theme="blackCircle"
-                />
-            </Tooltip>
+            <Button 
+                disabled={!selectedAgent || state.isStreaming[chatId]}
+                className="send-button"
+                onClick={handleSendMessageStream}
+                icon={sendButton}
+                theme="blackCircle"
+            />
         </div>
         </div>
     )

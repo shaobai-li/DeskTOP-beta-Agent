@@ -4,19 +4,10 @@ export function useChatsState() {
     
     const [chats, setChats] = useState([]);
     const [agents, setAgents] = useState([]);
-
-    const [messages, setMessagesState] = useState({});
-
-
-    const setMessages = (chatId, updater) => {
-        setMessagesState((prev) => {
-            const newMessages = updater(prev[chatId] || []);
-            return {
-                ...prev,
-                [chatId]: newMessages
-            };
-        });
-    };
+    
+    const [messages, setMessages] = useState({}); // chatId → message[]
+    const [isLoaded, setIsLoaded] = useState({}); // chatId → boolean
+    const [isStreaming, setIsStreaming] = useState({}); // chatId → boolean
 
     return {
         chats,
@@ -24,6 +15,10 @@ export function useChatsState() {
         agents,
         setAgents,
         messages,
-        setMessages 
+        setMessages,
+        isLoaded,
+        setIsLoaded,
+        isStreaming,
+        setIsStreaming
     };
 }

@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 from models.chat import Chat
 from models.message import Message
 from utils import uuid7, to_camel_case
-from agents import SearchAgent, TopicAnalysisAgent, DraftAgent
+from agents import SearchAgent, TopicAnalysisAgent, DraftAgent, LanguageStyler
 
 
 class MessageService:
@@ -17,6 +17,7 @@ class MessageService:
         self.search_agent = SearchAgent()
         self.topic_analysis_agent = TopicAnalysisAgent()
         self.draft_agent = DraftAgent()
+        self.language_styler = LanguageStyler()
 
     @staticmethod
     async def create_chat(title: str, selected_agent: str, db: AsyncSession) -> str:
@@ -137,21 +138,50 @@ class MessageService:
                 }) + "\n"
                 yield chunk_str
                 
+                
+                journey_state = "1"
                 if xml_topic:
                     await MessageService.save_message(chat_id, journey_state=journey_state, content=str(xml_topic), role="assistant", db=db)
             
-            journey_state = "1"
+            
             
         elif journey_state == "1":
-            generated_draft = self.draft_agent.draft(topic)
-            chunk_str = json.dumps({
+            status_msg = "正在生成草稿"
+            yield json.dumps({
                 "stage": 5,
+                "topic": topic,
+                "generated_content": status_msg
+            }) + "\n"
+
+            generated_draft = self.draft_agent.draft(topic)
+            
+            chunk_str = json.dumps({
+                "stage": 6,
                 "topic": topic,
                 "generated_content": generated_draft
             }) + "\n"
             yield chunk_str
-            journey_state = "0"
+
+            journey_state = "1"
             await MessageService.save_message(chat_id, journey_state=journey_state, content=generated_draft, role="assistant", db=db)
+
+
+            status_msg = "正在进行语言风格处理中"
+            yield json.dumps({
+                "stage": 7,
+                "topic": topic,
+                "generated_content": status_msg
+            }) + "\n"
+            
+            optimized_draft = self.language_styler.styler(generated_draft)
+            yield json.dumps({
+                "stage": 8,
+                "topic": topic,
+                "generated_content": optimized_draft
+            }) + "\n"
+
+            journey_state = "0"
+            await MessageService.save_message(chat_id, journey_state=journey_state, content=optimized_draft, role="assistant", db=db)
+            
         else:
             raise ValueError("Invalid journey state")
-

@@ -1,10 +1,13 @@
 import { beginChat, streamChat } from "@services/messagesService";
 import { useNavigate } from "react-router-dom";
+import { useChat } from "@contexts/ChatContext";
+
 
 const processStreamChunk = (jsonStr, currentChatId, addMessage) => {
     try {
         const { stage, generated_content } = JSON.parse(jsonStr);
-        const newAssistantMessage = { role: "assistant", stage, content: generated_content };
+        const newAssistantMessage = { role: "assistant", content: generated_content }
+        console.log("messages:", getMessages(currentChatId));
         addMessage(currentChatId, newAssistantMessage);
         
         // setMessages((prev) => {
@@ -14,7 +17,7 @@ const processStreamChunk = (jsonStr, currentChatId, addMessage) => {
         //         const updated = [...prev];
         //         updated[index] = {
         //             ...updated[index],
-        //             content: updated[index].content + "\n" + generated_content
+        //             content: updated[index].content + "\n" + generated_content   
         //         };
         //         return updated;
         //     }
@@ -25,20 +28,16 @@ const processStreamChunk = (jsonStr, currentChatId, addMessage) => {
     }
 };
 
-export const useChatStreaming = (state, actions, {chatId = null, selectedAgentId = null}) => {
+export const useChatStreaming = (chatId = null, selectedAgentId = null) => {
     const navigate = useNavigate();
+
+    const { state, actions } = useChat();
 
 
     const handleSendMessage = async (message) => {
-        // 乐观更新 UI
+
         const newUserMessage = { role: "user", content: message };
-
         let currentChatId = chatId;
-        actions.addMessage(currentChatId, newUserMessage);
-
-        console.log("topic", message);
-        console.log("chat_id", currentChatId);
-        console.log("selected_agent", selectedAgentId);
 
         if (currentChatId === "new") {
             const { data, error } = await beginChat({
@@ -56,13 +55,14 @@ export const useChatStreaming = (state, actions, {chatId = null, selectedAgentId
             currentChatId = data.chatId
             //actions.setSelectedAgentId(currentChatId, selectedAgentId);
             actions.addChat(data);
-            actions.addMessage(currentChatId, newUserMessage)
-            console.log("chat data returned", data);
             navigate(`/chat/${currentChatId}`);
         } 
 
 
         try {
+            
+            actions.appendMessage(currentChatId, newUserMessage)
+            state.setIsStreaming(prev => ({ ...prev, [currentChatId]: true })); 
             const response = await streamChat({
                 topic: message,
                 chat_id: currentChatId,
@@ -85,13 +85,15 @@ export const useChatStreaming = (state, actions, {chatId = null, selectedAgentId
 
                 for (const jsonStr of parts) {
                     if (!jsonStr.trim()) continue;
-                    processStreamChunk(jsonStr, currentChatId, actions.addMessage);
+                    processStreamChunk(jsonStr, currentChatId, actions.appendMessage);
                 }
             }
 
+            state.setIsStreaming(prev => ({ ...prev, [currentChatId]: false }));
+
         } catch (error) {
             console.error("Streaming Error:", error);
-            actions.setMessages(currentChatId, () => [{ role: "assistant", content: "⚠️ 连接中断，请重试。" }]);
+            actions.appendMessage(currentChatId, [{ role: "assistant", content: "⚠️ 连接中断，请重试。" }]);
         }
     };
 

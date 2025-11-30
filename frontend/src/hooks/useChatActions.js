@@ -11,11 +11,15 @@ export function useChatActions(state) {
             return;
         }
         state.setChats(data);
+        
+        for (const chat of data) {
+            ensureChat(chat.chatId);
+        }
     };
 
     const addChat = (chat) => {
-        console.log("addChat", chat);
         state.setChats(prev => [chat, ...prev]);
+        ensureChat(chat.chatId);
     };
 
     const updateChatByTitle = async (chatId, newTitle) => {
@@ -39,38 +43,76 @@ export function useChatActions(state) {
             return;
         }
         state.setChats(prev => prev.filter(chat => chat.chatId !== chatId));
+
+        state.setMessages(prev => { const p = { ...prev }; delete p[chatId]; return p; });
+        state.setIsLoaded(prev => { const p = { ...prev }; delete p[chatId]; return p; });
+        state.setIsStreaming(prev => { const p = { ...prev }; delete p[chatId]; return p; });
     };
     
-    const loadMessages = async (chatId) => {
-        // Initialize messages for this chat immediately to prevent undefined state
-        if (!state.messages[chatId]) {
-            state.setMessages(chatId, () => []);
-        }
+    const ensureChat = (chatId) => {
+        state.setMessages(prev => {
+            if (prev[chatId]) return prev;
+            return { ...prev, [chatId]: [] };
+        });
+        
+        state.setIsLoaded(prev => {
+            if (prev[chatId] !== undefined) return prev;
+            return { ...prev, [chatId]: false };
+        });
 
-        const { data, error } = await getMessages(chatId);
-
-        if (error) {
-            state.setMessages(chatId, () => [
-                { role: "assistant", content: "⚠️ 无法加载历史消息，请稍后再试。" }
-            ]);
-            return;
-        }
-
-        state.setMessages(
-            chatId,
-            () => data?.length > 0
-                ? data
-                : [{ role: "assistant", content: "你好，这是新的聊天窗口，有什么可以帮你？" }]
-        );
-    };
-
-    // 添加一条消息
-    const addMessage = (chatId, message) => {
-        state.setMessages(chatId, (prevMessages) => {
-            return [...prevMessages, message];
+        state.setIsStreaming(prev => {
+            if (prev[chatId] !== undefined) return prev;
+            return { ...prev, [chatId]: false };
         });
     };
-      
+
+    const appendMessage = (chatId, message) => {
+        state.setMessages(prev => ({
+            ...prev,
+            [chatId]: [...(prev[chatId] || []), message]
+        }));
+    };
+
+    const replaceMessages = (chatId, messagesArray) => {
+        state.setMessages(prev => ({
+            ...prev,
+            [chatId]: messagesArray
+        }));
+    };
+
+    const loadMessages = async (chatId) => {
+        ensureChat(chatId);
+        
+        if (state.isLoaded[chatId] || state.isStreaming[chatId]) return;
+
+
+        const { data, error } = await getMessages(chatId);
+    
+        if (error) {
+            appendMessage(chatId, {
+                role: "assistant",
+                content: "⚠️ 无法加载历史消息，请稍后再试。"
+            });
+            return;
+        }
+    
+        replaceMessages(chatId, data);
+
+        state.setIsLoaded(prev => ({ ...prev, [chatId]: true }));
+        // state.setMessages(prev => {
+        //     const existing = prev[chatId] || [];
+    
+        //     // 只加载历史消息（旧消息），避免覆盖 UI 里新消息
+        //     return {
+        //         ...prev,
+        //         [chatId]: [...data, ...existing]
+        //     };
+        // });
+    };
+    
+
+    // 添加一条消息
+
 
     const loadAgents = async () => {
         const { data, error } = await getAgents();
@@ -132,12 +174,17 @@ export function useChatActions(state) {
         addChat, 
         updateChatByTitle,
         deleteChatById,
+
         loadMessages, 
-        addMessage,
+        appendMessage,
+        replaceMessages,
+        ensureChat,
+        
         loadAgents, 
         addAgent, 
         updateAgentByField,
         deleteAgentById,
+        
         getSelectedAgentId, 
         setSelectedAgentId,
         getAgentById

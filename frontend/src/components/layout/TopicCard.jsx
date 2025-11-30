@@ -8,11 +8,11 @@ import { useParams } from 'react-router-dom';
 
 function TopicCard({ cardContents, isSelected = false, onSelect }) {
 
-  const { state, actions } = useChat();
+  const { actions } = useChat();
 
   const { chatId } = useParams();
   const selectedAgentId = actions.getSelectedAgentId(chatId);
-  const { handleSendMessage } = useChatStreaming(state, actions, {chatId, selectedAgentId});
+  const { handleSendMessage } = useChatStreaming(chatId, selectedAgentId);
 
 
   const content = cardContents || {};

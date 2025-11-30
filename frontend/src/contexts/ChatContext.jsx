@@ -18,6 +18,7 @@ export default function ChatProvider({ children }) {
         actions.loadAgents();
     }, []);
 
+    
     return (
         <ChatContext.Provider value={{ state, actions }}>
             {children}

@@ -23,20 +23,18 @@ export default function ChatPage() {
     const chatExists = chatId === "new" || state.chats.some(chat => chat.chatId === chatId);
 
     useEffect(() => {
-
-
-        if (chatId !== "new") {
-            actions.loadMessages(chatId);
+        if (chatId !== "new") {            
+            actions.loadMessages(chatId);        
         } else {
-            state.setMessages(chatId, () => [{ role: "assistant", content: "你好，这是新的聊天窗口，有什么可以帮你？" }]);
+            actions.replaceMessages(chatId, [{ role: "assistant", content: "你好，这是新的聊天窗口，有什么可以帮你？" }]);
         }
     }, [chatId]);
 
-    const currentMessages = state.messages[chatId] || [];
+    const currentMessages = state.messages[chatId] ?? [];
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [state.messages[chatId]]);
+    }, [currentMessages]);
 
     // 如果聊天不存在，跳转到首页（新建聊天页面）
     if (!chatExists) {
