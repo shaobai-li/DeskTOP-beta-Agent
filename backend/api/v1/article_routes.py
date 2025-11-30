@@ -13,6 +13,7 @@ class ArticleCreate(BaseModel):
     source_platform: str = "小红书"
     author_name: str = ""
     tags_by_author: str = ""
+    content: str = ""  # 新增
 
 
 class ArticleUpdate(BaseModel):
@@ -21,6 +22,7 @@ class ArticleUpdate(BaseModel):
     source_platform: str | None = None
     author_name: str | None = None
     tags_by_author: str | None = None
+    content: str | None = None  # 新增
 
 
 @router.get("/articles")

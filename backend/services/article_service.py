@@ -5,7 +5,7 @@ from typing import List, Dict, Optional
 from datetime import datetime
 from models.article import Article
 from models.tag import Tag
-from utils import to_camel_case
+from utils import to_camel_case, uuid7
 
 
 class ArticleService:
@@ -45,6 +45,7 @@ class ArticleService:
         # 创建新文章
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         new_article = Article(
+            article_id=uuid7(),
             title=title.strip(),
             date=date.strip(),
             source_platform=source_platform.strip(),

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ArticlesTable from "@components/layout/ArticlesTable";
 import Pagination from "@components/layout/Pagination";
-import { getArticles, createArticle, deleteArticle } from "@services/articlesService";
+import { getArticles, createArticle, deleteArticle, rebuildArticlesEmbedding } from "@services/articlesService";
 import Input from "@components/common/Input";
 import Button from "@components/common/Button";
 import ArticleModal from "@components/layout/ArticleModal";
@@ -48,6 +48,17 @@ export default function TextbaseArticlesPage() {
         setRows(prev => prev.filter(row => row.articleId !== articleId));
     };
 
+    // 处理重建索引
+    const handleRebuildIndex = async () => {
+        console.log("开始重建索引...");
+        const { data, error } = await rebuildArticlesEmbedding();
+        if (error) {
+            console.error("重建索引失败：", error);
+            return;
+        }
+        console.log("重建索引完成！", data);
+    };
+
     // 处理文章提交
     const handleArticleSubmit = async (formData) => {
         console.log("提交的表单数据：", formData);
@@ -79,7 +90,10 @@ export default function TextbaseArticlesPage() {
                     value={searchValue}
                     onChange={handleSearchChange}
                 />
-                <Button onClick={handleAddClick} text="添加" />
+                <div className="flex gap-2">
+                    <Button onClick={handleRebuildIndex} text="重建索引" theme="white" />
+                    <Button onClick={handleAddClick} text="添加" />
+                </div>
             </div>
             <div className="textbase-article__content flex flex-col px-8">
                 <ArticlesTable articles={currentRows} onDelete={handleDeleteArticle} />

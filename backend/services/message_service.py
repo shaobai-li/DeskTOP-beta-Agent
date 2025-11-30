@@ -106,7 +106,7 @@ class MessageService:
         if journey_state == "0":
             chunks = self.search_agent.local_search(topic, 4)
             chunk_str = json.dumps({
-                "stage": 1,
+                "is_status_message": False,
                 "topic": topic,
                 "generated_content": chunks
             }) + "\n"
@@ -116,28 +116,35 @@ class MessageService:
 
             status_msg = "正在构思的选题列表"
             yield json.dumps({
-                "stage": 2,
+                "is_status_message": True,
                 "topic": topic,
                 "generated_content": status_msg
             }) + "\n"
 
             topic_list = self.search_agent.content_framework(chunks)
-            status_msg2 = "正在分析选题列表"
+
+            status_msg = "正在分析选题列表"
             yield json.dumps({
-                "stage": 3,
+                "is_status_message": True,
                 "topic": topic,
-                "generated_content": status_msg2
+                "generated_content": status_msg
             }) + "\n"
 
             xml_topic = None
             for xml_topic in self.topic_analysis_agent.analyze_topic_list(topic_list):
                 chunk_str = json.dumps({
-                    "stage": 4,
+                    "is_status_message": False,
                     "topic": topic,
                     "generated_content": xml_topic
                 }) + "\n"
                 yield chunk_str
-                
+
+                status_msg = "正在分析选题列表"
+                yield json.dumps({
+                    "is_status_message": True,
+                    "topic": topic,
+                    "generated_content": status_msg
+                }) + "\n"                
                 
                 journey_state = "1"
                 if xml_topic:
@@ -148,7 +155,7 @@ class MessageService:
         elif journey_state == "1":
             status_msg = "正在生成草稿"
             yield json.dumps({
-                "stage": 5,
+                "is_status_message": True,
                 "topic": topic,
                 "generated_content": status_msg
             }) + "\n"
@@ -156,7 +163,7 @@ class MessageService:
             generated_draft = self.draft_agent.draft(topic)
             
             chunk_str = json.dumps({
-                "stage": 6,
+                "is_status_message": False,
                 "topic": topic,
                 "generated_content": generated_draft
             }) + "\n"
@@ -168,14 +175,14 @@ class MessageService:
 
             status_msg = "正在进行语言风格处理中"
             yield json.dumps({
-                "stage": 7,
+                "is_status_message": True,
                 "topic": topic,
                 "generated_content": status_msg
             }) + "\n"
             
             optimized_draft = self.language_styler.styler(generated_draft)
             yield json.dumps({
-                "stage": 8,
+                "is_status_message": False,
                 "topic": topic,
                 "generated_content": optimized_draft
             }) + "\n"

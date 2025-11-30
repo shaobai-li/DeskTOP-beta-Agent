@@ -1,6 +1,6 @@
 .chat-input {
   width: 100%;
-  max-width: 550px;
+  max-width: 1000px;
   display: flex;
   flex-direction: column;
   border: 1px solid #ccc;

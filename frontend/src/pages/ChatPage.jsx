@@ -1,6 +1,7 @@
 import ChatInput from "@components/chatbot/ChatInput";
 import UserMessage from "@components/chatbot/UserMessage";
 import AIMessage from "@components/chatbot/AIMessage";
+import Loading from "@components/common/Loading";  // 添加 Loading 导入
 import "./ChatPage.css";
 import { useChat } from "@contexts/ChatContext";
 import { useRef, useEffect } from "react";
@@ -31,6 +32,7 @@ export default function ChatPage() {
     }, [chatId]);
 
     const currentMessages = state.messages[chatId] ?? [];
+    const currentStatusMessage = state.statusMessage?.[chatId];  // 获取当前状态消息
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -52,6 +54,14 @@ export default function ChatPage() {
                             return <AIMessage key={index} message={message.content} />;
                         }
                     })}
+                    {/* 临时状态消息：在消息列表末尾单独显示 */}
+                    {currentStatusMessage && (
+                        <Loading 
+                            key={currentStatusMessage}  // 添加 key，文字变化时强制重新创建组件
+                            text={currentStatusMessage} 
+                            className="mt-4"
+                        />
+                    )}
                     <div ref={messagesEndRef} />
                 </div>
             </div>

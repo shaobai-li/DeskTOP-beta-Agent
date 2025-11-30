@@ -7,7 +7,8 @@ export default function ArticleModal({ isOpen, onClose, onSubmit }) {
     date: "",
     source_platform: "小红书",  
     author_name: "",            
-    tags_by_author: ""         
+    tags_by_author: "",
+    content: ""         
   });
 
   if (!isOpen) return null;
@@ -93,6 +94,20 @@ export default function ArticleModal({ isOpen, onClose, onSubmit }) {
                 onChange={handleChange}
                 placeholder="#旅行 #穿搭"
                 className="w-full px-3 py-2 border rounded-md"
+              />
+            </div>
+
+            <h3 className="font-semibold">文章内容</h3>
+
+            <div>
+              <label>内容</label>
+              <textarea
+                name="content"
+                value={formData.content}
+                onChange={handleChange}
+                placeholder="请输入文章内容..."
+                rows={6}
+                className="w-full px-3 py-2 border rounded-md resize-y"
               />
             </div>
 

@@ -1,8 +1,8 @@
-from utils.llm_client import create_llm_client
-from utils.prompt_loader import load_prompt
+from agents.utils.llm_client import create_llm_client
+from agents.utils.prompt_loader import load_prompt
 
 
-SYSTEM_PROMPT = load_prompt("styling")
+SYSTEM_PROMPT = load_prompt("language_style")
 
 class LanguageStyler:
     def __init__(self):

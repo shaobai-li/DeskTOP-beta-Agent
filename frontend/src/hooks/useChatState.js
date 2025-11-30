@@ -8,6 +8,7 @@ export function useChatsState() {
     const [messages, setMessages] = useState({}); // chatId → message[]
     const [isLoaded, setIsLoaded] = useState({}); // chatId → boolean
     const [isStreaming, setIsStreaming] = useState({}); // chatId → boolean
+    const [statusMessage, setStatusMessage] = useState({}); // chatId → string | null (临时状态提示)
 
     return {
         chats,
@@ -19,6 +20,8 @@ export function useChatsState() {
         isLoaded,
         setIsLoaded,
         isStreaming,
-        setIsStreaming
+        setIsStreaming,
+        statusMessage,
+        setStatusMessage
     };
 }

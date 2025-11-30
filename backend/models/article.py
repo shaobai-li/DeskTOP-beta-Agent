@@ -20,6 +20,7 @@ class Article(Base):
     source_platform = Column(String, nullable=False, server_default="小红书")
     author_name = Column(String, server_default="")
     tags_by_author = Column(String, server_default="")
+    content = Column(String, server_default="")
     created_at = Column(String, nullable=False)
     updated_at = Column(String, nullable=False)
 
@@ -34,6 +35,7 @@ class Article(Base):
             "sourcePlatform": self.source_platform,
             "authorName": self.author_name,
             "tagsByAuthor": self.tags_by_author,
+            "content": self.content, 
             "createdAt": self.created_at,
             "updatedAt": self.updated_at
         }

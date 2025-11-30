@@ -42,3 +42,11 @@
 .simple-table tbody tr:last-child td {
     border-bottom: none;
 }
+
+/* content 列文本溢出省略 */
+.simple-table td:nth-child(7) {
+    max-width: 200px;           /* 根据需要调整最大宽度 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
