@@ -66,10 +66,9 @@ class AgentService:
         new_agent = {
             "agent_id": uuid7(),
             "title": snake_data.get("title", "未命名智能体"),
-            "profile": "",
-            "quadrant_prompt": "",
-            "script_generation_prompt": "",
-            "language_style_prompt": ""
+            "persona_prompt": snake_data.get("persona_prompt", ""),
+            "language_style_prompt": snake_data.get("language_style_prompt", ""),
+            "default_prompt_dir": snake_data.get("default_prompt_dir", "agents/prompts/")
         }
         
         agents.append(new_agent)

@@ -6,18 +6,47 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from models.chat import Chat
 from models.message import Message
-from utils import uuid7, to_camel_case
+from utils import uuid7, to_camel_case, to_snake_case
 from agents import SearchAgent, TopicAnalysisAgent, DraftAgent, LanguageStyler
+from services.agent_service import AgentService
 
 
 class MessageService:
     """消息业务逻辑服务层"""
 
     def __init__(self):
-        self.search_agent = SearchAgent()
-        self.topic_analysis_agent = TopicAnalysisAgent()
-        self.draft_agent = DraftAgent()
-        self.language_styler = LanguageStyler()
+        # agents 将在 _init_agents 中根据 selected_agent 初始化
+        self.search_agent = None
+        self.topic_analysis_agent = None
+        self.draft_agent = None
+        self.language_styler = None
+        self._current_agent_id = None
+    
+    def _init_agents(self, selected_agent: str):
+        """根据 selected_agent (agent_id) 初始化各个 agent"""
+        # 如果已经是同一个 agent，不需要重新初始化
+        if self._current_agent_id == selected_agent:
+            return
+        
+        # 获取 agent 配置
+        agent_config = AgentService.get_agent_by_id(selected_agent)
+        if not agent_config:
+            # 如果找不到配置，使用默认配置
+            agent_config = {
+                "persona_prompt": "",
+                "language_style_prompt": "",
+                "default_prompt_dir": "agents/prompts/"
+            }
+        else:
+            # 将 camelCase 转换回 snake_case，因为 agent 类期望 snake_case 键名
+            agent_config = to_snake_case(agent_config)
+        
+        # 使用 agent 配置初始化各个 agent
+        self.search_agent = SearchAgent(agent_config)
+        self.topic_analysis_agent = TopicAnalysisAgent(agent_config)
+        self.draft_agent = DraftAgent(agent_config)
+        self.language_styler = LanguageStyler(agent_config)
+        self._current_agent_id = selected_agent
 
     @staticmethod
     async def create_chat(title: str, selected_agent: str, db: AsyncSession) -> str:
@@ -101,6 +130,9 @@ class MessageService:
 
     async def generate_content(self, topic: str, chat_id: str, selected_agent: str, db: AsyncSession) -> AsyncGenerator[str, None]:
         """处理聊天消息生成请求"""
+        # 根据 selected_agent 初始化各个 agent
+        self._init_agents(selected_agent)
+        
         journey_state = await MessageService.get_journey_state(chat_id, db)
 
         if journey_state == "0":

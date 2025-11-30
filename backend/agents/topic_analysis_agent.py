@@ -3,20 +3,33 @@ from agents.utils.xml_parser import parse_topic_list, build_topic_xml
 from agents.utils.text_cleaner import clean_json_tags
 from agents.utils.prompt_loader import load_prompt
 
-SYSTEM_PROMPT_TOPIC_ANALYSIS = load_prompt("topic_analysis")
 
 class TopicAnalysisAgent:
 
-    def __init__(self):
+    def __init__(self, agent_config: dict = None):
+        """
+        初始化 TopicAnalysisAgent
+        
+        Args:
+            agent_config: 智能体配置，包含 default_prompt_dir
+        """
         self.module = {
             "llm_client": create_llm_client("deepseek"),
             "llm_model": "deepseek-chat"
         }
+        self.agent_config = agent_config or {}
+        
+    def _get_system_prompt(self) -> str:
+        """获取系统提示词，使用 default_prompt_dir 加载"""
+        prompt_dir = self.agent_config.get("default_prompt_dir", "agents/prompts/")
+        return load_prompt("topic_analysis", prompt_dir)
 
     def analyze_topic(self, topic):
         print("Entering analyze_topic...")
+        system_prompt = self._get_system_prompt()
+        print("System prompt:", system_prompt)
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT_TOPIC_ANALYSIS},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"{topic}"}
             ]
         print("Sending messages to LLM...")

@@ -1,19 +1,29 @@
 from agents.utils.llm_client import create_llm_client
-from agents.utils.prompt_loader import load_prompt
 
-
-SYSTEM_PROMPT = load_prompt("language_style")
 
 class LanguageStyler:
-    def __init__(self):
+    def __init__(self, agent_config: dict = None):
+        """
+        初始化 LanguageStyler
+        
+        Args:
+            agent_config: 智能体配置，包含 language_style_prompt
+        """
         self.module = {
             'llm_client': create_llm_client("deepseek"),
             'llm_model' : "deepseek-chat"
         }
+        self.agent_config = agent_config or {}
+    
+    def _get_system_prompt(self) -> str:
+        """获取系统提示词，直接从 agent_config 获取 language_style_prompt"""
+        print("Language style prompt:", self.agent_config.get("language_style_prompt", ""))
+        return self.agent_config.get("language_style_prompt", "")
 
     def styler(self, topic: str):
+        system_prompt = self._get_system_prompt()
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"请将以下内容进行语言风格化：{topic}"}
             ]
         response = self.module["llm_client"].chat.completions.create(

@@ -5,12 +5,16 @@ from sentence_transformers import SentenceTransformer
 from agents.utils.llm_client import create_llm_client
 from agents.utils.prompt_loader import load_prompt
 
-SYSTEM_PROMPT_CONTENT_TOPIC = load_prompt("content_topic")
-
 
 class SearchAgent:
     
-    def __init__(self):
+    def __init__(self, agent_config: dict = None):
+        """
+        初始化 SearchAgent
+        
+        Args:
+            agent_config: 智能体配置，包含 default_prompt_dir
+        """
         self.embedding_model = SentenceTransformer('BAAI/bge-large-zh-v1.5')
         self.cg_chunks_index = faiss.read_index("database/cg_chunks_20251014.index")
         with open("database/cg_chunks_20251014.json", "r", encoding="utf-8") as f:
@@ -22,6 +26,12 @@ class SearchAgent:
             "llm_client": create_llm_client("deepseek"),
             "llm_model": "deepseek-chat"
         }
+        self.agent_config = agent_config or {}
+    
+    def _get_system_prompt(self) -> str:
+        """获取系统提示词，使用 default_prompt_dir 加载"""
+        prompt_dir = self.agent_config.get("default_prompt_dir", "agents/prompts/")
+        return load_prompt("content_topic", prompt_dir)
 
     def local_search(self, queries, k):
         print("Entering local_search...")
@@ -37,8 +47,10 @@ class SearchAgent:
 
     def content_framework(self, chunks):
         print("Entering content_framework...")
+        system_prompt = self._get_system_prompt()
+        print("System prompt:", system_prompt)
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT_CONTENT_TOPIC},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"{self.texts_retrieved}"}
             ]
         print("Sending messages to LLM...")
@@ -48,5 +60,5 @@ class SearchAgent:
             )
         print("Received response from LLM...")
         completion = response.choices[0].message.content
-        print(completion)
+        
         return completion

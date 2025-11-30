@@ -22,9 +22,9 @@ function AgentPage() {
       <div className="agent-page-body flex-grow px-8 py-8">
         <PromptInput
           title="人设"
-          value={agent.profile}
+          value={agent.personaPrompt}
           placeholder="请输入知能体的人设描述..."
-          onConfirm={handleConfirm('profile')}
+          onConfirm={handleConfirm('personaPrompt')}
         />
         
         <PromptInput
