@@ -1,13 +1,13 @@
 import { apiPost, apiGet } from "./apiClient";
 
 export function beginChat(body) {
-    return apiPost("/api/messages/begin", body);
+    return apiPost("/messages/begin", body);
 }
 
 export function streamChat(body) {
-    return apiPost("/api/messages/stream", body, { stream: true });
+    return apiPost("/messages/stream", body, { stream: true });
 }
 
 export function getMessages(chatId) {
-    return apiGet(`/api/messages/${chatId}`);
+    return apiGet(`/messages/${chatId}`);
 }

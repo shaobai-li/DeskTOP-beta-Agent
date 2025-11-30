@@ -1,8 +1,12 @@
-# database.py
+import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from config.settings import DB_DEV_PATH
-from pathlib import Path
+
+
+def dict_factory(cursor, row):
+    """SQLite 字典工厂函数，将查询结果转换为字典"""
+    return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
 
 
 # 异步 SQLite 引擎（完美支持你现有的 app_dev.db）
@@ -19,6 +23,8 @@ AsyncSessionLocal = sessionmaker(
     expire_on_commit=False
 )
 
+
 async def get_db() -> AsyncSession:
     async with AsyncSessionLocal() as session:
         yield session
+

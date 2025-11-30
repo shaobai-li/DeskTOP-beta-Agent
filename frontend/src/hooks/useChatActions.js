@@ -1,6 +1,6 @@
-import { apiGet } from "@services/apiClient";
 import { getChats, updateChat, deleteChat } from "@services/chatsService";
 import { getAgents, createAgent, updateAgent, deleteAgent } from "@services/agentsService";
+import { getMessages } from "@services/messagesService";
 
 export function useChatActions(state) {
 
@@ -40,27 +40,37 @@ export function useChatActions(state) {
         }
         state.setChats(prev => prev.filter(chat => chat.chatId !== chatId));
     };
-
+    
     const loadMessages = async (chatId) => {
-            if (!chatId) {
-                state.setMessages([
-                    { role: "assistant", content: "你好，这是新的聊天窗口，有什么可以帮你？" }
-                ]);
-                return;
-            }
+        // Initialize messages for this chat immediately to prevent undefined state
+        if (!state.messages[chatId]) {
+            state.setMessages(chatId, () => []);
+        }
 
-            const { data, error } = await apiGet(`/api/chat/${chatId}/messages`);
+        const { data, error } = await getMessages(chatId);
 
-            if (error) {
-                state.setMessages([
-                    { role: "assistant", content: "⚠️ 无法加载历史消息，请稍后再试。" }
-                ]);
-                return;
-            }
-            
-            if (data?.length > 0) state.setMessages(data);
-            else state.setMessages([{ role: "assistant", content: "你好，这是新的聊天窗口，有什么可以帮你？" }]);
+        if (error) {
+            state.setMessages(chatId, () => [
+                { role: "assistant", content: "⚠️ 无法加载历史消息，请稍后再试。" }
+            ]);
+            return;
+        }
+
+        state.setMessages(
+            chatId,
+            () => data?.length > 0
+                ? data
+                : [{ role: "assistant", content: "你好，这是新的聊天窗口，有什么可以帮你？" }]
+        );
     };
+
+    // 添加一条消息
+    const addMessage = (chatId, message) => {
+        state.setMessages(chatId, (prevMessages) => {
+            return [...prevMessages, message];
+        });
+    };
+      
 
     const loadAgents = async () => {
         const { data, error } = await getAgents();
@@ -123,6 +133,7 @@ export function useChatActions(state) {
         updateChatByTitle,
         deleteChatById,
         loadMessages, 
+        addMessage,
         loadAgents, 
         addAgent, 
         updateAgentByField,

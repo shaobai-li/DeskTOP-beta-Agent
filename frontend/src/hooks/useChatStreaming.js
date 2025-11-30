@@ -1,22 +1,25 @@
 import { beginChat, streamChat } from "@services/messagesService";
 import { useNavigate } from "react-router-dom";
 
-const processStreamChunk = (jsonStr, setMessages) => {
+const processStreamChunk = (jsonStr, currentChatId, addMessage) => {
     try {
         const { stage, generated_content } = JSON.parse(jsonStr);
-        setMessages((prev) => {
-            // 查找是否已经有正在生成的 assistant 消息
-            const index = prev.findIndex((msg) => msg.role === "assistant" && msg.stage === stage);
-            if (index !== -1) {
-                const updated = [...prev];
-                updated[index] = {
-                    ...updated[index],
-                    content: updated[index].content + "\n" + generated_content
-                };
-                return updated;
-            }
-            return [...prev, { role: "assistant", stage, content: generated_content }];
-        });
+        const newAssistantMessage = { role: "assistant", stage, content: generated_content };
+        addMessage(currentChatId, newAssistantMessage);
+        
+        // setMessages((prev) => {
+        //     // 查找是否已经有正在生成的 assistant 消息
+        //     const index = prev.findIndex((msg) => msg.role === "assistant" && msg.stage === stage);
+        //     if (index !== -1) {
+        //         const updated = [...prev];
+        //         updated[index] = {
+        //             ...updated[index],
+        //             content: updated[index].content + "\n" + generated_content
+        //         };
+        //         return updated;
+        //     }
+        //     return [...prev, { role: "assistant", stage, content: generated_content }];
+        // });
     } catch (err) {
         console.error("JSON parse error:", err, jsonStr);
     }
@@ -28,15 +31,16 @@ export const useChatStreaming = (state, actions, {chatId = null, selectedAgentId
 
     const handleSendMessage = async (message) => {
         // 乐观更新 UI
-        state.setMessages((prev) => [...prev, { role: "user", content: message }]);
+        const newUserMessage = { role: "user", content: message };
 
         let currentChatId = chatId;
+        actions.addMessage(currentChatId, newUserMessage);
 
         console.log("topic", message);
         console.log("chat_id", currentChatId);
         console.log("selected_agent", selectedAgentId);
 
-        if (!currentChatId) {
+        if (currentChatId === "new") {
             const { data, error } = await beginChat({
                 topic: message,
                 chat_id: currentChatId,
@@ -52,6 +56,7 @@ export const useChatStreaming = (state, actions, {chatId = null, selectedAgentId
             currentChatId = data.chatId
             //actions.setSelectedAgentId(currentChatId, selectedAgentId);
             actions.addChat(data);
+            actions.addMessage(currentChatId, newUserMessage)
             console.log("chat data returned", data);
             navigate(`/chat/${currentChatId}`);
         } 
@@ -80,12 +85,13 @@ export const useChatStreaming = (state, actions, {chatId = null, selectedAgentId
 
                 for (const jsonStr of parts) {
                     if (!jsonStr.trim()) continue;
-                    processStreamChunk(jsonStr, state.setMessages);
+                    processStreamChunk(jsonStr, currentChatId, actions.addMessage);
                 }
             }
+
         } catch (error) {
             console.error("Streaming Error:", error);
-            state.setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ 连接中断，请重试。" }]);
+            actions.setMessages(currentChatId, () => [{ role: "assistant", content: "⚠️ 连接中断，请重试。" }]);
         }
     };
 

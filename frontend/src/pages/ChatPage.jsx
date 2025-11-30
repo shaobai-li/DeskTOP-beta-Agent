@@ -14,21 +14,29 @@ export function useChatPageContext() {
 
 export default function ChatPage() {
 
-    const { chatId } = useParams();
+    const { chatId = "new" } = useParams();
     const { state, actions } = useChat();
 
     const messagesEndRef = useRef(null);
 
     // 检查聊天是否存在（仅当 chatId 有值时才检查）
-    const chatExists = !chatId || state.chats.some(chat => chat.chatId === chatId);
+    const chatExists = chatId === "new" || state.chats.some(chat => chat.chatId === chatId);
 
     useEffect(() => {
-        actions.loadMessages(chatId);
+
+
+        if (chatId !== "new") {
+            actions.loadMessages(chatId);
+        } else {
+            state.setMessages(chatId, () => [{ role: "assistant", content: "你好，这是新的聊天窗口，有什么可以帮你？" }]);
+        }
     }, [chatId]);
+
+    const currentMessages = state.messages[chatId] || [];
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [state.messages]);
+    }, [state.messages[chatId]]);
 
     // 如果聊天不存在，跳转到首页（新建聊天页面）
     if (!chatExists) {
@@ -39,7 +47,7 @@ export default function ChatPage() {
         <div className="chat-panel">
             <div className="messages-container">
                 <div className="messages-list">
-                    {state.messages.map((message, index) => {
+                    {currentMessages.map((message, index) => {
                         if (message.role === "user") {
                             return <UserMessage key={index} message={message.content} />;
                         } else {

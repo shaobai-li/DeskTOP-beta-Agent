@@ -5,7 +5,7 @@ from pathlib import Path
 from fastapi import FastAPI, File, UploadFile
 from datetime import datetime
 
-from routes import chat_router, article_router, agent_router, tag_router, messages_router
+from api.v1 import agent_router, chat_router, article_router, message_router, tag_router
 
 # 初始化
 app = FastAPI()
@@ -13,11 +13,11 @@ UPLOAD_DIR = Path(__file__).parent / "database/uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 TEXT_METADATA_FILE = UPLOAD_DIR / "texts_metadata.json"
 
-app.include_router(chat_router, prefix="/api")
-app.include_router(article_router, prefix="/api")
-app.include_router(agent_router, prefix="/api")
-app.include_router(tag_router, prefix="/api")
-app.include_router(messages_router, prefix="/api")
+app.include_router(agent_router, prefix="/api/v1")
+app.include_router(chat_router, prefix="/api/v1")
+app.include_router(article_router, prefix="/api/v1")
+app.include_router(message_router, prefix="/api/v1")
+app.include_router(tag_router, prefix="/api/v1")
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):

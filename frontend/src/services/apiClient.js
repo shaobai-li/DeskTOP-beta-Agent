@@ -1,6 +1,12 @@
+const API_PREFIX = "/api/v1";
+const buildUrl = (url) => {
+    return url.startsWith('/') ? `${API_PREFIX}${url}` : url;
+}
+
 export async function apiGet(url) {
     try {
-        const response = await fetch(url);
+        const fullUrl = buildUrl(url);
+        const response = await fetch(fullUrl);
 
         if (!response.ok) {
             throw new Error(`网络错误：${response.status}`);
@@ -16,7 +22,8 @@ export async function apiGet(url) {
 
 export async function apiPatch(url, body) {
     try {
-        const response = await fetch(url, {
+        const fullUrl = buildUrl(url);
+        const response = await fetch(fullUrl, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -37,7 +44,8 @@ export async function apiPatch(url, body) {
 }
 export async function apiPost(url, body, { stream = false } = {}) {
     try {
-        const response = await fetch(url, {
+        const fullUrl = buildUrl(url);
+        const response = await fetch(fullUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -63,7 +71,8 @@ export async function apiPost(url, body, { stream = false } = {}) {
 
 export async function apiDelete(url) {
     try {
-        const response = await fetch(url, {
+        const fullUrl = buildUrl(url);
+        const response = await fetch(fullUrl, {
             method: 'DELETE',
             // headers: {
             //     'Content-Type': 'application/json',

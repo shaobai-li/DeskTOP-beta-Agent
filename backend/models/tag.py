@@ -1,8 +1,6 @@
-from sqlalchemy import Column, String, text
-from sqlalchemy.orm import DeclarativeBase
-
-class Base(DeclarativeBase):
-    pass
+from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
+from .base import Base
 
 class Tag(Base):
     __tablename__ = "tags"
@@ -13,6 +11,9 @@ class Tag(Base):
     origin_note = Column(String, server_default="")
     created_at = Column(String, nullable=False)
 
+    # 关系
+    articles = relationship("Article", secondary="article_tags", back_populates="tags")
+
     def to_dict(self):
         return {
             "tagId": self.tag_id,
@@ -21,3 +22,4 @@ class Tag(Base):
             "originNote": self.origin_note,
             "createdAt": self.created_at
         }
+

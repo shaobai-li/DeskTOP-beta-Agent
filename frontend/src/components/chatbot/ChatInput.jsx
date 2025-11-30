@@ -38,11 +38,13 @@ export function AgentLabel({ text, onClick, isFixed = false }) {
 export default function ChatInput() {
 
     const { state, actions } = useChat();
-    const { chatId } = useParams();
+    const { chatId = "new" } = useParams();
     const [selectedAgentId, setSelectedAgentId] = useState(actions.getSelectedAgentId(chatId));
     
     useEffect(() => {
-        chatId && setSelectedAgentId(actions.getSelectedAgentId(chatId));
+        if (chatId !== "new") {
+            setSelectedAgentId(actions.getSelectedAgentId(chatId));
+        }
     }, [chatId, actions]);
 
     const selectedAgent = actions.getAgentById(selectedAgentId)
@@ -79,7 +81,9 @@ export default function ChatInput() {
 
     const updateSelectedAgentId = (agentId) => {
         setSelectedAgentId(agentId);
-        chatId && actions.setSelectedAgentId(chatId, agentId);
+        if (chatId !== "new") {
+            actions.setSelectedAgentId(chatId, agentId);
+        }
     }
 
     return (

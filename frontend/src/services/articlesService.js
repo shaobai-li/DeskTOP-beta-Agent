@@ -1,13 +1,13 @@
 import { apiGet, apiPost, apiDelete } from "./apiClient";
 
 export function getArticles() {
-    return apiGet("/api/articles");
+    return apiGet("/articles");
 }
 
 export function createArticle(articleData) {
-    return apiPost("/api/articles", articleData);
+    return apiPost("/articles", articleData);
 }
 
 export function deleteArticle(articleId) {
-    return apiDelete(`/api/articles/${articleId}`);
+    return apiDelete(`/articles/${articleId}`);
 }

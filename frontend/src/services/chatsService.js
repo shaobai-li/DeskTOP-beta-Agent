@@ -1,14 +1,14 @@
 import { apiGet, apiPatch, apiDelete } from "./apiClient";
 
 export function getChats() {
-    return apiGet("/api/chats");
+    return apiGet("/chats");
 }
 
 export function updateChat(chatId, body) {
-    return apiPatch(`/api/chat/${chatId}`, body);
+    return apiPatch(`/chat/${chatId}`, body);
 }
 
 export function deleteChat(chatId) {
-    return apiDelete(`/api/chat/${chatId}`);
+    return apiDelete(`/chat/${chatId}`);
 }
 

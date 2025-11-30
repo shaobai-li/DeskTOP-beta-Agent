@@ -5,12 +5,12 @@ import { useChatActions } from "@hooks/useChatActions";
 export const ChatContext = createContext();
 
 export default function ChatProvider({ children }) {
-
     const state = useChatsState({
         agents: [],
         chats: [],
-        messages: []
+        messages: {}
     });
+
     const actions = useChatActions(state);
 
     useEffect(() => {
@@ -18,13 +18,13 @@ export default function ChatProvider({ children }) {
         actions.loadAgents();
     }, []);
 
-    console.log("Chats", state.chats);
     return (
         <ChatContext.Provider value={{ state, actions }}>
             {children}
         </ChatContext.Provider>
-    )
+    );
 }
+
 
 export function useChat() {
     return useContext(ChatContext);
