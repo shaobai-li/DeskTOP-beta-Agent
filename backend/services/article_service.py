@@ -6,7 +6,7 @@ from datetime import datetime
 from models.article import Article
 from models.tag import Tag
 from utils import to_camel_case, uuid7
-from config.settings import VECTOR_INDEX_DIR, VECTOR_INDEX_PREFIX
+from config.settings import VECTOR_INDEX_PATH
 
 # RAG related import
 from sentence_transformers import SentenceTransformer
@@ -36,6 +36,25 @@ class ArticleService:
             articles_list.append(article_dict)
         
         return to_camel_case(articles_list)
+
+    @staticmethod
+    async def get_articles_for_embedding(db: AsyncSession) -> List[Dict]:
+        """获取用于向量检索的精简文章数据（仅 embedding_id, title, content）
+        
+        注意：按 embedding_id 升序排列，与 faiss 索引顺序一致
+        """
+        result = await db.execute(
+            select(Article).order_by(Article.embedding_id.asc())
+        )
+        articles = result.scalars().all()
+        return [
+            {
+                "embedding_id": article.embedding_id,
+                "title": article.title,
+                "content": article.content
+            }
+            for article in articles
+        ]
 
     @staticmethod
     async def create_article(title: str, date: str, source_platform: str = "小红书", 
@@ -133,7 +152,9 @@ class ArticleService:
 
         for article, embedding_id in zip(articles_list, embedding_id_list):
             article.embedding_id = embedding_id
+            db.add(article)  # 显式标记对象需要更新
 
+        await db.flush()  # 强制将修改刷新到数据库
         await db.commit()
 
     @staticmethod
@@ -141,8 +162,6 @@ class ArticleService:
         # 从配置文件读取路径，生成向量索引文件的完整路径
         import time
         tic = time.time()
-        index_filename = f"{VECTOR_INDEX_PREFIX}_{datetime.now().strftime('%Y%m%d')}.index"
-        index_path = VECTOR_INDEX_DIR / index_filename
 
         print("# 读取所有文章")
         articles = await ArticleService.get_all_articles(db)
@@ -157,7 +176,7 @@ class ArticleService:
         print("# 添加向量到index")
         index.add(embedding)
         print("# 写入index文件")
-        faiss.write_index(index, str(index_path))
+        faiss.write_index(index, str(VECTOR_INDEX_PATH))
         print("# 写入index文件完成")
 
         print("# 更新embedding_id到数据库中")
@@ -165,4 +184,4 @@ class ArticleService:
         await ArticleService.update_embedding_ids(embedding_id_list, db)
 
         toc = time.time()
-        return {"message": f"重建文章向量数据库成功，索引文件: {index_path}", "duration": {toc - tic}}
+        return {"message": f"重建文章向量数据库成功，索引文件: {VECTOR_INDEX_PATH}", "duration": {toc - tic}}

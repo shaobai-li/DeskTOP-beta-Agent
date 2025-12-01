@@ -8,23 +8,6 @@ import AgentPage from "@pages/AgentPage";
 import ChatProvider from "@contexts/ChatContext";
 import "./App.css";
 
-// function ChatPageWrapper() {
-//     const { chatId } = useParams();
-//     return <ChatPage chatId={chatId} key={chatId} />;
-// }
-
-function Tags() {
-    return (
-        <div style={{ textAlign: 'left', color: '#666' }}>
-            <h2>标签页面</h2>
-            <p>标签内容将在这里显示...</p>
-        </div>
-    );
-}
-
-
-
-
 function App() {
     return (
         <BrowserRouter>

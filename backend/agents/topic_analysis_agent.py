@@ -27,7 +27,6 @@ class TopicAnalysisAgent:
     def analyze_topic(self, topic):
         print("Entering analyze_topic...")
         system_prompt = self._get_system_prompt()
-        print("System prompt:", system_prompt)
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"{topic}"}

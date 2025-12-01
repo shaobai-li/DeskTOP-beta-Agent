@@ -22,7 +22,7 @@ class MessageService:
         self.language_styler = None
         self._current_agent_id = None
     
-    def _init_agents(self, selected_agent: str):
+    async def _init_agents(self, selected_agent: str):
         """根据 selected_agent (agent_id) 初始化各个 agent"""
         # 如果已经是同一个 agent，不需要重新初始化
         if self._current_agent_id == selected_agent:
@@ -41,8 +41,8 @@ class MessageService:
             # 将 camelCase 转换回 snake_case，因为 agent 类期望 snake_case 键名
             agent_config = to_snake_case(agent_config)
         
-        # 使用 agent 配置初始化各个 agent
-        self.search_agent = SearchAgent(agent_config)
+        # 使用 agent 配置初始化各个 agent（SearchAgent 需要异步初始化）
+        self.search_agent = await SearchAgent.create(agent_config)
         self.topic_analysis_agent = TopicAnalysisAgent(agent_config)
         self.draft_agent = DraftAgent(agent_config)
         self.language_styler = LanguageStyler(agent_config)
@@ -131,7 +131,7 @@ class MessageService:
     async def generate_content(self, topic: str, chat_id: str, selected_agent: str, db: AsyncSession) -> AsyncGenerator[str, None]:
         """处理聊天消息生成请求"""
         # 根据 selected_agent 初始化各个 agent
-        self._init_agents(selected_agent)
+        await self._init_agents(selected_agent)
         
         journey_state = await MessageService.get_journey_state(chat_id, db)
 

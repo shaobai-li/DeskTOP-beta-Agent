@@ -21,6 +21,7 @@ class Article(Base):
     author_name = Column(String, server_default="")
     tags_by_author = Column(String, server_default="")
     content = Column(String, server_default="")
+    embedding_id = Column(Integer, nullable=True)  # 向量索引ID，与 faiss index 顺序对应
     created_at = Column(String, nullable=False)
     updated_at = Column(String, nullable=False)
 
@@ -35,7 +36,8 @@ class Article(Base):
             "sourcePlatform": self.source_platform,
             "authorName": self.author_name,
             "tagsByAuthor": self.tags_by_author,
-            "content": self.content, 
+            "content": self.content,
+            "embeddingId": self.embedding_id,
             "createdAt": self.created_at,
             "updatedAt": self.updated_at
         }
