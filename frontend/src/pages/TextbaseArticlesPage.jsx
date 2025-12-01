@@ -50,13 +50,13 @@ export default function TextbaseArticlesPage() {
 
     // 处理重建索引
     const handleRebuildIndex = async () => {
-        console.log("开始重建索引...");
+        
         const { data, error } = await rebuildArticlesEmbedding();
         if (error) {
             console.error("重建索引失败：", error);
             return;
         }
-        console.log("重建索引完成！", data);
+        console.log("获取到数据:", data);
     };
 
     // 处理文章提交

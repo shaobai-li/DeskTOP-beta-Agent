@@ -6,6 +6,12 @@ from datetime import datetime
 from models.article import Article
 from models.tag import Tag
 from utils import to_camel_case, uuid7
+from config.settings import VECTOR_INDEX_DIR, VECTOR_INDEX_PREFIX
+
+# RAG related import
+from sentence_transformers import SentenceTransformer
+import faiss
+
 
 
 class ArticleService:
@@ -114,3 +120,49 @@ class ArticleService:
         
         return {"message": f"文章 {article_id} 已删除"}
 
+    @staticmethod
+    async def update_embedding_ids(embedding_id_list: List[int], db: AsyncSession = None):
+        """批量更新所有文章的 embedding_id，与 embedding_id_list 长度必须一致"""
+        # assumption: embedding_id_list is a list of embedding_id in新的顺序和 Article 记录顺序严格一致
+        
+        articles = await db.execute(select(Article).order_by(Article.article_id))
+        articles_list = articles.scalars().all()
+
+        if len(articles_list) != len(embedding_id_list):
+            raise ValueError(f"传入的 embedding_id_list 长度({len(embedding_id_list)})和当前文章数({len(articles_list)})不一致")
+
+        for article, embedding_id in zip(articles_list, embedding_id_list):
+            article.embedding_id = embedding_id
+
+        await db.commit()
+
+    @staticmethod
+    async def rebuild_articles_embedding(db: AsyncSession = None) -> Dict:
+        # 从配置文件读取路径，生成向量索引文件的完整路径
+        import time
+        tic = time.time()
+        index_filename = f"{VECTOR_INDEX_PREFIX}_{datetime.now().strftime('%Y%m%d')}.index"
+        index_path = VECTOR_INDEX_DIR / index_filename
+
+        print("# 读取所有文章")
+        articles = await ArticleService.get_all_articles(db)
+        article_contents = [article['content'] if article['content'] else "" for article in articles]
+        
+        print("# 加载embedding模型")
+        embedding_model = SentenceTransformer('BAAI/bge-large-zh-v1.5')
+        print("# 对文章进行向量化")
+        embedding = embedding_model.encode(article_contents, normalize_embeddings=True)
+        print("# 创建index")
+        index = faiss.IndexFlatL2(embedding.shape[1])
+        print("# 添加向量到index")
+        index.add(embedding)
+        print("# 写入index文件")
+        faiss.write_index(index, str(index_path))
+        print("# 写入index文件完成")
+
+        print("# 更新embedding_id到数据库中")
+        embedding_id_list = [i for i in range(len(articles))]
+        await ArticleService.update_embedding_ids(embedding_id_list, db)
+
+        toc = time.time()
+        return {"message": f"重建文章向量数据库成功，索引文件: {index_path}", "duration": {toc - tic}}

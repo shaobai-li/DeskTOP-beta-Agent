@@ -103,3 +103,12 @@ async def delete_article(article_id: int, db: AsyncSession = Depends(get_db)):
             detail=f"删除失败: {str(e)}"
         )
 
+@router.post("/articles/embedding", status_code=status.HTTP_200_OK)
+async def rebuild_articles_embedding(db: AsyncSession = Depends(get_db)):
+    try:
+        return await ArticleService.rebuild_articles_embedding(db)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"重建文章向量数据库失败: {str(e)}"
+        )
