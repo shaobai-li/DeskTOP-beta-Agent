@@ -131,7 +131,14 @@ class MessageService:
     async def generate_content(self, topic: str, chat_id: str, selected_agent: str, db: AsyncSession) -> AsyncGenerator[str, None]:
         """处理聊天消息生成请求"""
         # 根据 selected_agent 初始化各个 agent
-        await self._init_agents(selected_agent)
+        if self._current_agent_id != selected_agent:
+            status_msg = "正在搜索文章库"
+            yield json.dumps({
+                "is_status_message" : True,
+                "topic": topic,
+                "generated_content": status_msg
+            }) + "\n"
+            await self._init_agents(selected_agent)
         
         journey_state = await MessageService.get_journey_state(chat_id, db)
 
@@ -146,7 +153,7 @@ class MessageService:
             
             await MessageService.save_message(chat_id, journey_state=journey_state, content=chunks, role="assistant", db=db)
 
-            status_msg = "正在构思的选题列表"
+            status_msg = "正在构思选题列表"
             yield json.dumps({
                 "is_status_message": True,
                 "topic": topic,

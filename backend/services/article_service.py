@@ -148,7 +148,7 @@ class ArticleService:
         """批量更新所有文章的 embedding_id，与 embedding_id_list 长度必须一致"""
         # assumption: embedding_id_list is a list of embedding_id in新的顺序和 Article 记录顺序严格一致
         
-        articles = await db.execute(select(Article).order_by(Article.article_id))
+        articles = await db.execute(select(Article).order_by(Article.article_id.asc()))
         articles_list = articles.scalars().all()
 
         if len(articles_list) != len(embedding_id_list):
@@ -168,7 +168,10 @@ class ArticleService:
         tic = time.time()
 
         print("# 读取所有文章")
-        articles = await ArticleService.get_all_articles(db)
+        result = await db.execute(
+            select(Article).order_by(Article.article_id.asc())
+        )
+        articles = result.scalars().all()
         article_contents = [article['content'] if article['content'] else "" for article in articles]
         
         print("# 加载embedding模型")
