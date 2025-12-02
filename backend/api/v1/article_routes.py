@@ -47,6 +47,7 @@ async def create_article(article: ArticleCreate, db: AsyncSession = Depends(get_
             source_platform=article.source_platform,
             author_name=article.author_name,
             tags_by_author=article.tags_by_author,
+            content=article.content,
             db=db
         )
     except ValueError as e:
@@ -62,7 +63,7 @@ async def create_article(article: ArticleCreate, db: AsyncSession = Depends(get_
 
 
 @router.put("/articles/{article_id}", status_code=status.HTTP_200_OK)
-async def update_article(article_id: int, update_data: ArticleUpdate, db: AsyncSession = Depends(get_db)):
+async def update_article(article_id: str, update_data: ArticleUpdate, db: AsyncSession = Depends(get_db)):
     """更新指定 article_id 的文章"""
     try:
         return await ArticleService.update_article(
@@ -72,6 +73,7 @@ async def update_article(article_id: int, update_data: ArticleUpdate, db: AsyncS
             source_platform=update_data.source_platform,
             author_name=update_data.author_name,
             tags_by_author=update_data.tags_by_author,
+            content=update_data.content,  # 添加这行
             db=db
         )
     except ValueError as e:
@@ -88,7 +90,7 @@ async def update_article(article_id: int, update_data: ArticleUpdate, db: AsyncS
 
 
 @router.delete("/articles/{article_id}", status_code=status.HTTP_200_OK)
-async def delete_article(article_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_article(article_id: str, db: AsyncSession = Depends(get_db)):
     """删除指定 article_id 的文章"""
     try:
         return await ArticleService.delete_article(article_id, db)

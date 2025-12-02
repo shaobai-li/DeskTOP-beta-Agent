@@ -23,7 +23,7 @@ class ArticleService:
         result = await db.execute(
             select(Article)
             .options(selectinload(Article.tags))
-            .order_by(Article.article_id.desc())
+            .order_by(Article.created_at.desc())
         )
         articles = result.scalars().all()
         
@@ -58,7 +58,7 @@ class ArticleService:
 
     @staticmethod
     async def create_article(title: str, date: str, source_platform: str = "小红书", 
-                      author_name: str = "", tags_by_author: str = "", db: AsyncSession = None) -> Dict:
+                      author_name: str = "", tags_by_author: str = "", content: str = "", db: AsyncSession = None) -> Dict:
         """创建新文章"""
         # 检查标题是否已存在
         result = await db.execute(
@@ -76,6 +76,7 @@ class ArticleService:
             source_platform=source_platform.strip(),
             author_name=author_name.strip(),
             tags_by_author=tags_by_author.strip(),
+            content=content.strip(),
             created_at=now,
             updated_at=now
         )
@@ -87,9 +88,9 @@ class ArticleService:
         return to_camel_case([new_article.to_dict()])[0]
 
     @staticmethod
-    async def update_article(article_id: int, title: Optional[str] = None, date: Optional[str] = None,
+    async def update_article(article_id: str, title: Optional[str] = None, date: Optional[str] = None,
                       source_platform: Optional[str] = None, author_name: Optional[str] = None,
-                      tags_by_author: Optional[str] = None, db: AsyncSession = None) -> Dict:
+                      tags_by_author: Optional[str] = None, content: Optional[str] = None, db: AsyncSession = None) -> Dict:
         """更新指定 article_id 的文章"""
         article = await db.get(Article, article_id)
         if not article:
@@ -118,9 +119,12 @@ class ArticleService:
         if tags_by_author is not None:
             article.tags_by_author = tags_by_author.strip()
 
+        if content is not None:
+            article.content = content.strip()
+
         # 如果有任何更新，更新 updated_at
         if any([title is not None, date is not None, source_platform is not None, 
-                author_name is not None, tags_by_author is not None]):
+                author_name is not None, tags_by_author is not None, content is not None]):
             article.updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             await db.commit()
             await db.refresh(article)
@@ -128,7 +132,7 @@ class ArticleService:
         return to_camel_case([article.to_dict()])[0]
 
     @staticmethod
-    async def delete_article(article_id: int, db: AsyncSession = None) -> Dict:
+    async def delete_article(article_id: str, db: AsyncSession = None) -> Dict:
         """删除指定 article_id 的文章"""
         article = await db.get(Article, article_id)
         if not article:

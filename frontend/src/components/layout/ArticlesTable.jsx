@@ -2,7 +2,7 @@ import "./ArticlesTable.css";
 import TableHeader from "./TableHeader";
 import TableBody from "./TableBody";
 
-function ArticlesTable({ articles, onDelete }) {
+function ArticlesTable({ articles, onDelete, onEdit }) {
     const headers = ['标题', '日期', '来源平台', '作者', '原平台标签', '标签', '内容'];
     const fields = ['title', 'date', 'sourcePlatform', 'authorName', 'tagsByAuthor', 'tags', 'content'];
     
@@ -10,7 +10,7 @@ function ArticlesTable({ articles, onDelete }) {
         <div className="table-wrapper">
             <table className="simple-table">
                 <TableHeader headers={headers} />
-                <TableBody data={articles} fields={fields} onDelete={onDelete} />
+                <TableBody data={articles} fields={fields} onDelete={onDelete} onEdit={onEdit} />
             </table>
         </div>
     );

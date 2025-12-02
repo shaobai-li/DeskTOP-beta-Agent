@@ -3,7 +3,7 @@ import MoreButton from '@components/common/MoreButton';
 import PopupMenu from '@components/common/PopupMenu';
 
 
-function TableBody({ data, fields, onDelete }) {
+function TableBody({ data, fields, onDelete, onEdit }) {
     const [menuState, setMenuState] = useState({ show: false, position: null, rowIndex: null });
 
     const handleMoreClick = (e, rowIndex) => {
@@ -28,6 +28,16 @@ function TableBody({ data, fields, onDelete }) {
             const articleId = data[menuState.rowIndex].articleId;
             if (articleId && onDelete) {
                 onDelete(articleId);
+            }
+        }
+        handleCloseMenu();
+    };
+
+    const handleEdit = () => {
+        if (menuState.rowIndex !== null && data[menuState.rowIndex]) {
+            const article = data[menuState.rowIndex];
+            if (onEdit) {
+                onEdit(article);
             }
         }
         handleCloseMenu();
@@ -63,7 +73,10 @@ function TableBody({ data, fields, onDelete }) {
             {menuState.show && (
                 <PopupMenu position={menuState.position} onClose={handleCloseMenu}>
                     <div className="flex flex-col min-w-[100px]">
-                        <div className="px-3 py-2 cursor-pointer hover:bg-neutral-100 rounded">
+                        <div 
+                            className="px-3 py-2 cursor-pointer hover:bg-neutral-100 rounded"
+                            onClick={handleEdit}
+                        >
                             编辑
                         </div>
                         <div 

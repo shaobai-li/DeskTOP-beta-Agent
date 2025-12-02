@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ArticlesTable from "@components/layout/ArticlesTable";
 import Pagination from "@components/layout/Pagination";
-import { getArticles, createArticle, deleteArticle, rebuildArticlesEmbedding } from "@services/articlesService";
+import { getArticles, createArticle, updateArticle, deleteArticle, rebuildArticlesEmbedding } from "@services/articlesService";
 import Input from "@components/common/Input";
 import Button from "@components/common/Button";
 import ArticleModal from "@components/layout/ArticleModal";
@@ -12,6 +12,7 @@ export default function TextbaseArticlesPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(20);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingArticle, setEditingArticle] = useState(null);  // 新增：存储正在编辑的文章
 
     useEffect(() => {
         async function loadArticles() {
@@ -30,11 +31,19 @@ export default function TextbaseArticlesPage() {
     };
 
     const handleAddClick = () => {
+        setEditingArticle(null);  // 清空编辑状态
+        setIsModalOpen(true);
+    };
+
+    // 新增：处理编辑按钮点击
+    const handleEditArticle = (article) => {
+        setEditingArticle(article);
         setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
+        setEditingArticle(null);  // 关闭时清空编辑状态
     };
 
     // 处理文章删除
@@ -50,32 +59,39 @@ export default function TextbaseArticlesPage() {
 
     // 处理重建索引
     const handleRebuildIndex = async () => {
-        
+        console.log("开始重建索引...");
         const { data, error } = await rebuildArticlesEmbedding();
         if (error) {
             console.error("重建索引失败：", error);
             return;
         }
-        console.log("获取到数据:", data);
+        console.log("重建索引完成！", data);
     };
 
-    // 处理文章提交
-    const handleArticleSubmit = async (formData) => {
-        console.log("提交的表单数据：", formData);
-        
-        const { data, error } = await createArticle(formData);
-        if (error) {
-            console.error("创建文章失败：", error);
-            return;
+    // 修改：处理文章提交（新建或更新）
+    const handleArticleSubmit = async (formData, articleId) => {
+        if (articleId) {
+            // 编辑模式
+            const { data, error } = await updateArticle(articleId, formData);
+            if (error) {
+                console.error("更新文章失败：", error);
+                return;
+            }
+            console.log("文章更新成功！", data);
+        } else {
+            // 新建模式
+            const { data, error } = await createArticle(formData);
+            if (error) {
+                console.error("创建文章失败：", error);
+                return;
+            }
+            console.log("文章创建成功！", data);
         }
         
-        console.log("文章创建成功！", data);
-        
-        // 创建成功后重新加载文章列表
+        // 重新加载文章列表
         const { data: articles, error: loadError } = await getArticles();
         if (!loadError) {
             setRows(articles);
-            console.log("文章列表已更新");
         }
     };
 
@@ -96,7 +112,11 @@ export default function TextbaseArticlesPage() {
                 </div>
             </div>
             <div className="textbase-article__content flex flex-col px-8">
-                <ArticlesTable articles={currentRows} onDelete={handleDeleteArticle} />
+                <ArticlesTable 
+                    articles={currentRows} 
+                    onDelete={handleDeleteArticle}
+                    onEdit={handleEditArticle}  // 新增
+                />
             </div>
             <div className="textbase-article__footer flex px-8 justify-end">
                 <Pagination
@@ -111,6 +131,7 @@ export default function TextbaseArticlesPage() {
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 onSubmit={handleArticleSubmit}
+                initialData={editingArticle}  // 新增：传递编辑数据
             />
         </div>
     )

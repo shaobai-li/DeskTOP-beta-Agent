@@ -6,7 +6,7 @@ from .base import Base
 article_tags = Table(
     "article_tags",
     Base.metadata,
-    Column("article_id", Integer, ForeignKey("articles.article_id"), primary_key=True),
+    Column("article_id", String, ForeignKey("articles.article_id"), primary_key=True),
     Column("tag_id", String, ForeignKey("tags.tag_id"), primary_key=True)
 )
 
@@ -14,7 +14,7 @@ article_tags = Table(
 class Article(Base):
     __tablename__ = "articles"
 
-    article_id = Column(Integer, primary_key=True, autoincrement=True)
+    article_id = Column(String, primary_key=True)
     title = Column(String, nullable=False, unique=True)
     date = Column(String, nullable=False)
     source_platform = Column(String, nullable=False, server_default="小红书")

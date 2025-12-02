@@ -69,6 +69,29 @@ export async function apiPost(url, body, { stream = false } = {}) {
     }
 }
 
+export async function apiPut(url, body) {
+    try {
+        const fullUrl = buildUrl(url);
+        const response = await fetch(fullUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+            throw new Error(`网络错误：${response.status}`);
+        }
+
+        const data = await response.json();
+        return { data, error: null };
+    } catch (error) {
+        console.error("API 请求失败：", error);
+        return { data: null, error };
+    }
+}
+
 export async function apiDelete(url) {
     try {
         const fullUrl = buildUrl(url);

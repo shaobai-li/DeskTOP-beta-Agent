@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DarkBackground from '@components/common/DarkBackground';
 
-export default function ArticleModal({ isOpen, onClose, onSubmit }) {
+export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = null }) {
   const [formData, setFormData] = useState({
     title: "",
     date: "",
@@ -10,6 +10,30 @@ export default function ArticleModal({ isOpen, onClose, onSubmit }) {
     tags_by_author: "",
     content: ""         
   });
+
+  // 当 initialData 变化时，更新表单数据
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        title: initialData.title || "",
+        date: initialData.date || "",
+        source_platform: initialData.sourcePlatform || "小红书",
+        author_name: initialData.authorName || "",
+        tags_by_author: initialData.tagsByAuthor || "",
+        content: initialData.content || ""
+      });
+    } else {
+      // 重置表单
+      setFormData({
+        title: "",
+        date: "",
+        source_platform: "小红书",
+        author_name: "",
+        tags_by_author: "",
+        content: ""
+      });
+    }
+  }, [initialData, isOpen]);
 
   if (!isOpen) return null;
 
@@ -22,9 +46,11 @@ export default function ArticleModal({ isOpen, onClose, onSubmit }) {
   };
 
   const handleSave = () => {
-    onSubmit?.(formData);
+    onSubmit?.(formData, initialData?.articleId);  // 传递 articleId 用于区分新建/编辑
     onClose();
   };
+
+  const isEditMode = !!initialData;
 
   return (
     <DarkBackground onClose={onClose}>
@@ -32,7 +58,7 @@ export default function ArticleModal({ isOpen, onClose, onSubmit }) {
         <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
 
           <div className="flex items-center justify-between px-6 py-4 border-b">
-            <h2 className="text-lg font-medium">文章设置</h2>
+            <h2 className="text-lg font-medium">{isEditMode ? '编辑文章' : '添加文章'}</h2>
             <button onClick={onClose}>✕</button>
           </div>
 
@@ -121,7 +147,7 @@ export default function ArticleModal({ isOpen, onClose, onSubmit }) {
               onClick={handleSave}
               className="bg-black text-white px-4 py-2 rounded"
             >
-              保存
+              {isEditMode ? '更新' : '保存'}
             </button>
           </div>
 
