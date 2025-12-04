@@ -3,12 +3,17 @@ import ReactDOM from "react-dom";
 import lightBulbIcon from "@assets/icon-ui-light-bulb.svg";
 import Button from "@components/common/Button";
 import Input from "@components/common/Input";
+import TagsInput from "@components/common/TagsInput";
 import DarkBackground from "@components/common/DarkBackground";
+import tagOptions from "@/mockTags.json";
+// tags表的信息传入
 
 export default function NewAgentModal({ onClose, onCreate }) {
     const [agentName, setAgentName] = useState("");
+    const [selectedTags, setSelectedTags] = useState([]);
+
     const handleCreate = () => {
-        onCreate(agentName);
+        onCreate(agentName, selectedTags);
         onClose();
     };
 
@@ -31,6 +36,11 @@ export default function NewAgentModal({ onClose, onCreate }) {
                     <Input
                       value={agentName}
                       onChange={handleChange}
+                    />
+                    <TagsInput
+                      options={tagOptions}
+                      value={selectedTags}
+                      onChange={setSelectedTags}
                     />
                     <div className="flex items-start gap-2 px-4 py-4 text-xs text-neutral-500 bg-neutral-100 rounded-[12px]">
                         <img src={lightBulbIcon} alt="light bulb" className="w-4 h-4" />
