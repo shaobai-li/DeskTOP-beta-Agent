@@ -18,10 +18,5 @@
   width: 100%; /* 设置容器宽度 */
 }
 
-.side-panel__sidebar-logo {
-  width: 120px;
-  height: auto;
-  object-fit: contain;
-  margin-left: -20px;
-}
+
 
