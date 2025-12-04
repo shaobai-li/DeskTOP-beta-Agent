@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import Tag from './Tag';
+import { useFilteredOptions } from './useFilteredOptions';
+import TagsInputDropdown from './TagsInputDropdown';
+import TagsInputEmptyState from './TagsInputEmptyState';
+import TagsInputTags from './TagsInputTags';
 
 /**
  * TagsInput 组件 - 带下拉菜单的标签输入框
@@ -19,12 +22,8 @@ export default function TagsInput({
     const containerRef = useRef(null);
     const inputRef = useRef(null);
 
-    // 过滤出未选中且匹配输入的选项
-    const filteredOptions = options.filter(option => {
-        const isSelected = value.some(tag => tag.id === option.id);
-        const matchesInput = option.label.toLowerCase().includes(inputValue.toLowerCase());
-        return !isSelected && matchesInput;
-    });
+    // 使用 Hook 过滤选项
+    const filteredOptions = useFilteredOptions(options, value, inputValue);
 
     // 点击外部关闭下拉菜单和编辑模式
     useEffect(() => {
@@ -83,13 +82,7 @@ export default function TagsInput({
                 )}
 
                 {/* 已选标签 */}
-                {value.map(tag => (
-                    <Tag
-                        key={tag.id}
-                        text={tag.label}
-                        onRemove={() => handleRemoveTag(tag.id)}
-                    />
-                ))}
+                <TagsInputTags tags={value} onRemove={handleRemoveTag} />
 
                 {/* 输入框 - 仅在编辑模式显示 */}
                 {isEditing && (
@@ -108,30 +101,17 @@ export default function TagsInput({
             </div>
 
             {/* 下拉菜单 */}
-            {isOpen && inputValue && filteredOptions.length > 0 && (
-                <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg overflow-hidden">
-                    <ul className="max-h-48 overflow-y-auto py-1">
-                        {filteredOptions.map((option) => (
-                            <li
-                                key={option.id}
-                                onClick={() => handleSelectOption(option)}
-                                className="px-3 py-2 text-sm cursor-pointer transition-colors text-neutral-700 hover:bg-neutral-50"
-                            >
-                                {option.label}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
+            <TagsInputDropdown
+                options={filteredOptions}
+                onSelect={handleSelectOption}
+                isOpen={isOpen && inputValue && filteredOptions.length > 0}
+            />
 
             {/* 无匹配结果提示 */}
-            {isOpen && inputValue && filteredOptions.length === 0 && (
-                <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg overflow-hidden">
-                    <div className="px-3 py-3 text-sm text-neutral-400 text-center">
-                        没有匹配的标签
-                    </div>
-                </div>
-            )}
+            <TagsInputEmptyState
+                show={isOpen && inputValue && filteredOptions.length === 0}
+            />
         </div>
     );
 }
+
