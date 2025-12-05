@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { useFilteredOptions } from './useFilteredOptions';
+import { useDisplayOptions } from './useDisplayOptions';
 import TagsInputDropdown from './TagsInputDropdown';
-import TagsInputEmptyState from './TagsInputEmptyState';
 import TagsInputTags from './TagsInputTags';
 
 /**
@@ -22,8 +21,8 @@ export default function TagsInput({
     const containerRef = useRef(null);
     const inputRef = useRef(null);
 
-    // 使用 Hook 过滤选项
-    const filteredOptions = useFilteredOptions(options, value, inputValue);
+    // 使用 Hook 确定要显示的选项
+    const displayOptions = useDisplayOptions(options, value, inputValue);
 
     // 点击外部关闭下拉菜单和编辑模式
     useEffect(() => {
@@ -102,14 +101,9 @@ export default function TagsInput({
 
             {/* 下拉菜单 */}
             <TagsInputDropdown
-                options={filteredOptions}
+                options={displayOptions}
                 onSelect={handleSelectOption}
-                isOpen={isOpen && inputValue && filteredOptions.length > 0}
-            />
-
-            {/* 无匹配结果提示 */}
-            <TagsInputEmptyState
-                show={isOpen && inputValue && filteredOptions.length === 0}
+                isOpen={isOpen && (isEditing || inputValue) && displayOptions.length > 0}
             />
         </div>
     );

@@ -12,7 +12,7 @@ export default function TagsInputDropdown({ options, onSelect, isOpen }) {
 
     return (
         <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg overflow-hidden">
-            <ul className="max-h-48 overflow-y-auto py-1">
+            <ul className="max-h-[100px] overflow-y-auto py-1">
                 {options.map((option) => (
                     <li
                         key={option.id}
