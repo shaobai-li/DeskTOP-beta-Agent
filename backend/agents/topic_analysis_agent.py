@@ -47,8 +47,7 @@ class TopicAnalysisAgent:
         for i, topic in enumerate(topics):
             print(f"Analyzing topic: {i+1}/{len(topics)}")
             result = self.analyze_topic(topic)
-            result = clean_json_tags(result)
-            topic["topic"]["subtitle"] = '\n'.join([topic["topic"]["subtitle"], result])
+            topic["topic"]["subtitle"] = clean_json_tags(result)
             print(topic["topic"]["subtitle"])
             xml_topic = build_topic_xml(topic)
             yield xml_topic
