@@ -1,6 +1,9 @@
 import { useParams, Navigate } from 'react-router-dom'
+import { useState } from 'react'
 import PromptInput from '@components/layout/PromptInput'
 import { useChat } from '@contexts/ChatContext'
+import TagsInput from '@components/common/TagsInput'
+import tagOptions from '@/mockTags.json'
 
 function AgentPage() {
   const { agentId } = useParams()
@@ -8,7 +11,7 @@ function AgentPage() {
   
   const agent = actions.getAgentById(agentId)
 
-  
+  const [selectedTags, setSelectedTags] = useState([])
 
   const handleConfirm = (field) => async (newValue) => {
     actions.updateAgentByField(agentId, field, newValue)
@@ -32,6 +35,12 @@ function AgentPage() {
           value={agent.languageStylePrompt}
           placeholder="请输入语言风格提示词..."
           onConfirm={handleConfirm('languageStylePrompt')}
+        />
+        <label>标签</label>
+        <TagsInput
+          options={tagOptions}
+          value={selectedTags}
+          onChange={setSelectedTags}
         />
       </div>
       {/* <div className="agent-page-footer">agent页面页脚</div> */}

@@ -25,9 +25,10 @@ function TableBody({ data, fields, onDelete, onEdit }) {
 
     const handleDelete = () => {
         if (menuState.rowIndex !== null && data[menuState.rowIndex]) {
-            const articleId = data[menuState.rowIndex].articleId;
-            if (articleId && onDelete) {
-                onDelete(articleId);
+            const item = data[menuState.rowIndex];
+            const itemId = item.articleId || item.id || item.tag_id || item.tagId;
+            if (itemId && onDelete) {
+                onDelete(itemId);
             }
         }
         handleCloseMenu();
@@ -35,9 +36,9 @@ function TableBody({ data, fields, onDelete, onEdit }) {
 
     const handleEdit = () => {
         if (menuState.rowIndex !== null && data[menuState.rowIndex]) {
-            const article = data[menuState.rowIndex];
+            const item = data[menuState.rowIndex];
             if (onEdit) {
-                onEdit(article);
+                onEdit(item);
             }
         }
         handleCloseMenu();

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import DarkBackground from '@components/common/DarkBackground';
+import TagsInput from "@components/common/TagsInput";
+import tagOptions from "@/mockTags.json";
 
 export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = null }) {
   const [formData, setFormData] = useState({
@@ -10,6 +12,7 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
     tags_by_author: "",
     content: ""         
   });
+  const [selectedTags, setSelectedTags] = useState([]);
 
   // 当 initialData 变化时，更新表单数据
   useEffect(() => {
@@ -57,8 +60,7 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
 
-          <div className="flex items-center justify-between px-6 py-4 border-b">
-            <h2 className="text-lg font-medium">{isEditMode ? '编辑文章' : '添加文章'}</h2>
+          <div className="flex items-center justify-end px-6 py-4 border-b">
             <button onClick={onClose}>✕</button>
           </div>
 
@@ -136,7 +138,15 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
                 className="w-full px-3 py-2 border rounded-md resize-y"
               />
             </div>
-
+            
+            <div>
+              <label>标签</label>
+              <TagsInput
+                options={tagOptions}
+                value={selectedTags}
+                onChange={setSelectedTags}
+              />
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 px-6 py-4 border-t">

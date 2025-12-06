@@ -1,6 +1,48 @@
+import { useState, useEffect } from 'react';
 import DarkBackground from '@components/common/DarkBackground';
 
-export default function TagModal({ isOpen, onClose }) {
+export default function TagModal({ isOpen, onClose, onSubmit, initialData = null }) {
+    const [formData, setFormData] = useState({
+        name: '',
+        description: '',
+        originNote: ''
+    });
+
+    // 初始化表单数据
+    useEffect(() => {
+        if (initialData) {
+            setFormData({
+                name: initialData.name || '',
+                description: initialData.description || '',
+                originNote: initialData.originNote || ''
+            });
+        } else {
+            setFormData({
+                name: '',
+                description: '',
+                originNote: ''
+            });
+        }
+    }, [initialData, isOpen]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = () => {
+        if (!formData.name.trim()) {
+            alert('标签名称不能为空');
+            return;
+        }
+        const tagId = initialData?.tagId || null;
+        onSubmit?.(formData, tagId);
+        onClose();
+    };
+
     if (!isOpen) return null;  
     return (
         <DarkBackground onClose={onClose}>
@@ -25,8 +67,11 @@ export default function TagModal({ isOpen, onClose }) {
                   <label className="block text-sm font-medium text-neutral-700 mb-2">名称</label>
                   <input
                     type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-neutral-400"
-                    placeholder=""
+                    placeholder="请输入标签名称"
                   />
                 </div>
     
@@ -34,8 +79,11 @@ export default function TagModal({ isOpen, onClose }) {
                   <label className="block text-sm font-medium text-neutral-700 mb-2">描述</label>
                   <textarea
                     rows={4}
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border border-neutral-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-neutral-400"
-                    placeholder=""
+                    placeholder="请输入标签描述"
                   />
                 </div>
     
@@ -43,7 +91,11 @@ export default function TagModal({ isOpen, onClose }) {
                   <label className="block text-sm font-medium text-neutral-700 mb-2">来源备注</label>
                   <textarea
                     rows={3}
+                    name="originNote"
+                    value={formData.originNote}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border border-neutral-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-neutral-400"
+                    placeholder="请输入来源备注"
                   />
                 </div>
               </div>
@@ -56,7 +108,10 @@ export default function TagModal({ isOpen, onClose }) {
                 >
                   取消
                 </button>
-                <button className="px-5 py-2 text-sm font-medium text-white bg-neutral-900 rounded-md hover:bg-neutral-800">
+                <button 
+                  onClick={handleSubmit}
+                  className="px-5 py-2 text-sm font-medium text-white bg-neutral-900 rounded-md hover:bg-neutral-800"
+                >
                   保存
                 </button>
               </div>
