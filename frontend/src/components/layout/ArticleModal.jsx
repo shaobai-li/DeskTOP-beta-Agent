@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import DarkBackground from '@components/common/DarkBackground';
 import TagsInput from "@components/common/TagsInput";
-import tagOptions from "@/mockTags.json";
+import { useChat } from "@contexts/ChatContext";
 
 export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = null }) {
+  const { state } = useChat();
   const [formData, setFormData] = useState({
     title: "",
     date: "",
@@ -13,6 +14,12 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
     content: ""         
   });
   const [selectedTags, setSelectedTags] = useState([]);
+
+  // 转换后端标签数据为 TagsInput 需要的格式
+  const tagOptions = state.tags.map(tag => ({
+    id: tag.tagId || tag.id,
+    label: tag.name
+  }));
 
   // 当 initialData 变化时，更新表单数据
   useEffect(() => {

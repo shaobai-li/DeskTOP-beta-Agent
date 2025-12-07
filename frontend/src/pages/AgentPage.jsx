@@ -3,11 +3,10 @@ import { useState } from 'react'
 import PromptInput from '@components/layout/PromptInput'
 import { useChat } from '@contexts/ChatContext'
 import TagsInput from '@components/common/TagsInput'
-import tagOptions from '@/mockTags.json'
 
 function AgentPage() {
   const { agentId } = useParams()
-  const { actions } = useChat()
+  const { state, actions } = useChat()
   
   const agent = actions.getAgentById(agentId)
 
@@ -16,6 +15,12 @@ function AgentPage() {
   const handleConfirm = (field) => async (newValue) => {
     actions.updateAgentByField(agentId, field, newValue)
   }
+
+  // 转换后端标签数据为 TagsInput 需要的格式
+  const tagOptions = state.tags.map(tag => ({
+    id: tag.tagId || tag.id,
+    label: tag.name
+  }))
 
   return (!agent) ? <Navigate to="/" replace /> : (
     <div className="agent-page flex flex-col h-full">

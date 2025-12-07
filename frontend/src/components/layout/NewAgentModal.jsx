@@ -5,12 +5,20 @@ import Button from "@components/common/Button";
 import Input from "@components/common/Input";
 import TagsInput from "@components/common/TagsInput";
 import DarkBackground from "@components/common/DarkBackground";
-import tagOptions from "@/mockTags.json";
+import { useChat } from "@contexts/ChatContext";
+
 // tags表的信息传入
 
 export default function NewAgentModal({ onClose, onCreate }) {
+    const { state } = useChat();
     const [agentName, setAgentName] = useState("");
     const [selectedTags, setSelectedTags] = useState([]);
+
+    // 转换后端标签数据为 TagsInput 需要的格式
+    const tagOptions = state.tags.map(tag => ({
+        id: tag.tagId || tag.id,
+        label: tag.name
+    }));
 
     const handleCreate = () => {
         onCreate(agentName, selectedTags);
