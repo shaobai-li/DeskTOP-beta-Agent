@@ -36,9 +36,9 @@ function AgentPage() {
         />
         
         <PromptInput
-          title="语言风格提示词"
+          title="特色卖点"
           value={agent.languageStylePrompt}
-          placeholder="请输入语言风格提示词..."
+          placeholder="请输入特色卖点..."
           onConfirm={handleConfirm('languageStylePrompt')}
         />
         <label>标签</label>
