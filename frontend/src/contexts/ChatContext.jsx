@@ -8,7 +8,8 @@ export default function ChatProvider({ children }) {
     const state = useChatsState({
         agents: [],
         chats: [],
-        messages: {}
+        messages: {},
+        tags: []
     });
 
     const actions = useChatActions(state);
@@ -16,6 +17,7 @@ export default function ChatProvider({ children }) {
     useEffect(() => {
         actions.loadChats();
         actions.loadAgents();
+        actions.loadTags();
     }, []);
 
     

@@ -4,6 +4,7 @@ export function useChatsState() {
     
     const [chats, setChats] = useState([]);
     const [agents, setAgents] = useState([]);
+    const [tags, setTags] = useState([]);
     
     const [messages, setMessages] = useState({}); // chatId → message[]
     const [isLoaded, setIsLoaded] = useState({}); // chatId → boolean
@@ -15,6 +16,8 @@ export function useChatsState() {
         setChats,
         agents,
         setAgents,
+        tags,
+        setTags,
         messages,
         setMessages,
         isLoaded,

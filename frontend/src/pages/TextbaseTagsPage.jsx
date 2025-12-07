@@ -3,24 +3,15 @@ import TagTable from "@components/layout/TagTable";
 import { getTags, deleteTag, createTag, updateTag } from "@services/tagsService";
 import Button from "@components/common/Button";
 import TagModal from "@components/layout/TagModal";
+import { useChat } from "@contexts/ChatContext";
 
 export default function TextbaseTagsPage() {
-    const [tags, setTags] = useState([]);
+    const { state, actions } = useChat();
     const [searchValue, setSearchValue] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTag, setEditingTag] = useState(null);
 
     useEffect(() => {
-        async function loadTags() {
-            const { data, error } = await getTags();
-            if (error) {
-                console.error("加载标签失败：", error);
-                return;
-            }
-            console.log("标签数据:", data);
-            setTags(data);
-        }
-        loadTags();
     }, []);
 
     const handleSearchChange = (e) => {
@@ -60,8 +51,7 @@ export default function TextbaseTagsPage() {
             }
             
             // 重新加载标签列表
-            const { data } = await getTags();
-            setTags(data);
+            await actions.loadTags();
         } catch (error) {
             console.error("处理标签提交失败：", error);
         }
@@ -75,7 +65,7 @@ export default function TextbaseTagsPage() {
                 return;
             }
             console.log("标签删除成功！");
-            setTags(prev => prev.filter(tag => tag.tagId !== tagId));
+            await actions.loadTags();
         }
     };
 
@@ -99,7 +89,7 @@ export default function TextbaseTagsPage() {
             </div>
             <div className="textbase-tags__content flex flex-col px-8">
                 <TagTable 
-                    tags={tags} 
+                    tags={state.tags} 
                     onDelete={handleDeleteTag}
                     onEdit={handleEditTag}
                 />

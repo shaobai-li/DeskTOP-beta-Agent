@@ -1,6 +1,8 @@
 import { getChats, updateChat, deleteChat } from "@services/chatsService";
 import { getAgents, createAgent, updateAgent, deleteAgent } from "@services/agentsService";
 import { getMessages } from "@services/messagesService";
+import { getTags } from "@services/tagsService";
+
 
 export function useChatActions(state) {
 
@@ -169,6 +171,14 @@ export function useChatActions(state) {
         return state.agents.find(agent => agent.agentId === agentId) ?? null;
     }
 
+    const loadTags = async () => {
+        const { data, error } = await getTags();
+        if (error) {
+            console.error("加载标签失败：", error);
+            return;
+        }
+        state.setTags(data);
+    }
     return { 
         loadChats, 
         addChat, 
@@ -184,6 +194,8 @@ export function useChatActions(state) {
         addAgent, 
         updateAgentByField,
         deleteAgentById,
+
+        loadTags,
         
         getSelectedAgentId, 
         setSelectedAgentId,
