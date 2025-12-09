@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './Sidebar.css';
 import MenuItem from '../components/sidebar/MenuItem';
 import MenuGroupHeader from '@components/common/MenuGroupHeader';
 import NewAgentModal from '@components/layout/NewAgentModal';
@@ -61,7 +60,8 @@ export default function SidePanel() {
 
     return (
       <>
-        <aside className="side-panel">
+        <aside className="w-60 bg-gray-50 h-screen border border-gray-200 overflow-y-auto flex flex-col relative pb-10">
+        <div className="sticky top-0  z-10 flex-shrink-0">
           <div className="flex justify-left items-center px-6 py-4">
             <img src={logo} alt="logo" className="flex h-12" />
           </div>
@@ -85,11 +85,14 @@ export default function SidePanel() {
                     renderOnSelected={false}
                     handleMenuItemClick={handleNewAgentClick}
                     icon={newAgentIcon} />
+            </div>
+
+            <div className="side-panel__scroll-content">
           <MenuGroupHeader title="知能体库"
                            isOpen={isOpenAgents}
                            onToggle={() => setIsOpenAgents(prev => !prev)} />
           { isOpenAgents && (
-            <div className="mt-2 p-0 overflow-y-auto max-h-[300px]">
+            <div className="mt-2">
                 {state.agents.map((agent) => (
                   <MenuItem
                     key={agent.agentId}
@@ -110,7 +113,7 @@ export default function SidePanel() {
                            isOpen={isOpenChats}
                            onToggle={() => setIsOpenChats(prev => !prev)} />
           { isOpenChats && (
-            <div className="mt-2 p-0 overflow-y-auto max-h-[300px]">
+            <div className="mt-2">
                 {state.chats.map((chat) => (
                   <MenuItem
                     key={chat.chatId}
@@ -127,7 +130,7 @@ export default function SidePanel() {
                 ))}
               </div>
           )}
-
+          </div>
         </aside>
         {
           showNewAgentModal && (
