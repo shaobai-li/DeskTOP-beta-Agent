@@ -80,7 +80,7 @@ export default function TextbaseTagsPage() {
     };
 
     return (
-        <div className="textbase-tags">
+        <div className="textbase-tags h-full flex-col overflow-y-auto">
             <div className="textbase-tags__header flex justify-between items-center px-8 py-4">
                 <div></div>
                 <div className="flex gap-2">

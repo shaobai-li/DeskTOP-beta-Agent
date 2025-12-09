@@ -100,7 +100,7 @@ export default function TextbaseArticlesPage() {
     const currentRows = rows.slice(startIndex, endIndex);
 
     return (
-        <div className="textbase-articles">
+        <div className="textbase-articles h-full flex-col overflow-y-auto">
             <div className="textbase-articles__header flex justify-between px-8 py-2">
                 <Input 
                     value={searchValue}

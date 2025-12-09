@@ -3,8 +3,8 @@
     padding: 0;
     border-radius: 10px;
     border: 1px solid #e5e5e5;
-    overflow-y: auto;
-    max-height: 700px;
+    /* overflow-y: auto;
+    max-height: 700px; */
 }
   
   
@@ -13,8 +13,6 @@
     width: 100%;
     border-spacing: 0;
     background: white;
-    border-radius: 12px;
-    overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     font-size: 14px;
     font-weight: normal;
@@ -49,4 +47,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.simple-table th {
+    position: sticky;   /* 启用粘性定位 */
+    top: 0;             /* 固定在顶部 */
+    z-index: 10;        /* 确保在滚动内容之上 */
+    background: white;  
 }
