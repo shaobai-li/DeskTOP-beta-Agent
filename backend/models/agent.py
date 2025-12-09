@@ -21,6 +21,7 @@ class Agent(Base):
     persona_prompt = Column(Text, nullable=True, default="")
     language_style_prompt = Column(Text, nullable=True, default="")
     default_prompt_dir = Column(String, nullable=True, default="agents/prompts/")
+    vector_index = Column(Text, nullable=True)  # 新增的向量索引列
     
     # 关系
     tags = relationship("Tag", secondary=agent_tags, back_populates="agents")
@@ -31,5 +32,6 @@ class Agent(Base):
             "title": self.title,
             "persona_prompt": self.persona_prompt,
             "language_style_prompt": self.language_style_prompt,
-            "default_prompt_dir": self.default_prompt_dir
+            "default_prompt_dir": self.default_prompt_dir,
+            "vector_index": self.vector_index  # 添加到字典方法中
         }
