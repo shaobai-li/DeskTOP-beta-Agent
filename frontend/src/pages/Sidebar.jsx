@@ -61,7 +61,7 @@ export default function SidePanel() {
     return (
       <>
         <aside className="w-60 bg-gray-50 h-screen border border-gray-200 overflow-y-auto flex flex-col relative pb-10">
-        <div className="sticky top-0  z-10 flex-shrink-0">
+        <div className="sticky top-0 bg-gray-50 z-10 flex-shrink-0">
           <div className="flex justify-left items-center px-6 py-4">
             <img src={logo} alt="logo" className="flex h-12" />
           </div>
