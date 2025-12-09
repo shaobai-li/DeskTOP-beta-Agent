@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
+from typing import List
 from services.article_service import ArticleService
 from db import get_db
 
@@ -103,6 +104,27 @@ async def delete_article(article_id: str, db: AsyncSession = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"删除失败: {str(e)}"
+        )
+
+
+@router.patch("/articles/{article_id}/tags")
+async def update_article_tags(article_id: str, tag_ids: List[str] = Body(...), db: AsyncSession = Depends(get_db)):
+    """更新文章的标签关联"""
+    try:
+        updated_article = await ArticleService.update_article_tags(article_id, tag_ids, db)
+        return {
+            "message": "更新标签成功",
+            "article": updated_article
+        }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"更新标签失败: {str(e)}"
         )
 
 @router.post("/articles/embedding", status_code=status.HTTP_200_OK)

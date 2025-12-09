@@ -13,6 +13,7 @@ class Tag(Base):
 
     # 关系
     articles = relationship("Article", secondary="article_tags", back_populates="tags")
+    agents = relationship("Agent", secondary="agent_tags", back_populates="tags")
 
     def to_dict(self):
         return {

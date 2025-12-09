@@ -30,7 +30,10 @@ class ArticleService:
         articles_list = []
         for article in articles:
             article_dict = article.to_dict()
-            # 添加标签名称字符串
+            # 添加标签详细信息（包含tagId和name）用于编辑
+            tags_info = [{"tagId": tag.tag_id, "name": tag.name} for tag in article.tags]
+            article_dict['tagsInfo'] = tags_info
+            # 标签名称字符串用于表格显示
             tags_names = [tag.name for tag in article.tags]
             article_dict['tags'] = ', '.join(tags_names) if tags_names else ''
             articles_list.append(article_dict)
@@ -142,6 +145,40 @@ class ArticleService:
         await db.commit()
         
         return {"message": f"文章 {article_id} 已删除"}
+
+    @staticmethod
+    async def update_article_tags(article_id: str, tag_ids: List[str], db: AsyncSession) -> Dict:
+        """更新文章的标签关联"""
+        result = await db.execute(
+            select(Article)
+            .options(selectinload(Article.tags))
+            .where(Article.article_id == article_id)
+        )
+        article = result.scalar_one_or_none()
+        
+        if not article:
+            raise ValueError(f"文章 {article_id} 不存在")
+        
+        # 获取要关联的标签
+        if tag_ids:
+            result = await db.execute(
+                select(Tag).where(Tag.tag_id.in_(tag_ids))
+            )
+            tags = result.scalars().all()
+            if len(tags) != len(tag_ids):
+                raise ValueError("部分标签不存在")
+        else:
+            tags = []
+        
+        # 更新关联关系
+        article.tags = tags
+        await db.commit()
+        await db.refresh(article)
+        
+        article_dict = article.to_dict()
+        tags_info = [{"tagId": tag.tag_id, "name": tag.name} for tag in article.tags]
+        article_dict['tags'] = tags_info
+        return to_camel_case([article_dict])[0]
 
     @staticmethod
     async def update_embedding_ids(embedding_id_list: List[int], db: AsyncSession = None):
