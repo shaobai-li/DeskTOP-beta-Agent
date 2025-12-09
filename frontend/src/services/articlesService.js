@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiDelete, apiPut } from "./apiClient";
+import { apiGet, apiPost, apiDelete, apiPut, apiPatch } from "./apiClient";
 
 export function getArticles() {
     return apiGet("/articles");
@@ -18,4 +18,8 @@ export function updateArticle(articleId, articleData) {
 
 export function rebuildArticlesEmbedding() {
     return apiPost("/articles/embedding");
+}
+
+export function updateArticleTags(articleId, tagIds) {
+    return apiPatch(`/articles/${articleId}/tags`, tagIds);
 }

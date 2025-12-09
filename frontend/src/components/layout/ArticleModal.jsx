@@ -32,6 +32,16 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
         tags_by_author: initialData.tagsByAuthor || "",
         content: initialData.content || ""
       });
+      // 加载文章的标签（从 tagsInfo 字段读取）
+      if (initialData.tagsInfo && Array.isArray(initialData.tagsInfo)) {
+        const tags = initialData.tagsInfo.map(tag => ({
+          id: tag.tagId || tag.id,
+          label: tag.name
+        }));
+        setSelectedTags(tags);
+      } else {
+        setSelectedTags([]);
+      }
     } else {
       // 重置表单
       setFormData({
@@ -42,6 +52,7 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
         tags_by_author: "",
         content: ""
       });
+      setSelectedTags([]);
     }
   }, [initialData, isOpen]);
 
@@ -56,7 +67,8 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
   };
 
   const handleSave = () => {
-    onSubmit?.(formData, initialData?.articleId);  // 传递 articleId 用于区分新建/编辑
+    const tagIds = selectedTags.map(tag => tag.id || tag.tagId);
+    onSubmit?.(formData, initialData?.articleId, tagIds);  // 传递 articleId 和 tagIds
     onClose();
   };
 

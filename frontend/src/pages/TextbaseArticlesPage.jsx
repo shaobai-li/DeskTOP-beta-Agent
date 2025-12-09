@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ArticlesTable from "@components/layout/ArticlesTable";
 import Pagination from "@components/layout/Pagination";
-import { getArticles, createArticle, updateArticle, deleteArticle, rebuildArticlesEmbedding } from "@services/articlesService";
+import { getArticles, createArticle, updateArticle, deleteArticle, updateArticleTags } from "@services/articlesService";
 import Input from "@components/common/Input";
 import Button from "@components/common/Button";
 import ArticleModal from "@components/layout/ArticleModal";
@@ -57,19 +57,10 @@ export default function TextbaseArticlesPage() {
         setRows(prev => prev.filter(row => row.articleId !== articleId));
     };
 
-    // 处理重建索引
-    const handleRebuildIndex = async () => {
-        console.log("开始重建索引...");
-        const { data, error } = await rebuildArticlesEmbedding();
-        if (error) {
-            console.error("重建索引失败：", error);
-            return;
-        }
-        console.log("重建索引完成！", data);
-    };
-
     // 修改：处理文章提交（新建或更新）
-    const handleArticleSubmit = async (formData, articleId) => {
+    const handleArticleSubmit = async (formData, articleId, tagIds = []) => {
+        let finalArticleId = articleId;
+        
         if (articleId) {
             // 编辑模式
             const { data, error } = await updateArticle(articleId, formData);
@@ -86,6 +77,19 @@ export default function TextbaseArticlesPage() {
                 return;
             }
             console.log("文章创建成功！", data);
+            // 获取新创建的文章ID
+            finalArticleId = data.articleId;
+        }
+        
+        // 更新文章标签
+        if (finalArticleId && tagIds) {
+            const { error: tagsError } = await updateArticleTags(finalArticleId, tagIds);
+            if (tagsError) {
+                console.error("更新文章标签失败：", tagsError);
+                // 即使标签更新失败，也继续重新加载文章列表
+            } else {
+                console.log("文章标签更新成功！");
+            }
         }
         
         // 重新加载文章列表
@@ -107,7 +111,6 @@ export default function TextbaseArticlesPage() {
                     onChange={handleSearchChange}
                 />
                 <div className="flex gap-2">
-                    <Button onClick={handleRebuildIndex} text="重建索引" theme="white" />
                     <Button onClick={handleAddClick} text="添加" />
                 </div>
             </div>

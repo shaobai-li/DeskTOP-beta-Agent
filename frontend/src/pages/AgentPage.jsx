@@ -3,6 +3,7 @@ import { useState } from 'react'
 import PromptInput from '@components/layout/PromptInput'
 import { useChat } from '@contexts/ChatContext'
 import TagsInput from '@components/common/TagsInput'
+import Button from '@components/common/Button'
 
 function AgentPage() {
   const { agentId } = useParams()
@@ -41,12 +42,20 @@ function AgentPage() {
           placeholder="请输入特色卖点..."
           onConfirm={handleConfirm('languageStylePrompt')}
         />
-        <label>标签</label>
-        <TagsInput
-          options={tagOptions}
-          value={selectedTags}
-          onChange={setSelectedTags}
-        />
+        
+        <div className="flex flex-row  justify-between">
+          <div className="flex flex-col">
+            <label>标签</label>
+            <TagsInput
+              options={tagOptions}
+              value={selectedTags}
+              onChange={setSelectedTags}
+            />
+          </div>
+          <div className="flex flex-col justify-end">
+            <Button text="保存" onClick={null} />
+          </div>
+        </div>
       </div>
       {/* <div className="agent-page-footer">agent页面页脚</div> */}
     </div>

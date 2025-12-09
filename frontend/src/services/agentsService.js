@@ -23,3 +23,11 @@ export function createAgent(body) {
 export function deleteAgent(agentId) {
     return apiDelete(`/agents/${agentId}`);
 }
+
+export function updateAgentTags(agentId, tagIds) {
+    return apiPatch(`/agents/${agentId}/tags`, tagIds);
+}
+
+export function saveAgent(agentId, body) {
+    return apiPost(`/agents/${agentId}/save`, body);
+}
