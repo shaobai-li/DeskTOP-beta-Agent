@@ -125,8 +125,9 @@ export function useChatActions(state) {
         state.setAgents(data);
     };
 
-    const addAgent = async (agentTitle) => {
-        const { data, error } = await createAgent({ title: agentTitle.trim() });
+    const addAgent = async (agentTitle, selectedTags = []) => {
+        const tagIds = (selectedTags || []).map(t => t.id ?? t.tagId).filter(Boolean);
+        const { data, error } = await createAgent({ title: agentTitle.trim(), tagIds });
         if (error) {
             console.error("创建知能体失败：", error);
             return;

@@ -39,11 +39,11 @@ export default function SidePanel() {
         }
     };
 
-    const newAgent = async (agentTitle) => {
+    const newAgent = async (agentTitle, selectedTags = []) => {
         if (!agentTitle.trim()) {
             return;
         }
-        actions.addAgent(agentTitle.trim());
+        actions.addAgent(agentTitle.trim(), selectedTags);
     };
 
     const handleMenuItemClick = (itemName) => {
