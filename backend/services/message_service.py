@@ -22,14 +22,14 @@ class MessageService:
         self.language_styler = None
         self._current_agent_id = None
     
-    async def _init_agents(self, selected_agent: str):
+    async def _init_agents(self, selected_agent: str, db: AsyncSession):
         """根据 selected_agent (agent_id) 初始化各个 agent"""
         # 如果已经是同一个 agent，不需要重新初始化
         if self._current_agent_id == selected_agent:
             return
         
         # 获取 agent 配置
-        agent_config = AgentService.get_agent_by_id(selected_agent)
+        agent_config = await AgentService.get_agent_by_id(selected_agent, db)
         if not agent_config:
             # 如果找不到配置，使用默认配置
             agent_config = {
@@ -138,7 +138,7 @@ class MessageService:
                 "topic": topic,
                 "generated_content": status_msg
             }) + "\n"
-            await self._init_agents(selected_agent)
+            await self._init_agents(selected_agent, db)
         
         journey_state = await MessageService.get_journey_state(chat_id, db)
 
