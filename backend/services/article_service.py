@@ -11,6 +11,7 @@ from config.settings import VECTOR_INDEX_PATH
 # RAG related import
 from sentence_transformers import SentenceTransformer
 import faiss
+from huggingface_hub import snapshot_download
 
 
 
@@ -199,7 +200,7 @@ class ArticleService:
         await db.commit()
 
     @staticmethod
-    async def rebuild_articles_embedding(db: AsyncSession = None) -> Dict:
+    async def rebuild_articles_embedding(db: AsyncSession = None, tagIds: List[str] = None) -> Dict:
         # 从配置文件读取路径，生成向量索引文件的完整路径
         import time
         tic = time.time()
@@ -212,7 +213,8 @@ class ArticleService:
         article_contents = [article['content'] if article['content'] else "" for article in articles]
         
         print("# 加载embedding模型")
-        embedding_model = SentenceTransformer('BAAI/bge-large-zh-v1.5')
+        local_path = snapshot_download("BAAI/bge-large-zh-v1.5")
+        embedding_model = SentenceTransformer(local_path, device="cpu")
         print("# 对文章进行向量化")
         embedding = embedding_model.encode(article_contents, normalize_embeddings=True)
         print("# 创建index")

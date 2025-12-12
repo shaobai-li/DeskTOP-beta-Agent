@@ -7,7 +7,7 @@ from agents.utils.prompt_loader import load_prompt
 from config.settings import VECTOR_INDEX_PATH
 from services.article_service import ArticleService
 from db.session import AsyncSessionLocal
-
+from huggingface_hub import snapshot_download
 
 class SearchAgent:
     
@@ -19,7 +19,8 @@ class SearchAgent:
         Args:
             agent_config: 智能体配置，包含 default_prompt_dir
         """
-        self.embedding_model = SentenceTransformer('BAAI/bge-large-zh-v1.5')
+        local_path = snapshot_download("BAAI/bge-large-zh-v1.5")
+        self.embedding_model = SentenceTransformer(local_path, device="cpu")
         self.vector_index = faiss.read_index(str(VECTOR_INDEX_PATH))
         self.topic = ""
         self.texts_retrieved = ""
