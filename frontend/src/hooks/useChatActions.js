@@ -1,5 +1,5 @@
 import { getChats, updateChat, deleteChat } from "@services/chatsService";
-import { getAgents, createAgent, updateAgent, deleteAgent } from "@services/agentsService";
+import { getAgents, createAgent, updateAgent, deleteAgent, updateAgentTags } from "@services/agentsService";
 import { getMessages } from "@services/messagesService";
 import { getTags } from "@services/tagsService";
 
@@ -123,6 +123,16 @@ export function useChatActions(state) {
             return;
         }
         state.setAgents(data);
+        
+        // 初始化 agentTags 状态
+        const initialAgentTags = {};
+        data.forEach(agent => {
+            if (agent.tags && Array.isArray(agent.tags)) {
+                const tagIds = agent.tags.map(tag => tag.tagId ?? tag.id).filter(Boolean);
+                initialAgentTags[agent.agentId] = tagIds;
+            }
+        });
+        state.setAgentTags(initialAgentTags);
     };
 
     const addAgent = async (agentTitle, selectedTags = []) => {
@@ -133,6 +143,12 @@ export function useChatActions(state) {
             return;
         }
         state.setAgents(prev => [...prev, data.agent]);
+        
+        // 同时更新 agentTags 状态
+        state.setAgentTags(prev => ({
+            ...prev,
+            [data.agent.agentId]: tagIds
+        }));
     }
 
     const updateAgentByField = async (agentId, field, newValue) => {
@@ -158,6 +174,35 @@ export function useChatActions(state) {
         }
         state.setAgents(prev => prev.filter(agent => agent.agentId !== agentId));
     }
+
+    // 更新知能体的标签
+    const updateAgentTagsByAgentId = async (agentId, tagIds) => {
+
+        // 同时更新 agents 状态中的 tags 字段以保持兼容性
+        console.log(state.agents)
+        state.setAgents(prev => 
+            prev.map(agent => {
+                if (agent.agentId !== agentId) return agent;
+                // 若后端返回最新 agent，直接替换；否则根据 tagIds 回填本地 tags
+                const idSet = new Set(tagIds);
+                const tags = state.tags.filter(t => idSet.has(t.tagId));
+                return { ...agent, tags: tags };
+            })
+        );
+
+        const { data, error } = await updateAgentTags(agentId, tagIds);
+        if (error) {
+            console.error("更新知能体标签失败：", error);
+            return;
+        }
+        // 更新独立的 agentTags 状态
+        state.setAgentTags(prev => ({
+            ...prev,
+            [agentId]: tagIds
+        }));
+        
+
+    };
 
     const getSelectedAgentId = (chatId) => {
         return state.chats.find(chat => chat.chatId === chatId)?.selectedAgent;
@@ -200,6 +245,7 @@ export function useChatActions(state) {
         
         getSelectedAgentId, 
         setSelectedAgentId,
-        getAgentById
+        getAgentById,
+        updateAgentTagsByAgentId
     };
 }

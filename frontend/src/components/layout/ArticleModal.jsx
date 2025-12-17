@@ -15,10 +15,10 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
   });
   const [selectedTags, setSelectedTags] = useState([]);
 
-  // 转换后端标签数据为 TagsInput 需要的格式
+  // 转换后端标签数据为 TagsInput 需要的格式  
   const tagOptions = state.tags.map(tag => ({
-    id: tag.tagId || tag.id,
-    label: tag.name
+    tagId: tag.tagId,
+    name: tag.name
   }));
 
   // 当 initialData 变化时，更新表单数据

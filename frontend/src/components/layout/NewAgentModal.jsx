@@ -14,11 +14,6 @@ export default function NewAgentModal({ onClose, onCreate }) {
     const [agentName, setAgentName] = useState("");
     const [selectedTags, setSelectedTags] = useState([]);
 
-    // 转换后端标签数据为 TagsInput 需要的格式
-    const tagOptions = state.tags.map(tag => ({
-        id: tag.tagId || tag.id,
-        label: tag.name
-    }));
 
     const handleCreate = () => {
         onCreate(agentName, selectedTags);
@@ -46,7 +41,7 @@ export default function NewAgentModal({ onClose, onCreate }) {
                       onChange={handleChange}
                     />
                     <TagsInput
-                      options={tagOptions}
+                      options={state.tags}
                       value={selectedTags}
                       onChange={setSelectedTags}
                     />

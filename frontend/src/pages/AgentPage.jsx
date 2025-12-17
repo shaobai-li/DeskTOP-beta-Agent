@@ -1,9 +1,9 @@
 import { useParams, Navigate } from 'react-router-dom'
-import { useState } from 'react'
 import PromptInput from '@components/layout/PromptInput'
 import { useChat } from '@contexts/ChatContext'
 import TagsInput from '@components/common/TagsInput'
 import Button from '@components/common/Button'
+
 
 function AgentPage() {
   const { agentId } = useParams()
@@ -11,17 +11,15 @@ function AgentPage() {
   
   const agent = actions.getAgentById(agentId)
 
-  const [selectedTags, setSelectedTags] = useState([])
 
   const handleConfirm = (field) => async (newValue) => {
     actions.updateAgentByField(agentId, field, newValue)
   }
 
-  // 转换后端标签数据为 TagsInput 需要的格式
-  const tagOptions = state.tags.map(tag => ({
-    id: tag.tagId || tag.id,
-    label: tag.name
-  }))
+  const handleTagsChange = async (newTags) => {
+    const tagIds = newTags.map(tag => tag.tagId).filter(Boolean);
+    await actions.updateAgentTagsByAgentId(agentId, tagIds);
+  }
 
   return (!agent) ? <Navigate to="/" replace /> : (
     <div className="agent-page flex flex-col h-full">
@@ -47,9 +45,9 @@ function AgentPage() {
           <div className="flex flex-col">
             <label>标签</label>
             <TagsInput
-              options={tagOptions}
-              value={selectedTags}
-              onChange={setSelectedTags}
+              options={state.tags}
+              value={agent.tags}
+              onChange={handleTagsChange}
             />
           </div>
           <div className="flex flex-col justify-end">

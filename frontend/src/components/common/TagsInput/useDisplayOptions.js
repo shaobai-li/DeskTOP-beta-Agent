@@ -13,12 +13,16 @@ import { useFilteredOptions } from './useFilteredOptions';
  */
 export function useDisplayOptions(options, selectedTags, inputValue) {
     // 获取所有可用标签（排除已选中的）
+    
     const availableOptions = options.filter(option => 
-        !selectedTags.some(tag => tag.id === option.id)
+        !selectedTags.some(tag => tag.tagId === option.tagId)
     );
 
+    
+    
     // 使用 Hook 过滤选项
     const filteredOptions = useFilteredOptions(options, selectedTags, inputValue);
+
 
     // 确定要显示的选项
     if (!inputValue) {

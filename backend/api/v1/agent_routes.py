@@ -131,3 +131,17 @@ async def delete_agent(agent_id: str, db: AsyncSession = Depends(get_db)):
             detail=str(e)
         )
 
+@router.patch("/agents/{agent_id}/tags")
+async def update_agent_tags(agent_id: str, tag_ids: List[str] = Body(...), db: AsyncSession = Depends(get_db)):
+    """更新知能体的标签关联"""
+    try:
+        updated_agent = await AgentService.update_agent_tags(agent_id, tag_ids, db)
+        return {
+            "message": "更新标签成功",
+            "agent": updated_agent
+        }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )

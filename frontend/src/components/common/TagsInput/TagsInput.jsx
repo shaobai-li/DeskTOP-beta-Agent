@@ -6,8 +6,8 @@ import TagsInputTags from './TagsInputTags';
 /**
  * TagsInput 组件 - 带下拉菜单的标签输入框
  * @param {Object} props
- * @param {Array<{id: string|number, label: string}>} props.options - 可选的标签选项列表
- * @param {Array<{id: string|number, label: string}>} props.value - 已选中的标签列表
+ * @param {Array<{tagId: string|number, name: string}>} props.options - 可选的标签选项列表
+ * @param {Array<{tagId: string|number, name: string}>} props.value - 已选中的标签列表
  * @param {function} props.onChange - 选中标签变化时的回调，参数为新的标签列表
  */
 export default function TagsInput({
@@ -24,6 +24,7 @@ export default function TagsInput({
     // 使用 Hook 确定要显示的选项
     const displayOptions = useDisplayOptions(options, value, inputValue);
 
+    
     // 点击外部关闭下拉菜单和编辑模式
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -36,6 +37,7 @@ export default function TagsInput({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    
     // 进入编辑模式
     const handleStartEditing = () => {
         setIsEditing(true);
@@ -52,9 +54,10 @@ export default function TagsInput({
 
     // 删除标签
     const handleRemoveTag = (tagId) => {
-        onChange(value.filter(tag => tag.id !== tagId));
+        onChange(value.filter(tag => tag.tagId !== tagId));
     };
 
+    
     return (
         <div ref={containerRef} className="relative">
             {/* 输入区域 */}
