@@ -86,7 +86,7 @@ class AgentService:
             agent_id=uuid7(),
             title=title,
             persona_prompt=snake_data.get("persona_prompt", ""),
-            language_style_prompt=snake_data.get("language_style_prompt", ""),
+            usp_prompt=snake_data.get("usp_prompt", ""),
             default_prompt_dir=snake_data.get("default_prompt_dir", "agents/prompts/")
         )
         
@@ -139,8 +139,8 @@ class AgentService:
             agent.title = snake_data["title"]
         if "persona_prompt" in snake_data and snake_data["persona_prompt"] is not None:
             agent.persona_prompt = snake_data["persona_prompt"]
-        if "language_style_prompt" in snake_data and snake_data["language_style_prompt"] is not None:
-            agent.language_style_prompt = snake_data["language_style_prompt"]
+        if "usp_prompt" in snake_data and snake_data["usp_prompt"] is not None:
+            agent.usp_prompt = snake_data["usp_prompt"]
         if "default_prompt_dir" in snake_data and snake_data["default_prompt_dir"] is not None:
             agent.default_prompt_dir = snake_data["default_prompt_dir"]
         
@@ -204,8 +204,8 @@ class AgentService:
         # 更新提示词字段
         if "persona_prompt" in snake_data:
             agent.persona_prompt = snake_data["persona_prompt"] or ""
-        if "language_style_prompt" in snake_data:
-            agent.language_style_prompt = snake_data["language_style_prompt"] or ""
+        if "usp_prompt" in snake_data:
+            agent.usp_prompt = snake_data["usp_prompt"] or ""
         
         # 更新标签关联
         if "tag_ids" in snake_data:

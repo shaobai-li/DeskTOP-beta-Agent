@@ -7,7 +7,7 @@ class LanguageStyler:
         初始化 LanguageStyler
         
         Args:
-            agent_config: 智能体配置，包含 language_style_prompt
+            agent_config: 智能体配置，包含 usp_prompt
         """
         self.module = {
             'llm_client': create_llm_client("deepseek"),
@@ -16,9 +16,9 @@ class LanguageStyler:
         self.agent_config = agent_config or {}
     
     def _get_system_prompt(self) -> str:
-        """获取系统提示词，直接从 agent_config 获取 language_style_prompt"""
-        print("Language style prompt:", self.agent_config.get("language_style_prompt", ""))
-        return self.agent_config.get("language_style_prompt", "")
+        """获取系统提示词，直接从 agent_config 获取 usp_prompt"""
+        print("usp_prompt:", self.agent_config.get("usp_prompt", ""))
+        return self.agent_config.get("usp_prompt", "")
 
     def styler(self, topic: str):
         system_prompt = self._get_system_prompt()

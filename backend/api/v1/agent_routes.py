@@ -14,7 +14,7 @@ class AgentCreate(BaseModel):
     """创建知能体的请求模型"""
     title: Optional[str] = "未命名智能体"
     persona_prompt: Optional[str] = ""
-    language_style_prompt: Optional[str] = ""
+    usp_prompt: Optional[str] = ""
     default_prompt_dir: Optional[str] = "agents/prompts/"
 
 
@@ -22,7 +22,7 @@ class AgentUpdate(BaseModel):
     """更新知能体的请求模型"""
     title: Optional[str] = None
     persona_prompt: Optional[str] = None
-    language_style_prompt: Optional[str] = None
+    usp_prompt: Optional[str] = None
     default_prompt_dir: Optional[str] = None
 
 

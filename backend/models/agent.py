@@ -19,7 +19,7 @@ class Agent(Base):
     agent_id = Column(String, primary_key=True, default=uuid7)
     title = Column(String, nullable=False, default="未命名智能体")
     persona_prompt = Column(Text, nullable=True, default="")
-    language_style_prompt = Column(Text, nullable=True, default="")
+    usp_prompt = Column(Text, nullable=True, default="")
     default_prompt_dir = Column(String, nullable=True, default="agents/prompts/")
     vector_index = Column(Text, nullable=True)  # 新增的向量索引列
     
@@ -31,7 +31,7 @@ class Agent(Base):
             "agent_id": self.agent_id,
             "title": self.title,
             "persona_prompt": self.persona_prompt,
-            "language_style_prompt": self.language_style_prompt,
+            "usp_prompt": self.usp_prompt,
             "default_prompt_dir": self.default_prompt_dir,
             "vector_index": self.vector_index  # 添加到字典方法中
         }

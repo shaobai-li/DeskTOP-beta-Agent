@@ -34,7 +34,7 @@ class MessageService:
             # 如果找不到配置，使用默认配置
             agent_config = {
                 "persona_prompt": "",
-                "language_style_prompt": "",
+                "usp_prompt": "",
                 "default_prompt_dir": "agents/prompts/"
             }
         else:
