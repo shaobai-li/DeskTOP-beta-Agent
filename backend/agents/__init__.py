@@ -1,11 +1,11 @@
 from .seach_agent import SearchAgent
 from .topic_analysis_agent import TopicAnalysisAgent
-from .draft_agent import DraftAgent
+from .structure_draft_agent import StructureDraftAgent
 from .language_styler import LanguageStyler
 
 __all__ = [
     "SearchAgent",
     "TopicAnalysisAgent",
-    "DraftAgent",
+    "StructureDraftAgent",
     "LanguageStyler"
 ]

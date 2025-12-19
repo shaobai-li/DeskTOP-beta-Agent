@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 from models.chat import Chat
 from models.message import Message
 from utils import uuid7, to_camel_case, to_snake_case
-from agents import SearchAgent, TopicAnalysisAgent, DraftAgent, LanguageStyler
+from agents import SearchAgent, TopicAnalysisAgent, StructureDraftAgent, LanguageStyler
 from services.agent_service import AgentService
 
 
@@ -44,7 +44,7 @@ class MessageService:
         # 使用 agent 配置初始化各个 agent（SearchAgent 需要异步初始化）
         self.search_agent = await SearchAgent.create(agent_config)
         self.topic_analysis_agent = TopicAnalysisAgent(agent_config)
-        self.draft_agent = DraftAgent(agent_config)
+        self.draft_agent = StructureDraftAgent(agent_config)
         self.language_styler = LanguageStyler(agent_config)
         self._current_agent_id = selected_agent
 
@@ -199,7 +199,7 @@ class MessageService:
                 "generated_content": status_msg
             }) + "\n"
 
-            generated_draft = self.draft_agent.draft(topic)
+            generated_draft = self.draft_agent.structure_draft(topic)
             
             chunk_str = json.dumps({
                 "is_status_message": False,

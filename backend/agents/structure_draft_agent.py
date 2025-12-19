@@ -2,10 +2,10 @@ from agents.utils.llm_client import create_llm_client
 from agents.utils.prompt_loader import load_prompt
 
 
-class DraftAgent:
+class StructureDraftAgent:
     def __init__(self, agent_config: dict = None):
         """
-        初始化 DraftAgent
+        初始化 StructureDraftAgent
         
         Args:
             agent_config: 智能体配置，包含 persona_prompt 和 default_prompt_dir
@@ -20,18 +20,18 @@ class DraftAgent:
         """构建系统提示词"""
         # 从 agent_config 获取 prompt_dir，使用它来加载 draft 提示词
         prompt_dir = self.agent_config.get("default_prompt_dir", "agents/prompts/")
-        system_prompt_draft = load_prompt("draft", prompt_dir)
+        system_prompt_structure_draft = load_prompt("structure_draft", prompt_dir)
         
         # 从 agent_config 直接获取 persona_prompt
-        persona_prompt = self.agent_config.get("persona_prompt", "")
-        print("Persona prompt:", persona_prompt)
+        # persona_prompt = self.agent_config.get("persona_prompt", "")
+        # print("Persona prompt:", persona_prompt)
         
-        if persona_prompt:
-            return '\n\n'.join([system_prompt_draft, persona_prompt])
-        return system_prompt_draft
+        # if persona_prompt:
+        #     return '\n\n'.join([system_prompt_draft, persona_prompt])
+        return system_prompt_structure_draft
 
-    def draft(self, topic: str) -> str:
-        print("Entering draft...")
+    def structure_draft(self, topic: str) -> str:
+        print("Entering structure_draft...")
         system_prompt = self._build_system_prompt()
         messages=[
             {"role": "system", "content": system_prompt},
@@ -44,12 +44,13 @@ class DraftAgent:
             )
         print("Received response from LLM...")
         completion = response.choices[0].message.content
+        print(completion)
         return completion
 
 
 
 def main():
-    draft_agent = DraftAgent()
+    structure_draft_agent = StructureDraftAgent()
     topic = """【选题4】自我介绍如何做到“有的放矢”？
 - 灵感来源：<text 7>, <text 10>  
 - 核心观点：自我介绍需结构化（头身尾），突出匹配、优秀、热情，并用故事案例支撑。
@@ -75,7 +76,7 @@ def main():
     }
 }
 """
-    result = draft_agent.draft(topic)
+    result = structure_draft_agent.structure_draft(topic)
     print(result)
 
 if __name__ == "__main__":
