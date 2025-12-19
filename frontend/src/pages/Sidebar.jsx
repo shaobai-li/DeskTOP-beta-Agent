@@ -5,7 +5,6 @@ import NewAgentModal from '@components/layout/NewAgentModal';
 import databaseIcon from '@assets/icon-nav-database.png';
 import newChatIcon from '@assets/icon-nav-new-chat.png';
 import newAgentIcon from '@assets/icon-nav-new-agent.svg';
-import logo from '../../public/app_znxt_word_logo_3.png';
 import { useChat } from '@contexts/ChatContext';
 
 export default function SidePanel() {
@@ -63,7 +62,7 @@ export default function SidePanel() {
         <aside className="w-60 bg-gray-50 h-screen border border-gray-200 overflow-y-auto flex flex-col relative pb-10">
         <div className="sticky top-0 bg-gray-50 z-10 flex-shrink-0">
           <div className="flex justify-left items-center px-6 py-4">
-            <img src={logo} alt="logo" className="flex h-12" />
+            <img src="/app_znxt_word_logo_3.png" alt="logo" className="flex h-12" />
           </div>
           <MenuItem title="新建聊天"
                     itemId={"item-new-chat"}
