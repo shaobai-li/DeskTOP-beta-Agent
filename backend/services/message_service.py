@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 from models.chat import Chat
 from models.message import Message
 from utils import uuid7, to_camel_case, to_snake_case
-from agents import SearchAgent, TopicAnalysisAgent, StructureDraftAgent, LanguageStyler
+from agents import SearchAgent, TopicAnalysisAgent, StructureDraftAgent, FinalDraftAgent
 from services.agent_service import AgentService
 
 
@@ -19,7 +19,7 @@ class MessageService:
         self.search_agent = None
         self.topic_analysis_agent = None
         self.draft_agent = None
-        self.language_styler = None
+        self.final_draft_agent = None
         self._current_agent_id = None
     
     async def _init_agents(self, selected_agent: str, db: AsyncSession):
@@ -45,7 +45,7 @@ class MessageService:
         self.search_agent = await SearchAgent.create(agent_config)
         self.topic_analysis_agent = TopicAnalysisAgent(agent_config)
         self.draft_agent = StructureDraftAgent(agent_config)
-        self.language_styler = LanguageStyler(agent_config)
+        self.final_draft_agent = FinalDraftAgent(agent_config)
         self._current_agent_id = selected_agent
 
     @staticmethod
@@ -192,7 +192,7 @@ class MessageService:
             
             
         elif journey_state == "1":
-            status_msg = "正在生成草稿"
+            status_msg = "正在生成结构化的初稿"
             yield json.dumps({
                 "is_status_message": True,
                 "topic": topic,
@@ -201,25 +201,25 @@ class MessageService:
 
             generated_draft = self.draft_agent.structure_draft(topic)
             
-            chunk_str = json.dumps({
-                "is_status_message": False,
-                "topic": topic,
-                "generated_content": generated_draft
-            }) + "\n"
-            yield chunk_str
+            # chunk_str = json.dumps({
+            #     "is_status_message": False,
+            #     "topic": topic,
+            #     "generated_content": generated_draft
+            # }) + "\n"
+            # yield chunk_str
 
             journey_state = "1"
             await MessageService.save_message(chat_id, journey_state=journey_state, content=generated_draft, role="assistant", db=db)
 
 
-            status_msg = "正在进行语言风格处理中"
+            status_msg = "正在进行终稿优化中"
             yield json.dumps({
                 "is_status_message": True,
                 "topic": topic,
                 "generated_content": status_msg
             }) + "\n"
             
-            optimized_draft = self.language_styler.styler(generated_draft)
+            optimized_draft = self.final_draft_agent.final_draft(generated_draft)
             yield json.dumps({
                 "is_status_message": False,
                 "topic": topic,
