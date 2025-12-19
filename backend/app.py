@@ -9,9 +9,6 @@ from api.v1 import agent_router, chat_router, article_router, message_router, ta
 
 # 初始化
 app = FastAPI()
-UPLOAD_DIR = Path(__file__).parent / "database/uploads"
-UPLOAD_DIR.mkdir(exist_ok=True)
-TEXT_METADATA_FILE = UPLOAD_DIR / "texts_metadata.json"
 
 app.include_router(agent_router, prefix="/api/v1")
 app.include_router(chat_router, prefix="/api/v1")
