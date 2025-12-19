@@ -35,6 +35,7 @@ function PromptInput({ title, value, placeholder, onConfirm = null, onChange = n
         <label className="prompt-input-label">{title}</label>
         <div className="prompt-input-buttons">
           <Button text="回退" disabled={disabled} onClick={handleCancel} />
+          <Button text="保存" disabled={disabled} onClick={handleConfirm} />
         </div>
       </div>
       <textarea

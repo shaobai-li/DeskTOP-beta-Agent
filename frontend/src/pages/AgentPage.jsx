@@ -21,6 +21,7 @@ function AgentPage() {
     await actions.updateAgentTagsByAgentId(agentId, tagIds);
   }
 
+
   return (!agent) ? <Navigate to="/" replace /> : (
     <div className="agent-page flex flex-col h-full">
       <div className="agent-page-header text-4xl font-bold px-8 py-8">
@@ -36,9 +37,9 @@ function AgentPage() {
         
         <PromptInput
           title="特色卖点"
-          value={agent.languageStylePrompt}
+          value={agent.uspPrompt}
           placeholder="请输入特色卖点..."
-          onConfirm={handleConfirm('languageStylePrompt')}
+          onConfirm={handleConfirm('uspPrompt')}
         />
         
         <div className="flex flex-row  justify-between">
