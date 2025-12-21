@@ -35,8 +35,8 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
       // 加载文章的标签（从 tagsInfo 字段读取）
       if (initialData.tagsInfo && Array.isArray(initialData.tagsInfo)) {
         const tags = initialData.tagsInfo.map(tag => ({
-          id: tag.tagId || tag.id,
-          label: tag.name
+          tagId: tag.tagId,
+          name: tag.name
         }));
         setSelectedTags(tags);
       } else {
@@ -67,7 +67,7 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
   };
 
   const handleSave = () => {
-    const tagIds = selectedTags.map(tag => tag.id || tag.tagId);
+    const tagIds = selectedTags.map(tag => tag.tagId).filter(Boolean);
     onSubmit?.(formData, initialData?.articleId, tagIds);  // 传递 articleId 和 tagIds
     onClose();
   };
