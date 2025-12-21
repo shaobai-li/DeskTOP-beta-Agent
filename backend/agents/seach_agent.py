@@ -1,6 +1,7 @@
 import json
 import asyncio
 import faiss
+import os
 from sentence_transformers import SentenceTransformer
 from agents.utils.llm_client import create_llm_client
 from agents.utils.prompt_loader import load_prompt
@@ -21,7 +22,7 @@ class SearchAgent:
         """
         local_path = snapshot_download("BAAI/bge-large-zh-v1.5")
         self.embedding_model = SentenceTransformer(local_path, device="cpu")
-        self.vector_index = faiss.read_index(str(VECTOR_INDEX_PATH))
+        self.vector_index = faiss.read_index(os.path.relpath(str(VECTOR_INDEX_PATH)))
         self.topic = ""
         self.texts_retrieved = ""
         self.content_framework_module = {
