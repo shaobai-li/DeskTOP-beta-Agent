@@ -85,6 +85,20 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
 
           <div className="p-6 space-y-6">
 
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label>链接</label>
+                <button 
+                  className="px-3 py-1 text-sm bg-black text-white rounded-md hover:bg-gray-800"
+                >
+                  识别url
+                </button>
+              </div>
+              <input
+                className="w-full px-3 py-2 border rounded-md"
+              />
+            </div>
+
             <h3 className="font-semibold">基本信息</h3>
 
             <div>
