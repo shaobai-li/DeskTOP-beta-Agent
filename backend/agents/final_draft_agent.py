@@ -29,12 +29,12 @@ class FinalDraftAgent:
 
         return '\n\n'.join([system_prompt_final_draft, persona_prompt, usp_prompt])
 
-    def final_draft(self, topic: str):
+    def get_final_draft(self, input_draft: str):
         print("Entering final_draft...")
         system_prompt = self._get_system_prompt()
         messages=[
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": f"请以下面的结构化的初稿为基础，进行优化生成终稿：{topic}"}
+            {"role": "user", "content": f"请以下面的结构化的初稿为基础，进行优化生成终稿：{input_draft}"}
             ]
         print("Sending messages to LLM...")
         response = self.module["llm_client"].chat.completions.create(

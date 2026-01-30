@@ -199,7 +199,7 @@ class MessageService:
                 "generated_content": status_msg
             }) + "\n"
 
-            generated_draft = self.draft_agent.structure_draft(topic)
+            initial_draft = self.draft_agent.structure_draft(topic)
             
             # chunk_str = json.dumps({
             #     "is_status_message": False,
@@ -209,7 +209,7 @@ class MessageService:
             # yield chunk_str
 
             journey_state = "1"
-            await MessageService.save_message(chat_id, journey_state=journey_state, content=generated_draft, role="assistant", db=db)
+            await MessageService.save_message(chat_id, journey_state=journey_state, content=initial_draft, role="assistant", db=db)
 
 
             status_msg = "正在进行终稿优化中"
@@ -219,7 +219,7 @@ class MessageService:
                 "generated_content": status_msg
             }) + "\n"
             
-            optimized_draft = self.final_draft_agent.final_draft(generated_draft)
+            optimized_draft = self.final_draft_agent.get_final_draft(initial_draft)
             yield json.dumps({
                 "is_status_message": False,
                 "topic": topic,
