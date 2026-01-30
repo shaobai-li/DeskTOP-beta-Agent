@@ -226,8 +226,24 @@ class MessageService:
                 "generated_content": optimized_draft
             }) + "\n"
 
-            journey_state = "0"
+            journey_state = "2"
             await MessageService.save_message(chat_id, journey_state=journey_state, content=optimized_draft, role="assistant", db=db)
+        
+
+        elif journey_state == "2":
+            # todo: topic 其实是用户输入
+            # if new_topic_intention(topic):
+            #     返回一个请求用户确认的对话
+            # else:
+            #     journey_state = "2"
+            reply_content = self.final_draft_agent.discuss_on_draft(topic)
+            yield json.dumps({
+                "is_status_message": False,
+                "topic": topic,
+                "generated_content": reply_content
+            }) + "\n"
+
+            await MessageService.save_message(chat_id, journey_state=journey_state, content=reply_content, role="user", db=db)
             
         else:
             raise ValueError("Invalid journey state")

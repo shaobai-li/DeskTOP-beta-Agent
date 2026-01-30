@@ -14,7 +14,14 @@ class FinalDraftAgent:
             'llm_model' : "deepseek-chat"
         }
         self.agent_config = agent_config or {}
-    
+        self.draft = None
+        self.discussion_messages = []
+    def _get_system_prompt(self) -> str:
+        """获取系统提示词，直接从 agent_config 获取 usp_prompt"""
+        prompt_dir = self.agent_config.get("default_prompt_dir", "agents/prompts/")
+        system_prompt_final_draft = load_prompt("final_draft", prompt_dir)
+        return system_prompt_final_draft
+
     def _get_system_prompt(self) -> str:
         """获取系统提示词，直接从 agent_config 获取 usp_prompt"""
         prompt_dir = self.agent_config.get("default_prompt_dir", "agents/prompts/")
@@ -43,6 +50,22 @@ class FinalDraftAgent:
             )
         print("Received response from LLM...")
         completion = response.choices[0].message.content
+        self.draft = completion
+        return completion
+
+    def discuss_on_draft(self, user_input: str):
+        print("Entering discuss_on_draft...")
+        if self.discussion_messages == []:
+            self.discussion_messages.append({"role": "system", "content": "你是一个专业的编辑，请根据用户的问题，对文稿进行讨论，并给出修改意见。文稿如下：\n{self.draft}"})
+        self.discussion_messages.append({"role": "user", "content": user_input})
+        print("Sending messages to LLM...")
+        response = self.module["llm_client"].chat.completions.create(
+            model=self.module["llm_model"],
+            messages=self.discussion_messages
+            )
+        print("Received response from LLM...")
+        completion = response.choices[0].message.content
+        self.discussion_messages.append({"role": "assistant", "content": completion})
         return completion
 
 def main():
