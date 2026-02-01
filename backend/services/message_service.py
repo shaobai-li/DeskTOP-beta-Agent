@@ -134,17 +134,17 @@ class MessageService:
         """处理聊天消息生成请求"""
         # 根据 selected_agent 初始化各个 agent
         if self._current_agent_id != selected_agent:
+            await self._init_agents(selected_agent, db)
+
+        journey_state = await MessageService.get_journey_state(chat_id, db)
+
+        if journey_state == "0":
             status_msg = "正在搜索文章库"
             yield json.dumps({
                 "is_status_message" : True,
                 "topic": topic,
                 "generated_content": status_msg
             }) + "\n"
-            await self._init_agents(selected_agent, db)
-        
-        journey_state = await MessageService.get_journey_state(chat_id, db)
-
-        if journey_state == "0":
             chunks = self.search_agent.local_search(topic, 4)
             chunk_str = json.dumps({
                 "is_status_message": False,
