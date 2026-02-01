@@ -50,6 +50,13 @@ class MessageService:
         self.intention_module = IntentionModule()
         self._current_agent_id = selected_agent
 
+    def _yield_message(self, topic: str, content: str, is_status: bool = False) -> str:
+        return json.dumps({
+            "is_status_message": is_status,
+            "topic": topic,
+            "generated_content": content
+        }) + "\n"
+
     @staticmethod
     async def create_chat(title: str, selected_agent: str, db: AsyncSession) -> str:
         """创建新的聊天记录，返回 chat_id"""
@@ -139,68 +146,30 @@ class MessageService:
         journey_state = await MessageService.get_journey_state(chat_id, db)
 
         if journey_state == "0":
-            status_msg = "正在搜索文章库"
-            yield json.dumps({
-                "is_status_message" : True,
-                "topic": topic,
-                "generated_content": status_msg
-            }) + "\n"
+            yield self._yield_message(topic, "正在搜索文章库", is_status=True)
+            
             chunks = self.search_agent.local_search(topic, 4)
-            chunk_str = json.dumps({
-                "is_status_message": False,
-                "topic": topic,
-                "generated_content": chunks
-            }) + "\n"
-            yield chunk_str
+            yield self._yield_message(topic, chunks)
             
             await MessageService.save_message(chat_id, journey_state=journey_state, content=chunks, role="assistant", db=db)
 
-            status_msg = "正在构思选题列表"
-            yield json.dumps({
-                "is_status_message": True,
-                "topic": topic,
-                "generated_content": status_msg
-            }) + "\n"
-
+            yield self._yield_message(topic, "正在构思选题列表", is_status=True)
             topic_list = self.search_agent.content_framework(chunks)
 
-            status_msg = "正在分析选题列表"
-            yield json.dumps({
-                "is_status_message": True,
-                "topic": topic,
-                "generated_content": status_msg
-            }) + "\n"
+            yield self._yield_message(topic, "正在分析选题列表", is_status=True)
 
             xml_topic = None
             for xml_topic in self.topic_analysis_agent.analyze_topic_list(topic_list):
-                chunk_str = json.dumps({
-                    "is_status_message": False,
-                    "topic": topic,
-                    "generated_content": xml_topic
-                }) + "\n"
-                yield chunk_str
-
-                status_msg = "正在分析选题列表"
-                yield json.dumps({
-                    "is_status_message": True,
-                    "topic": topic,
-                    "generated_content": status_msg
-                }) + "\n"                
+                yield self._yield_message(topic, xml_topic)
+                yield self._yield_message(topic, "正在分析选题列表", is_status=True)
                 
                 journey_state = "1"
                 if xml_topic:
                     await MessageService.save_message(chat_id, journey_state=journey_state, content=str(xml_topic), role="assistant", db=db)
-            
-            
-            
-        elif journey_state == "1":
-            status_msg = "正在生成结构化的初稿"
-            yield json.dumps({
-                "is_status_message": True,
-                "topic": topic,
-                "generated_content": status_msg
-            }) + "\n"
 
+        elif journey_state == "1":
+            yield self._yield_message(topic, "正在生成结构化的初稿", is_status=True)
+            
             initial_draft = self.draft_agent.structure_draft(topic)
             
             # chunk_str = json.dumps({
@@ -213,51 +182,28 @@ class MessageService:
             journey_state = "1"
             await MessageService.save_message(chat_id, journey_state=journey_state, content=initial_draft, role="assistant", db=db)
 
-
-            status_msg = "正在进行终稿优化中"
-            yield json.dumps({
-                "is_status_message": True,
-                "topic": topic,
-                "generated_content": status_msg
-            }) + "\n"
+            yield self._yield_message(topic, "正在进行终稿优化中", is_status=True)
             
             optimized_draft = self.final_draft_agent.get_final_draft(initial_draft)
-            yield json.dumps({
-                "is_status_message": False,
-                "topic": topic,
-                "generated_content": optimized_draft
-            }) + "\n"
+            yield self._yield_message(topic, optimized_draft)
 
             journey_state = "2"
-            await MessageService.save_message(chat_id, journey_state=journey_state, content=optimized_draft, role="assistant", db=db)
-        
+            await MessageService.save_message(chat_id, journey_state=journey_state, content=optimized_draft, role="assistant", db=db)        
 
         elif journey_state == "2":
             # todo: topic 其实是用户输入
-            yield json.dumps({
-                "is_status_message": True,
-                "topic": topic,
-                "generated_content": "正在思考"
-            }) + "\n"
+            yield self._yield_message(topic, "正在思考", is_status=True)
 
             is_new_topic, is_confirmed = self.intention_module.new_topic(topic)
 
             if is_new_topic:
                 if not is_confirmed:
-                    yield json.dumps({
-                        "is_status_message": False,
-                        "topic": topic,
-                        "generated_content": "请确认是否需要重新生成选题"
-                    }) + "\n"
+                    yield self._yield_message(topic, "请确认是否需要重新生成选题")
             else:
                 reply_content = self.final_draft_agent.discuss_on_draft(topic)
-                yield json.dumps({
-                    "is_status_message": False,
-                    "topic": topic,
-                    "generated_content": reply_content
-                }) + "\n"
+                yield self._yield_message(topic, reply_content)
 
                 await MessageService.save_message(chat_id, journey_state=journey_state, content=reply_content, role="user", db=db)
-            
+
         else:
             raise ValueError("Invalid journey state")
