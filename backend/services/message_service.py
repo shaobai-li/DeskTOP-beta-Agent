@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 from models.chat import Chat
 from models.message import Message
 from utils import uuid7, to_camel_case, to_snake_case
-from agents import SearchAgent, TopicAnalysisAgent, StructureDraftAgent, FinalDraftAgent
+from agents import SearchAgent, TopicAnalysisAgent, StructureDraftAgent, FinalDraftAgent, IntentionModule
 from services.agent_service import AgentService
 
 
@@ -20,6 +20,7 @@ class MessageService:
         self.topic_analysis_agent = None
         self.draft_agent = None
         self.final_draft_agent = None
+        self.intention_module = None
         self._current_agent_id = None
     
     async def _init_agents(self, selected_agent: str, db: AsyncSession):
@@ -46,6 +47,7 @@ class MessageService:
         self.topic_analysis_agent = TopicAnalysisAgent(agent_config)
         self.draft_agent = StructureDraftAgent(agent_config)
         self.final_draft_agent = FinalDraftAgent(agent_config)
+        self.intention_module = IntentionModule()
         self._current_agent_id = selected_agent
 
     @staticmethod
@@ -232,18 +234,30 @@ class MessageService:
 
         elif journey_state == "2":
             # todo: topic 其实是用户输入
-            # if new_topic_intention(topic):
-            #     返回一个请求用户确认的对话
-            # else:
-            #     journey_state = "2"
-            reply_content = self.final_draft_agent.discuss_on_draft(topic)
             yield json.dumps({
-                "is_status_message": False,
+                "is_status_message": True,
                 "topic": topic,
-                "generated_content": reply_content
+                "generated_content": "正在思考"
             }) + "\n"
 
-            await MessageService.save_message(chat_id, journey_state=journey_state, content=reply_content, role="user", db=db)
+            is_new_topic, is_confirmed = self.intention_module.new_topic(topic)
+
+            if is_new_topic:
+                if not is_confirmed:
+                    yield json.dumps({
+                        "is_status_message": False,
+                        "topic": topic,
+                        "generated_content": "请确认是否需要重新生成选题"
+                    }) + "\n"
+            else:
+                reply_content = self.final_draft_agent.discuss_on_draft(topic)
+                yield json.dumps({
+                    "is_status_message": False,
+                    "topic": topic,
+                    "generated_content": reply_content
+                }) + "\n"
+
+                await MessageService.save_message(chat_id, journey_state=journey_state, content=reply_content, role="user", db=db)
             
         else:
             raise ValueError("Invalid journey state")
