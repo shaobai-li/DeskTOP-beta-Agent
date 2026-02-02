@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import DarkBackground from '@components/common/DarkBackground';
+import modalCloseIcon from "@assets/icon-ui-modal-close.svg";
 
 export default function TagModal({ isOpen, onClose, onSubmit, initialData = null }) {
     const [formData, setFormData] = useState({
@@ -49,20 +50,21 @@ export default function TagModal({ isOpen, onClose, onSubmit, initialData = null
     
           {/* 弹窗本体 */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-lg">
-    
+            <div className="bg-white rounded-[18px] shadow-xl w-full max-w-lg">
+              <div className="px-4">
               {/* 标题栏 */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200">
-                <h2 className="text-lg font-medium text-neutral-900">标签设置</h2>
-                <button onClick={onClose} className="text-neutral-400 hover:text-neutral-700">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+              <div className="flex items-center justify-between py-4 border-b border-neutral-200">
+                <h2 className="text-2xl font-bold">标签设置</h2>
+                <button 
+                  className="h-9 w-9 rounded-lg bg-transparent hover:bg-neutral-100 flex items-center justify-center"
+                  onClick={onClose}
+                >
+                  <img src={modalCloseIcon} alt="close" className="w-6 h-6" />
                 </button>
               </div>
     
               {/* 表单区  */}
-              <div className="p-6 space-y-6">
+              <div className="py-4 space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">名称</label>
                   <input
@@ -70,7 +72,7 @@ export default function TagModal({ isOpen, onClose, onSubmit, initialData = null
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-neutral-400"
+                    className="w-full px-4 py-1 border border-neutral-200 rounded-lg text-sm outline-none text-neutral-900"
                     placeholder="请输入标签名称"
                   />
                 </div>
@@ -82,7 +84,7 @@ export default function TagModal({ isOpen, onClose, onSubmit, initialData = null
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-neutral-400"
+                    className="w-full px-4 py-1 border border-neutral-200 rounded-lg text-sm outline-none text-neutral-900 resize-none"
                     placeholder="请输入标签描述"
                   />
                 </div>
@@ -94,26 +96,27 @@ export default function TagModal({ isOpen, onClose, onSubmit, initialData = null
                     name="originNote"
                     value={formData.originNote}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-neutral-400"
+                    className="w-full px-4 py-1 border border-neutral-200 rounded-lg text-sm outline-none text-neutral-900 resize-none"
                     placeholder="请输入来源备注"
                   />
                 </div>
               </div>
     
               {/* 按钮区 */}
-              <div className="flex justify-end gap-3 px-6 py-4 bg-neutral-50 border-t border-neutral-200">
+              <div className="flex justify-end gap-3 py-4 border-t border-neutral-200">
                 <button
                   onClick={onClose}
-                  className="px-5 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-md hover:bg-neutral-50"
+                  className="px-5 py-1 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-md hover:bg-neutral-50"
                 >
                   取消
                 </button>
                 <button 
                   onClick={handleSubmit}
-                  className="px-5 py-2 text-sm font-medium text-white bg-neutral-900 rounded-md hover:bg-neutral-800"
+                  className="px-5 py-1 text-sm font-medium text-white bg-neutral-900 rounded-md hover:bg-neutral-800"
                 >
                   保存
                 </button>
+              </div>
               </div>
             </div>
           </div>

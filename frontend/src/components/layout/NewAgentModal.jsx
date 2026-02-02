@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import lightBulbIcon from "@assets/icon-ui-light-bulb.svg";
+import modalCloseIcon from "@assets/icon-ui-modal-close.svg";
 import Button from "@components/common/Button";
 import Input from "@components/common/Input";
 import TagsInput from "@components/common/TagsInput";
@@ -27,11 +28,16 @@ export default function NewAgentModal({ onClose, onCreate }) {
 
     const modalContent = (
         <DarkBackground onClose={onClose}>
-            <div className="new-agent-model border border-neutral-300 w-[90vw] max-w-[510px] bg-white rounded-[24px] flex flex-col">
+            <div className="new-agent-model border border-neutral-300 w-[90vw] max-w-[510px] bg-white rounded-[18px] flex flex-col">
                 <div className="new-agent-modal-header flex flex-row items-center justify-between px-4 py-4">
 
                     <h2 className="text-2xl font-bold">知能体名称</h2>
-                    <button className="pm-close-btn" onClick={onClose}>✕</button>
+                    <button 
+                        className="h-9 w-9 rounded-lg bg-transparent hover:bg-neutral-100 flex items-center justify-center"
+                        onClick={onClose}
+                    >
+                        <img src={modalCloseIcon} alt="close" className="w-6 h-6" />
+                    </button>
 
                 </div>
 

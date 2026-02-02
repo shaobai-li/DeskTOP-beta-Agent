@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import DarkBackground from '@components/common/DarkBackground';
 import TagsInput from "@components/common/TagsInput";
 import { useChat } from "@contexts/ChatContext";
+import modalCloseIcon from "@assets/icon-ui-modal-close.svg";
 
 export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = null }) {
   const { state } = useChat();
@@ -77,103 +78,104 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
   return (
     <DarkBackground onClose={onClose}>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-
-          <div className="flex items-center justify-end px-6 py-4 border-b">
-            <button onClick={onClose}>✕</button>
+        <div className="bg-white rounded-[18px] shadow-xl w-full max-w-lg overflow-hidden">
+          <div className="max-h-[70vh] overflow-y-auto">
+          <div className="px-4">
+          <div className="flex items-center justify-between py-4 border-b border-neutral-200">
+            <h2 className="text-2xl font-bold">文章设置</h2>
+            <button 
+              className="h-9 w-9 rounded-lg bg-transparent hover:bg-neutral-100 flex items-center justify-center"
+              onClick={onClose}
+            >
+              <img src={modalCloseIcon} alt="close" className="w-6 h-6" />
+            </button>
           </div>
 
-          <div className="p-6 space-y-6">
+          <div className="py-4 space-y-4">
 
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label>链接</label>
+                <label className="block text-sm font-medium text-neutral-700">链接</label>
                 <button 
-                  className="px-3 py-1 text-sm bg-black text-white rounded-md hover:bg-gray-800"
+                  className="px-3 py-1 text-sm font-medium bg-black text-white rounded-md hover:bg-gray-800"
                 >
                   识别url
                 </button>
               </div>
               <input
-                className="w-full px-3 py-2 border rounded-md"
+                className="w-full px-4 py-1 border border-neutral-200 rounded-lg text-sm outline-none text-neutral-900"
               />
             </div>
 
-            <h3 className="font-semibold">基本信息</h3>
-
             <div>
-              <label>标题</label>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">标题</label>
               <input
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
                 placeholder="请输入文章标题"
-                className="w-full px-3 py-2 border rounded-md"
+                className="w-full px-4 py-1 border border-neutral-200 rounded-lg text-sm outline-none text-neutral-900"
               />
             </div>
 
             <div>
-              <label>发布时间</label>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">发布时间</label>
               <input
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
                 placeholder="2024-11-27"
-                className="w-full px-3 py-2 border rounded-md"
+                className="w-full px-4 py-1 border border-neutral-200 rounded-lg text-sm outline-none text-neutral-900"
               />
             </div>
 
-            <h3 className="font-semibold">来源信息</h3>
-
             <div>
-              <label>来源平台</label>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">来源平台</label>
               <input
                 name="source_platform"
                 value={formData.source_platform}
                 onChange={handleChange}
                 placeholder="小红书"
-                className="w-full px-3 py-2 border rounded-md"
+                className="w-full px-4 py-1 border border-neutral-200 rounded-lg text-sm outline-none text-neutral-900"
               />
             </div>
 
             <div>
-              <label>作者名称</label>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">作者名称</label>
               <input
                 name="author_name"
                 value={formData.author_name}
                 onChange={handleChange}
                 placeholder="作者昵称"
-                className="w-full px-3 py-2 border rounded-md"
+                className="w-full px-4 py-1 border border-neutral-200 rounded-lg text-sm outline-none text-neutral-900"
               />
             </div>
 
             <div>
-              <label>原平台标签</label>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">原平台标签</label>
               <input
                 name="tags_by_author"
                 value={formData.tags_by_author}
                 onChange={handleChange}
                 placeholder="#旅行 #穿搭"
-                className="w-full px-3 py-2 border rounded-md"
+                className="w-full px-4 py-1 border border-neutral-200 rounded-lg text-sm outline-none text-neutral-900"
               />
             </div>
 
-            <h3 className="font-semibold">文章内容</h3>
-
             <div>
-              <label>内容</label>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">内容</label>
               <textarea
                 name="content"
                 value={formData.content}
                 onChange={handleChange}
                 placeholder="请输入文章内容..."
                 rows={6}
-                className="w-full px-3 py-2 border rounded-md resize-y"
+                className="w-full px-4 py-1 border border-neutral-200 rounded-lg text-sm outline-none text-neutral-900 resize-y"
               />
             </div>
             
             <div>
-              <label>标签</label>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">标签</label>
               <TagsInput
                 options={tagOptions}
                 value={selectedTags}
@@ -182,18 +184,19 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 px-6 py-4 border-t">
-            <button onClick={onClose} className="border px-4 py-2 rounded">
+          <div className="flex justify-end gap-3 py-4 border-t border-neutral-200">
+            <button onClick={onClose} className="px-5 py-1 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-md hover:bg-neutral-50">
               取消
             </button>
             <button
               onClick={handleSave}
-              className="bg-black text-white px-4 py-2 rounded"
+              className="px-5 py-1 text-sm font-medium text-white bg-neutral-900 rounded-md hover:bg-neutral-800"
             >
               {isEditMode ? '更新' : '保存'}
             </button>
           </div>
-
+          </div>
+          </div>
         </div>
       </div>
     </DarkBackground>
