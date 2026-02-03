@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 
 import sendButton from '@assets/icon-action-send.png';
@@ -49,6 +49,8 @@ export default function ChatInput() {
   const [showAgentMenu, setShowAgentMenu] = useState(false);
   const [anchorRect, setAnchorRect] = useState(null);
 
+  const textareaRef = useRef(null);
+
   useEffect(() => {
     if (chatId !== 'new') {
       setSelectedAgentId(actions.getSelectedAgentId(chatId));
@@ -62,6 +64,21 @@ export default function ChatInput() {
     if (!inputValue.trim()) return;
     handleSendMessage(inputValue.trim());
     setInputValue('');
+
+    if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+    }
+  };
+
+  const autoResizeTextarea = (element) => {
+    if (!element) return;
+    element.style.height = 'auto';
+    element.style.height = `${element.scrollHeight}px`;
+  };
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+    autoResizeTextarea(textareaRef.current);
   };
 
   const handleKeyDown = (e) => {
@@ -95,17 +112,23 @@ export default function ChatInput() {
         shadow-[1px_1px_10px_rgba(0,0,0,0.1)]
       "
     >
-      <input
+      <textarea
+        ref={textareaRef}
+        rows={1}
         className="
           m-[5px]
           px-[10px] py-[10px]
           rounded-[20px]
           border-none outline-none
           text-[18px] font-normal
+          resize-none
+          overflow-y-auto
+          leading-6
+          max-h-[168px]
         "
         placeholder="Ask anything"
         value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
+        onChange={handleInputChange}
         onKeyDown={handleKeyDown}
       />
 
