@@ -5,10 +5,10 @@ import os
 from sentence_transformers import SentenceTransformer
 from agents.utils.llm_client import create_llm_client
 from agents.utils.prompt_loader import load_prompt
-from config.settings import VECTOR_INDEX_PATH
+from config.settings import VECTOR_INDEX_PATH, BGE_MODEL_PATH
 from services.article_service import ArticleService
 from db.session import AsyncSessionLocal
-from huggingface_hub import snapshot_download
+
 
 class SearchAgent:
     
@@ -20,8 +20,8 @@ class SearchAgent:
         Args:
             agent_config: 智能体配置，包含 default_prompt_dir
         """
-        local_path = snapshot_download("BAAI/bge-large-zh-v1.5")
-        self.embedding_model = SentenceTransformer(local_path, device="cpu")
+
+        self.embedding_model = SentenceTransformer(str(BGE_MODEL_PATH), device="cpu")
         self.vector_index = faiss.read_index(os.path.relpath(str(VECTOR_INDEX_PATH)))
         self.topic = ""
         self.texts_retrieved = ""

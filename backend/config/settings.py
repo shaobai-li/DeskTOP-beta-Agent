@@ -15,4 +15,4 @@ JSON_DEV_TAGS_PATH = DATA_DIR / "app_dev_tags.json"
 VECTOR_INDEX_PATH = DATA_DIR / "app_vectors_dev.index"
 
 # 模型库
-MODEL_PATH = MODELS_DIR /  "bge-v1.5-final"
+BGE_MODEL_PATH = MODELS_DIR /  "bge-v1.5-final"
