@@ -1,42 +1,63 @@
 import "./AIMessage.css";
 import ReactMarkdown from "react-markdown";
-import TopicCard from "@components/layout/TopicCard";
+import TopicCardList from "@components/layout/TopicCardList";
 import CollapsibleText from "@components/layout/CollapsibleText";
-import { useState } from "react";
 import { parseMessage, MESSAGE_PART_TYPES } from "@utils/messageParser";
 
 export default function AIMessage({ message }) {
-  // 当前选中的 TopicCard（初始 = null）
-  const [selectedTopicIndex, setSelectedTopicIndex] = useState(null);
-
   // 解析消息，获取所有部分
   const parts = parseMessage(message);
 
+  // 将连续的 TOPIC 部分组合在一起
+  const groupedParts = [];
+  let currentTopicGroup = [];
+
+  parts.forEach((part, index) => {
+    if (part.type === MESSAGE_PART_TYPES.TOPIC) {
+      currentTopicGroup.push(part.topicData);
+    } else {
+      // 如果有累积的 TOPIC，先添加到结果中
+      if (currentTopicGroup.length > 0) {
+        groupedParts.push({
+          type: 'TOPIC_GROUP',
+          topics: currentTopicGroup,
+        });
+        currentTopicGroup = [];
+      }
+      // 添加当前非 TOPIC 部分
+      groupedParts.push(part);
+    }
+  });
+
+  // 处理最后可能剩余的 TOPIC 组
+  if (currentTopicGroup.length > 0) {
+    groupedParts.push({
+      type: 'TOPIC_GROUP',
+      topics: currentTopicGroup,
+    });
+  }
+
   return (
     <div className="ai-message">
-      {parts.map((p, i) => {
-        if (p.type === MESSAGE_PART_TYPES.TOPIC) {
+      {groupedParts.map((part, i) => {
+        if (part.type === 'TOPIC_GROUP') {
           return (
-            <TopicCard
-              key={`topic-${i}`}
-              cardContents={p.topicData}
-              isSelected={selectedTopicIndex === i}
-              onSelect={() =>
-                setSelectedTopicIndex((prev) => (prev === i ? null : i))
-              }
+            <TopicCardList
+              key={`topic-group-${i}`}
+              topics={part.topics}
             />
           );
-        } else if (p.type === MESSAGE_PART_TYPES.COLLAPSIBLE) {
+        } else if (part.type === MESSAGE_PART_TYPES.COLLAPSIBLE) {
           return (
             <CollapsibleText
               key={`collapsible-${i}`}
-              content={p.content}
+              content={part.content}
             />
           );
         } else {
           return (
             <div key={`text-${i}`} className="ai-message-bubble">
-              <ReactMarkdown>{p.content}</ReactMarkdown>
+              <ReactMarkdown>{part.content}</ReactMarkdown>
             </div>
           );
         }
