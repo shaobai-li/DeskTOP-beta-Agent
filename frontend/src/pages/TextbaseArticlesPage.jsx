@@ -9,6 +9,7 @@ import ArticleModal from "@components/layout/ArticleModal";
 export default function TextbaseArticlesPage() {
     const [rows, setRows] = useState([]);
     const [searchValue, setSearchValue] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(20);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,6 +26,14 @@ export default function TextbaseArticlesPage() {
         }
         loadArticles();
     }, []);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchValue);
+            setCurrentPage(1);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchValue]);
 
     const handleSearchChange = (e) => {
         setSearchValue(e.target.value);
@@ -99,9 +108,19 @@ export default function TextbaseArticlesPage() {
         }
     };
 
+    const filteredRows = debouncedSearch
+        ? rows.filter(row =>
+            row.title?.includes(debouncedSearch) ||
+            row.authorName?.includes(debouncedSearch) ||
+            row.tagsByAuthor?.includes(debouncedSearch) ||
+            row.tags?.includes(debouncedSearch) ||
+            row.content?.includes(debouncedSearch)
+        )
+        : rows;
+
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
-    const currentRows = rows.slice(startIndex, endIndex);
+    const currentRows = filteredRows.slice(startIndex, endIndex);
 
     return (
         <div className="textbase-articles h-full flex-col overflow-y-auto">
@@ -123,7 +142,7 @@ export default function TextbaseArticlesPage() {
             </div>
             <div className="textbase-article__footer flex px-8 justify-end">
                 <Pagination
-                    totalItems={rows.length}
+                    totalItems={filteredRows.length}
                     currentPage={currentPage}
                     onPageChange={setCurrentPage}
                     rowsPerPage={rowsPerPage}
