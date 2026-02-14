@@ -13,10 +13,7 @@ export default function AIMessage({ message }) {
   const parts = parseMessage(message);
 
   return (
-    <div
-      className="ai-message"
-      style={{ display: "flex", flexDirection: "column", gap: "8px" }}
-    >
+    <div className="ai-message">
       {parts.map((p, i) => {
         if (p.type === MESSAGE_PART_TYPES.TOPIC) {
           return (
