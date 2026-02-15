@@ -50,12 +50,20 @@ class MessageService:
         self.intention_module = IntentionModule()
         self._current_agent_id = selected_agent
 
-    def _yield_message(self, topic: str, content: str, is_status: bool = False) -> str:
-        return json.dumps({
+    def _yield_message(self, topic: str, content: str, is_status: bool = False, content_type: str = None, metadata: dict = None) -> str:
+        message = {
             "is_status_message": is_status,
             "topic": topic,
             "generated_content": content
-        }) + "\n"
+        }
+        
+        # 添加内容类型和元数据
+        if content_type:
+            message["content_type"] = content_type
+        if metadata:
+            message["metadata"] = metadata
+            
+        return json.dumps(message) + "\n"
 
     @staticmethod
     async def create_chat(title: str, selected_agent: str, db: AsyncSession) -> str:
@@ -158,14 +166,31 @@ class MessageService:
 
             yield self._yield_message(topic, "正在分析选题列表", is_status=True)
 
-            xml_topic = None
-            for xml_topic in self.topic_analysis_agent.analyze_topic_list(topic_list):
-                yield self._yield_message(topic, xml_topic)
+            # 生成唯一的 group_id
+            import uuid
+            group_id = f"topics-{uuid.uuid4().hex[:8]}"
+            
+            # 收集所有 topics 以获取总数
+            all_topics = list(self.topic_analysis_agent.analyze_topic_list(topic_list))
+            total = len(all_topics)
+            
+            # 逐个发送带元数据的 topic
+            for index, xml_topic in enumerate(all_topics):
+                metadata = {
+                    "group_id": group_id,
+                    "is_first": index == 0,
+                    "is_last": index == total - 1,
+                    "index": index,
+                    "total": total
+                }
+                yield self._yield_message(topic, xml_topic, content_type="topic", metadata=metadata)
                 yield self._yield_message(topic, "正在分析选题列表", is_status=True)
                 
                 journey_state = "1"
-                if xml_topic:
-                    await MessageService.save_message(chat_id, journey_state=journey_state, content=str(xml_topic), role="assistant", db=db)
+                # 只保存最后一个完整的 topics 组
+                if index == total - 1:
+                    all_topics_content = '\n'.join(all_topics)
+                    await MessageService.save_message(chat_id, journey_state=journey_state, content=all_topics_content, role="assistant", db=db)
 
         elif journey_state == "1":
             yield self._yield_message(topic, "正在生成结构化的初稿", is_status=True)
