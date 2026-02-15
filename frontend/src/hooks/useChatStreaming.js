@@ -3,42 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useChat } from "@contexts/ChatContext";
 
 
-const processStreamChunk = (jsonStr, currentChatId, addMessage, setStatusMessage) => {
-    try {
-        const { stage, generated_content, is_status_message, topic } = JSON.parse(jsonStr);
-        
-        console.log("收到消息:", { is_status_message, generated_content });  // 添加日志
-        
-        if (is_status_message) {
-            // 状态消息：更新临时状态，不添加到消息列表
-            setStatusMessage(prev => ({ ...prev, [currentChatId]: generated_content }));
-        } else {
-            // 真正内容：清除状态消息，添加到消息列表
-            setStatusMessage(prev => ({ ...prev, [currentChatId]: null }));
-            const newAssistantMessage = { 
-                role: "assistant", 
-                content: generated_content
-            }
-            addMessage(currentChatId, newAssistantMessage);
-        }
-        
-        // setMessages((prev) => {
-        //     // 查找是否已经有正在生成的 assistant 消息
-        //     const index = prev.findIndex((msg) => msg.role === "assistant" && msg.stage === stage);
-        //     if (index !== -1) {
-        //         const updated = [...prev];
-        //         updated[index] = {
-        //             ...updated[index],
-        //             content: updated[index].content + "\n" + generated_content   
-        //         };
-        //         return updated;
-        //     }
-        //     return [...prev, { role: "assistant", stage, content: generated_content }];
-        // });
-    } catch (err) {
-        console.error("JSON parse error:", err, jsonStr);
-    }
-};
 
 export const useChatStreaming = (chatId = null, selectedAgentId = null) => {
     const navigate = useNavigate();
@@ -97,7 +61,71 @@ export const useChatStreaming = (chatId = null, selectedAgentId = null) => {
 
                 for (const jsonStr of parts) {
                     if (!jsonStr.trim()) continue;
-                    processStreamChunk(jsonStr, currentChatId, actions.appendMessage, state.setStatusMessage);
+                    
+                    try {
+                        const parsedMessage = JSON.parse(jsonStr);
+                        const { 
+                            generated_content, 
+                            is_status_message, 
+                            content_type, 
+                            metadata 
+                        } = parsedMessage;
+                        
+                        // 打印后端发送的完整 JSON 消息
+                        console.log('后端消息:', parsedMessage);
+                        
+                        if (is_status_message) {
+                            // 状态消息
+                            state.setStatusMessage(prev => ({ ...prev, [currentChatId]: generated_content }));
+                        } else {
+                            // 真正内容
+                            state.setStatusMessage(prev => ({ ...prev, [currentChatId]: null }));
+                            
+                            // 使用元数据来判断如何处理消息
+                            if (content_type === 'topic' && metadata) {
+                                if (metadata.is_first) {
+                                    // 第一个 topic，创建新消息，并记录 group_id
+                                    actions.appendMessage(currentChatId, {
+                                        role: "assistant",
+                                        content: generated_content,
+                                        group_id: metadata.group_id
+                                    });
+                                } else {
+                                    // 后续的 topic，追加到同一个 group_id 的消息
+                                    state.setMessages(prev => {
+                                        const messages = prev[currentChatId] || [];
+                                        const updatedMessages = [...messages];
+                                        
+                                        // 找到相同 group_id 的消息
+                                        const targetIndex = updatedMessages.findIndex(
+                                            msg => msg.group_id === metadata.group_id
+                                        );
+                                        
+                                        if (targetIndex !== -1) {
+                                            updatedMessages[targetIndex] = {
+                                                ...updatedMessages[targetIndex],
+                                                content: updatedMessages[targetIndex].content + '\n' + generated_content
+                                            };
+                                        }
+                                        
+                                        return {
+                                            ...prev,
+                                            [currentChatId]: updatedMessages
+                                        };
+                                    });
+                                }
+                            } else {
+                                // 非 topic 消息，正常添加
+                                actions.appendMessage(currentChatId, {
+                                    role: "assistant",
+                                    content: generated_content
+                                });
+                            }
+                        }
+                    } catch (err) {
+                        console.error("JSON parse error:", err, jsonStr);
+                    }
+                    
                     // 让出事件循环，给 React 渲染机会
                     await new Promise(resolve => requestAnimationFrame(resolve));
                 }
