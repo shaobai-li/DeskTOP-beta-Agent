@@ -64,61 +64,58 @@ export const useChatStreaming = (chatId = null, selectedAgentId = null) => {
                     
                     try {
                         const parsedMessage = JSON.parse(jsonStr);
-                        const { 
-                            generated_content, 
-                            is_status_message, 
-                            content_type, 
-                            metadata 
-                        } = parsedMessage;
+                        const { event, id, data } = parsedMessage;
+                        const { content, index, chunking } = data || {};
                         
                         // 打印后端发送的完整 JSON 消息
                         console.log('后端消息:', parsedMessage);
                         
-                        if (is_status_message) {
+                        if (event === "status") {
                             // 状态消息
-                            state.setStatusMessage(prev => ({ ...prev, [currentChatId]: generated_content }));
-                        } else {
-                            // 真正内容
+                            state.setStatusMessage(prev => ({ ...prev, [currentChatId]: content }));
+                        } else if (event === "message") {
+                            // 真正的消息内容
                             state.setStatusMessage(prev => ({ ...prev, [currentChatId]: null }));
                             
-                            // 使用元数据来判断如何处理消息
-                            if (content_type === 'topic' && metadata) {
-                                if (metadata.is_first) {
-                                    // 第一个 topic，创建新消息，并记录 group_id
-                                    actions.appendMessage(currentChatId, {
-                                        role: "assistant",
-                                        content: generated_content,
-                                        group_id: metadata.group_id
-                                    });
-                                } else {
-                                    // 后续的 topic，追加到同一个 group_id 的消息
-                                    state.setMessages(prev => {
-                                        const messages = prev[currentChatId] || [];
-                                        const updatedMessages = [...messages];
-                                        
-                                        // 找到相同 group_id 的消息
-                                        const targetIndex = updatedMessages.findIndex(
-                                            msg => msg.group_id === metadata.group_id
-                                        );
-                                        
-                                        if (targetIndex !== -1) {
-                                            updatedMessages[targetIndex] = {
-                                                ...updatedMessages[targetIndex],
-                                                content: updatedMessages[targetIndex].content + '\n' + generated_content
-                                            };
-                                        }
-                                        
-                                        return {
-                                            ...prev,
-                                            [currentChatId]: updatedMessages
+                            if (chunking) {
+                                // chunking=true，表示需要追加到已有消息
+                                state.setMessages(prev => {
+                                    const messages = prev[currentChatId] || [];
+                                    const updatedMessages = [...messages];
+                                    
+                                    // 找到相同 message_id 的消息
+                                    const targetIndex = updatedMessages.findIndex(
+                                        msg => msg.messageId === id
+                                    );
+                                    
+                                    if (targetIndex !== -1) {
+                                        // 找到了，追加内容
+                                        updatedMessages[targetIndex] = {
+                                            ...updatedMessages[targetIndex],
+                                            content: updatedMessages[targetIndex].content + '\n' + content
                                         };
-                                    });
-                                }
+                                    } else {
+                                        // 第一次出现这个 message_id，创建新消息
+                                        updatedMessages.push({
+                                            role: "assistant",
+                                            content: content,
+                                            messageId: id,
+                                            index: index
+                                        });
+                                    }
+                                    
+                                    return {
+                                        ...prev,
+                                        [currentChatId]: updatedMessages
+                                    };
+                                });
                             } else {
-                                // 非 topic 消息，正常添加
+                                // chunking=false 或 undefined，创建新消息
                                 actions.appendMessage(currentChatId, {
                                     role: "assistant",
-                                    content: generated_content
+                                    content: content,
+                                    messageId: id,
+                                    index: index
                                 });
                             }
                         }
