@@ -193,6 +193,9 @@ class MessageService:
                     index=index,
                     chunking=True
                 )
+                    
+                status_message_id = uuid7()
+                yield self._yield_message("正在分析选题列表", message_id=status_message_id, event="status")
             
             # 保存所有 topics 到数据库
             if all_topics:
