@@ -53,14 +53,14 @@ class MessageService:
     def _yield_message(
         self, 
         content: str,
-        event: str = "message",  # "message" or "status"
         message_id: str,
+        event: str = "message",  # "message" or "status"
         index: int = 1,
         chunking: bool = False,
     ) -> str:
         message = {
             "event": event,
-            "id": message_id or uuid7(),
+            "id": message_id,
             "data": {
                 "content": content,
                 "index": index,
@@ -90,9 +90,8 @@ class MessageService:
         return chat_id
 
     @staticmethod
-    async def save_message(chat_id: str, content: str, role: str, journey_state: str, db: AsyncSession) -> str:
+    async def save_message(chat_id: str, content: str, role: str, journey_state: str, message_id: str, db: AsyncSession) -> str:
         """保存消息到数据库"""
-        message_id = uuid7()
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         new_message = Message(
@@ -141,7 +140,8 @@ class MessageService:
     async def begin_chat(self, topic: str, selected_agent: str, db: AsyncSession) -> dict:
         """快速创建会话并返回 chatId"""
         chat_id = await MessageService.create_chat(topic, selected_agent, db)
-        message_id = await MessageService.save_message(chat_id, journey_state="0", content=topic, role="user", db=db)
+        message_id = uuid7()
+        await MessageService.save_message(chat_id, journey_state="0", content=topic, role="user", message_id=message_id, db=db)
 
         return {
             "chatId": chat_id,
@@ -159,50 +159,50 @@ class MessageService:
         journey_state = await MessageService.get_journey_state(chat_id, db)
 
         if journey_state == "0":
-            yield self._yield_message("正在搜索文章库", event="status")
+            status_message_id = uuid7()
+            yield self._yield_message("正在搜索文章库", message_id=status_message_id, event="status")
             
             chunks = self.search_agent.local_search(topic, 4)
-            yield self._yield_message(chunks, event="message")
+            message_id = uuid7()
+            yield self._yield_message(chunks, message_id=message_id, event="message")
             
-            await MessageService.save_message(chat_id, journey_state=journey_state, content=chunks, role="assistant", db=db)
+            await MessageService.save_message(chat_id, journey_state=journey_state, content=chunks, role="assistant", message_id=message_id, db=db)
 
-            yield self._yield_message("正在构思选题列表", event="status")
+            status_message_id = uuid7()
+            yield self._yield_message("正在构思选题列表", message_id=status_message_id, event="status")
             topic_list = self.search_agent.content_framework(chunks)
 
-            yield self._yield_message("正在分析选题列表", event="status")
+            status_message_id = uuid7()
+            yield self._yield_message("正在分析选题列表", message_id=status_message_id, event="status")
 
-            # 生成唯一的 group_id
-            import uuid
-            group_id = f"topics-{uuid.uuid4().hex[:8]}"
-            
             # 流式发送 topics，边生成边发送
             all_topics = []  # 用于最后保存到数据库
+            message_id = uuid7()  # 为整个 topics 流生成统一的 message_id
             index = 0
             
-            # for xml_topic in self.topic_analysis_agent.analyze_topic_list(topic_list):
-            #     all_topics.append(xml_topic)
+            topic_generator = self.topic_analysis_agent.analyze_topic_list(topic_list)
+            for xml_topic in topic_generator:
+                all_topics.append(xml_topic)
+                index += 1
                 
-            #     yield self._yield_message(
-            #         xml_topic, 
-            #         event="message",
-            #     )
-            #     yield self._yield_message("正在分析选题列表", event="status")
-            #     index += 1
+                # 发送 topic 内容，使用 chunking=True 表示还有更多内容
+                yield self._yield_message(
+                    xml_topic,
+                    message_id=message_id,
+                    event="message",
+                    index=index,
+                    chunking=True
+                )
             
-            # # 发送最后一条，标记 is_last
-            # if all_topics:
-            #     yield self._yield_message(
-            #         "",  # 空内容，只是为了标记结束
-            #         event="message",
-            #     )
-                
-            #     journey_state = "1"
-            #     # 保存所有 topics 到数据库
-            #     all_topics_content = '\n'.join(all_topics)
-            #     await MessageService.save_message(chat_id, journey_state=journey_state, content=all_topics_content, role="assistant", db=db)
+            # 保存所有 topics 到数据库
+            if all_topics:
+                journey_state = "1"
+                all_topics_content = '\n'.join(all_topics)
+                await MessageService.save_message(chat_id, journey_state=journey_state, content=all_topics_content, role="assistant", message_id=message_id, db=db)
 
         elif journey_state == "1":
-            yield self._yield_message("正在生成结构化的初稿", event="status")
+            status_message_id = uuid7()
+            yield self._yield_message("正在生成结构化的初稿", message_id=status_message_id, event="status")
             
             initial_draft = self.draft_agent.structure_draft(topic)
             
@@ -214,30 +214,36 @@ class MessageService:
             # yield chunk_str
 
             journey_state = "1"
-            await MessageService.save_message(chat_id, journey_state=journey_state, content=initial_draft, role="assistant", db=db)
+            message_id = uuid7()
+            await MessageService.save_message(chat_id, journey_state=journey_state, content=initial_draft, role="assistant", message_id=message_id, db=db)
 
-            yield self._yield_message("正在进行终稿优化中", event="status")
+            status_message_id = uuid7()
+            yield self._yield_message("正在进行终稿优化中", message_id=status_message_id, event="status")
             
             optimized_draft = self.final_draft_agent.get_final_draft(initial_draft)
-            yield self._yield_message(optimized_draft, event="message")
+            message_id = uuid7()
+            yield self._yield_message(optimized_draft, message_id=message_id, event="message")
 
             journey_state = "2"
-            await MessageService.save_message(chat_id, journey_state=journey_state, content=optimized_draft, role="assistant", db=db)        
+            await MessageService.save_message(chat_id, journey_state=journey_state, content=optimized_draft, role="assistant", message_id=message_id, db=db)        
 
         elif journey_state == "2":
             # todo: topic 其实是用户输入
-            yield self._yield_message("正在思考", event="status")
+            status_message_id = uuid7()
+            yield self._yield_message("正在思考", message_id=status_message_id, event="status")
 
             is_new_topic, is_confirmed = self.intention_module.new_topic(topic)
 
             if is_new_topic:
                 if not is_confirmed:
-                    yield self._yield_message("请确认是否需要重新生成选题", event="message")
+                    message_id = uuid7()
+                    yield self._yield_message("请确认是否需要重新生成选题", message_id=message_id, event="message")
             else:
                 reply_content = self.final_draft_agent.discuss_on_draft(topic)
-                yield self._yield_message(reply_content, event="message")
+                message_id = uuid7()
+                yield self._yield_message(reply_content, message_id=message_id, event="message")
 
-                await MessageService.save_message(chat_id, journey_state=journey_state, content=reply_content, role="user", db=db)
+                await MessageService.save_message(chat_id, journey_state=journey_state, content=reply_content, role="user", message_id=message_id, db=db)
 
         else:
             raise ValueError("Invalid journey state")
