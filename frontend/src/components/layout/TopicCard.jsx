@@ -5,7 +5,7 @@ import { useChat } from "@contexts/ChatContext";
 import { useParams } from 'react-router-dom';
 
 
-function TopicCard({ cardContents, isSelected = false, onSelect }) {
+function TopicCard({ cardContents, isSelected = false, onSelect, isConfirmed = false, onConfirm }) {
 
   const { actions } = useChat();
 
@@ -21,19 +21,24 @@ function TopicCard({ cardContents, isSelected = false, onSelect }) {
   const handleClick = (e) => {
     console.log(cardContents);
     handleSendMessage(JSON.stringify(cardContents));
+    // 调用父组件的 onConfirm 回调，标记为已确认
+    if (onConfirm) {
+      onConfirm();
+    }
     e.stopPropagation();
   }
 
   return (
     <div
       className={`
-        border rounded-xl p-4 my-1.5 cursor-pointer border-gray-300
+        border rounded-xl p-4 my-1.5 border-gray-300
+        ${isConfirmed ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}
         ${isSelected 
           ? 'bg-blue-100' 
           : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
         }
       `}
-      onClick={onSelect}
+      onClick={isConfirmed ? undefined : onSelect}
     >
       <div className="text-[15px] font-semibold text-gray-900 mb-2 leading-6">
         {title}
@@ -42,7 +47,7 @@ function TopicCard({ cardContents, isSelected = false, onSelect }) {
         <ReactMarkdown>{description}</ReactMarkdown>
       </div>
 
-      {isSelected && (
+      {isSelected && !isConfirmed && (
         <div className="flex justify-end mt-3 w-full">
           <Button
             text="确认"

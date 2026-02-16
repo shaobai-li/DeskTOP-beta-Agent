@@ -6,7 +6,7 @@ import { parseMessage, MESSAGE_PART_TYPES } from "@utils/messageParser";
 
 export default function AIMessage({ message }) {
   // 解析消息，获取所有部分
-  const parts = parseMessage(message);
+  const parts = parseMessage(message.content || message);
 
   // 将连续的 TOPIC 部分组合在一起
   const groupedParts = [];
@@ -45,6 +45,8 @@ export default function AIMessage({ message }) {
             <TopicCardList
               key={`topic-group-${i}`}
               topics={part.topics}
+              messageId={message.messageId}
+              metadata={message.metadata}
             />
           );
         } else if (part.type === MESSAGE_PART_TYPES.COLLAPSIBLE) {
