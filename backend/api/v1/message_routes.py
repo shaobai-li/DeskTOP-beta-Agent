@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Dict, Any
 from services.message_service import MessageService
 from db import get_db
 
@@ -16,6 +16,10 @@ class UserQuery(BaseModel):
     topic: str
     chat_id: Optional[str] = None
     selected_agent: str
+
+
+class MetadataUpdate(BaseModel):
+    metadata: Dict[str, Any]
 
 
 @router.post("/messages/begin")
@@ -63,4 +67,30 @@ async def get_chat_messages(chat_id: str, db: AsyncSession = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"获取消息失败: {str(e)}"
+        )
+
+
+@router.patch("/messages/{message_id}/metadata")
+async def update_message_metadata(
+    message_id: str,
+    request: MetadataUpdate,
+    db: AsyncSession = Depends(get_db)
+):
+    """更新消息的 metadata"""
+    try:
+        success = await MessageService.update_message_metadata(
+            message_id, request.metadata, db
+        )
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="消息不存在"
+            )
+        return {"success": True}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"更新 metadata 失败: {str(e)}"
         )

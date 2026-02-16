@@ -115,6 +115,17 @@ class MessageService:
         return message_id
 
     @staticmethod
+    async def update_message_metadata(message_id: str, metadata: Dict, db: AsyncSession) -> bool:
+        """更新消息的 metadata"""
+        message = await db.get(Message, message_id)
+        if not message:
+            return False
+        
+        message.metadata = metadata
+        await db.commit()
+        return True
+
+    @staticmethod
     async def get_chat_messages(chat_id: str, db: AsyncSession) -> List[Dict]:
         """获取指定聊天的所有消息"""
         result = await db.execute(

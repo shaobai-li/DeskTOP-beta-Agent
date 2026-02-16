@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import Column, String, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from .base import Base
 
@@ -12,6 +12,7 @@ class Message(Base):
     content = Column(String, nullable=False)
     created_at = Column(String, nullable=False)
     journey_state = Column(String, nullable=False)
+    metadata = Column(JSON, nullable=True, default=None)
 
     # 关系
     chat = relationship("Chat", back_populates="messages")
@@ -23,6 +24,7 @@ class Message(Base):
             "role": self.role,
             "content": self.content,
             "createdAt": self.created_at,
-            "journeyState": self.journey_state
+            "journeyState": self.journey_state,
+            "metadata": self.metadata
         }
 
