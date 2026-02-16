@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import TopicCard from './TopicCard';
+import { updateMessageMetadata } from '@services/messagesService';
 
 function TopicCardList({ topics = [], messageId, metadata }) {
   // 从 metadata 中读取确认状态，如果存在则使用，否则为 null/false
@@ -29,19 +30,11 @@ function TopicCardList({ topics = [], messageId, metadata }) {
     
     // 如果有 messageId，则更新后端 metadata
     if (messageId) {
-      try {
-        await fetch(`/api/v1/messages/${messageId}/metadata`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            metadata: {
-              confirmedTopicIndex: index
-            }
-          })
-        });
-      } catch (error) {
+      const { error } = await updateMessageMetadata(messageId, {
+        confirmedTopicIndex: index
+      });
+      
+      if (error) {
         console.error('更新 metadata 失败:', error);
       }
     }

@@ -1,4 +1,4 @@
-import { apiPost, apiGet } from "./apiClient";
+import { apiPost, apiGet, apiPatch } from "./apiClient";
 
 export function beginChat(body) {
     return apiPost("/messages/begin", body);
@@ -10,4 +10,8 @@ export function streamChat(body) {
 
 export function getMessages(chatId) {
     return apiGet(`/messages/${chatId}`);
+}
+
+export function updateMessageMetadata(messageId, metadata) {
+    return apiPatch(`/messages/${messageId}/metadata`, { metadata });
 }
