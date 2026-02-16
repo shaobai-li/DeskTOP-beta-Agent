@@ -121,7 +121,7 @@ class MessageService:
         if not message:
             return False
         
-        message.metadata = metadata
+        message.meta_data = metadata
         await db.commit()
         return True
 

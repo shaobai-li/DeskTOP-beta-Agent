@@ -12,7 +12,7 @@ class Message(Base):
     content = Column(String, nullable=False)
     created_at = Column(String, nullable=False)
     journey_state = Column(String, nullable=False)
-    metadata = Column(JSON, nullable=True, default=None)
+    meta_data = Column(JSON, nullable=True, default=None)
 
     # 关系
     chat = relationship("Chat", back_populates="messages")
@@ -25,6 +25,6 @@ class Message(Base):
             "content": self.content,
             "createdAt": self.created_at,
             "journeyState": self.journey_state,
-            "metadata": self.metadata
+            "metadata": self.meta_data  # 前端仍然使用 metadata 字段名
         }
 
