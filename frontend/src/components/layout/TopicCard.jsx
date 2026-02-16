@@ -1,4 +1,3 @@
-import "./TopicCard.css";
 import ReactMarkdown from "react-markdown";
 import Button from "../common/Button";
 import { useChatStreaming } from "@hooks/useChatStreaming";
@@ -27,11 +26,19 @@ function TopicCard({ cardContents, isSelected = false, onSelect }) {
 
   return (
     <div
-      className={`topiccard-container ${isSelected ? "selected" : ""}`}
+      className={`
+        border rounded-xl p-4 my-1.5 cursor-pointer border-gray-300
+        ${isSelected 
+          ? 'bg-blue-100' 
+          : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+        }
+      `}
       onClick={onSelect}
     >
-      <div className="topiccard-option-title">{title}</div>
-      <div className="topiccard-option-description">
+      <div className="text-[15px] font-semibold text-gray-900 mb-2 leading-6">
+        {title}
+      </div>
+      <div className="text-sm text-gray-600">
         <ReactMarkdown>{description}</ReactMarkdown>
       </div>
 
