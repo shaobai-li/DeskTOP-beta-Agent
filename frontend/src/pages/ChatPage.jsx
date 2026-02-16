@@ -51,7 +51,7 @@ export default function ChatPage() {
                         if (message.role === "user") {
                             return <UserMessage key={index} message={message.content} />;
                         } else {
-                            return <AIMessage key={index} message={message.content} />;
+                            return <AIMessage key={index} message={message} />;
                         }
                     })}
                     {/* 临时状态消息：在消息列表末尾单独显示 */}
