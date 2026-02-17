@@ -1,4 +1,4 @@
-class IntentionModule:
+class IntentModule:
     def __init__(self):
         pass
 
@@ -7,4 +7,4 @@ class IntentionModule:
         import time
         time.sleep(3)
 
-        return False, False
+        return True, False

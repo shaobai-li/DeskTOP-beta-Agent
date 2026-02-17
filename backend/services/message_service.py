@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 from models.chat import Chat
 from models.message import Message
 from utils import uuid7, to_camel_case, to_snake_case
-from agents import SearchAgent, TopicAnalysisAgent, StructureDraftAgent, FinalDraftAgent, IntentionModule
+from agents import SearchAgent, TopicAnalysisAgent, StructureDraftAgent, FinalDraftAgent, IntentModule
 from services.agent_service import AgentService
 
 
@@ -20,7 +20,7 @@ class MessageService:
         self.topic_analysis_agent = None
         self.draft_agent = None
         self.final_draft_agent = None
-        self.intention_module = None
+        self.intent_module = None
         self._current_agent_id = None
     
     async def _init_agents(self, selected_agent: str, db: AsyncSession):
@@ -47,7 +47,7 @@ class MessageService:
         self.topic_analysis_agent = TopicAnalysisAgent(agent_config)
         self.draft_agent = StructureDraftAgent(agent_config)
         self.final_draft_agent = FinalDraftAgent(agent_config)
-        self.intention_module = IntentionModule()
+        self.intent_module = IntentModule()
         self._current_agent_id = selected_agent
 
     def _yield_message(
@@ -246,12 +246,12 @@ class MessageService:
             status_message_id = uuid7()
             yield self._yield_message("正在思考", message_id=status_message_id, event="status")
 
-            is_new_topic, is_confirmed = self.intention_module.new_topic(topic)
+            is_new_topic, is_confirmed = self.intent_module.new_topic(topic)
 
             if is_new_topic:
                 if not is_confirmed:
                     message_id = uuid7()
-                    yield self._yield_message("请确认是否需要重新生成选题", message_id=message_id, event="message")
+                    yield self._yield_message("<intent>进入新一轮的选题流程</intent>", message_id=message_id, event="message")
             else:
                 reply_content = self.final_draft_agent.discuss_on_draft(topic)
                 message_id = uuid7()
