@@ -2,6 +2,7 @@ import "./AIMessage.css";
 import ReactMarkdown from "react-markdown";
 import TopicCardList from "@components/layout/TopicCardList";
 import CollapsibleText from "@components/layout/CollapsibleText";
+import ConfirmDialog from "@components/layout/ConfirmDialog";
 import { parseMessage, MESSAGE_PART_TYPES } from "@utils/messageParser";
 
 export default function AIMessage({ message }) {
@@ -54,6 +55,15 @@ export default function AIMessage({ message }) {
             <CollapsibleText
               key={`collapsible-${i}`}
               content={part.content}
+            />
+          );
+        } else if (part.type === MESSAGE_PART_TYPES.INTENT) {
+          return (
+            <ConfirmDialog
+              key={`intent-${i}`}
+              title={part.intentData}
+              onConfirm={() => {}}
+              onCancel={() => {}}
             />
           );
         } else {

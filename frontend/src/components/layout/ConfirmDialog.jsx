@@ -1,9 +1,7 @@
 export default function ConfirmDialog({ 
   onConfirm, 
   onCancel,
-  title = "是开始一个新选题任务么？",
-  confirmText = "确认",
-  cancelText = "取消",
+  title,
   isConfirmed = false
 }) {
 
@@ -25,7 +23,7 @@ export default function ConfirmDialog({
           disabled={isConfirmed}
           className="flex-1 max-w-[160px] py-2.5 px-5 bg-gray-900 text-white text-sm rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200 disabled:cursor-not-allowed"
         >
-          {confirmText}
+          确认
         </button>
 
         {/* 取消按钮 */}
@@ -34,7 +32,7 @@ export default function ConfirmDialog({
           disabled={isConfirmed}
           className="flex-1 max-w-[160px] py-2.5 px-5 bg-white text-gray-900 text-sm border border-gray-300 rounded-lg font-medium hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200 disabled:cursor-not-allowed"
         >
-          {cancelText}
+          取消
         </button>
       </div>
     </div>

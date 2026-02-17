@@ -2,6 +2,7 @@
 const TAG_TYPES = {
     TOPIC: "topic",
     TEXT: "text",
+    INTENT: "intent",
 };
 
 // 消息部分类型常量
@@ -9,6 +10,7 @@ export const MESSAGE_PART_TYPES = {
     PLAIN: "plain",
     TOPIC: "topic",
     COLLAPSIBLE: "collapsible",
+    INTENT: "intent",
 };
 
 // 通用的 XML/HTML 标签解析函数
@@ -36,6 +38,11 @@ const parseText = (textHTML) => {
     return parseXMLTag(textHTML, "text", (text) => text.textContent.trim() || "");
 };
 
+// 解析单个 <intent>
+const parseIntent = (intentHTML) => {
+    return parseXMLTag(intentHTML, "intent", (intent) => intent.textContent.trim() || "");
+};
+
 // 标签配置
 const TAG_CONFIGS = {
     [TAG_TYPES.TOPIC]: {
@@ -47,6 +54,11 @@ const TAG_CONFIGS = {
         regex: /<text[^>]*>([\s\S]*?)<\/text>/gi,
         parser: parseText,
         partType: MESSAGE_PART_TYPES.COLLAPSIBLE,
+    },
+    [TAG_TYPES.INTENT]: {
+        regex: /<intent[^>]*>([\s\S]*?)<\/intent>/gi,
+        parser: parseIntent,
+        partType: MESSAGE_PART_TYPES.INTENT,
     },
 };
 
@@ -92,6 +104,11 @@ export function parseMessage(message) {
             parts.push({
             type: partType,
             topicData: parsedData,
+            });
+        } else if (partType === MESSAGE_PART_TYPES.INTENT) {
+            parts.push({
+            type: partType,
+            intentData: parsedData,
             });
         } else {
             parts.push({
