@@ -47,7 +47,7 @@ class MessageService:
         self.topic_analysis_agent = TopicAnalysisAgent(agent_config)
         self.draft_agent = StructureDraftAgent(agent_config)
         self.final_draft_agent = FinalDraftAgent(agent_config)
-        self.intent_module = IntentModule()
+        self.intent_module = IntentModule(agent_config)
         self._current_agent_id = selected_agent
 
     def _yield_message(
