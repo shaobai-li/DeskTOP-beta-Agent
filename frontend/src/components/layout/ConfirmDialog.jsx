@@ -7,7 +7,7 @@ export default function ConfirmDialog({
 
   return (
     <div className={`
-      border rounded-xl p-6 my-2 bg-white border-gray-200
+      border rounded-xl p-6 my-2 bg-white border-gray-200 max-w-sm shadow-md
       ${isConfirmed ? 'opacity-60 pointer-events-none' : ''}
     `}>
       {/* 标题 */}
