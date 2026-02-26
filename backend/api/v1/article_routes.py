@@ -26,6 +26,10 @@ class ArticleUpdate(BaseModel):
     content: str | None = None  # 新增
 
 
+class ArticleFromUrl(BaseModel):
+    url: str
+
+
 @router.get("/articles")
 async def get_articles(db: AsyncSession = Depends(get_db)):
     """读取所有文章数据（包含关联的标签）"""
@@ -135,4 +139,21 @@ async def rebuild_articles_embedding(db: AsyncSession = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"重建文章向量数据库失败: {str(e)}"
+        )
+
+
+@router.post("/articles/from-url", status_code=status.HTTP_201_CREATED)
+async def create_article_from_url(data: ArticleFromUrl, db: AsyncSession = Depends(get_db)):
+    """从小红书 URL 自动创建文章"""
+    try:
+        return await ArticleService.create_article_from_url(data.url, db)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"创建失败: {str(e)}"
         )

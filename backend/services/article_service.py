@@ -7,11 +7,17 @@ from models.article import Article
 from models.tag import Tag
 from utils import to_camel_case, uuid7
 from config.settings import VECTOR_INDEX_PATH
+import re
 
 # RAG related import
 from sentence_transformers import SentenceTransformer
 import faiss
 from huggingface_hub import snapshot_download
+
+# Crawler related import
+from infra.parser.factory import get_parser
+from crawl4ai import AsyncWebCrawler, CrawlerRunConfig
+from crawl4ai.content_scraping_strategy import LXMLWebScrapingStrategy
 
 
 
@@ -231,3 +237,51 @@ class ArticleService:
 
         toc = time.time()
         return {"message": f"重建文章向量数据库成功，索引文件: {VECTOR_INDEX_PATH}", "duration": {toc - tic}}
+
+    @staticmethod
+    async def create_article_from_url(url: str, db: AsyncSession) -> Dict:
+        """从小红书 URL 自动创建文章"""
+        parser = get_parser(url)
+        if not parser:
+            raise ValueError("不支持的平台，目前仅支持小红书")
+        
+        headers = {
+            "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) "
+                         "AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 XiaoHongShu/8.25.0"
+        }
+        config = CrawlerRunConfig(
+            scraping_strategy=LXMLWebScrapingStrategy(),
+            verbose=False
+        )
+        
+        async with AsyncWebCrawler() as crawler:
+            result = await crawler.arun(url=url, config=config, magic=True, headers=headers)
+            if not result.success or not result.html:
+                raise Exception("页面抓取失败或内容为空")
+            html = result.html
+        
+        data = await parser.parse(html, url)
+        
+        words = data["words"]
+        if not words:
+            raise ValueError("无法提取文章内容")
+        
+        parts = words.split()
+        title = parts[0] if parts else "无标题"
+        content = words
+        
+        tags = re.findall(r'#(\S+)', words)
+        tags_by_author = " ".join(f"#{tag}" for tag in tags)
+        
+        date_match = re.search(r'(\d{2}-\d{2})', words)
+        date = date_match.group(1) if date_match else datetime.now().strftime("%m-%d")
+        
+        return await ArticleService.create_article(
+            title=title,
+            date=date,
+            source_platform=data["source_platform"],
+            author_name=data["author_name"],
+            tags_by_author=tags_by_author,
+            content=content,
+            db=db
+        )
