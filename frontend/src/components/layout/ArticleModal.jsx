@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import DarkBackground from '@components/common/DarkBackground';
 import TagsInput from "@components/common/TagsInput";
 import { useChat } from "@contexts/ChatContext";
+import { createArticleFromUrl } from "@services/articlesService";
 import modalCloseIcon from "@assets/icon-ui-modal-close.svg";
 
 export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = null }) {
@@ -15,6 +16,8 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
     content: ""         
   });
   const [selectedTags, setSelectedTags] = useState([]);
+  const [articleUrl, setArticleUrl] = useState("");
+  const [isLoadingUrl, setIsLoadingUrl] = useState(false);
 
   // 转换后端标签数据为 TagsInput 需要的格式  
   const tagOptions = state.tags.map(tag => ({
@@ -54,6 +57,7 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
         content: ""
       });
       setSelectedTags([]);
+      setArticleUrl("");
     }
   }, [initialData, isOpen]);
 
@@ -67,9 +71,42 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
     }));
   };
 
+  const handleUrlRecognize = async () => {
+    if (!articleUrl.trim()) {
+      alert("请输入文章链接");
+      return;
+    }
+
+    setIsLoadingUrl(true);
+    try {
+      const { data, error } = await createArticleFromUrl(articleUrl);
+      if (error) {
+        console.error("识别文章失败：", error);
+        alert(`识别失败: ${error}`);
+        return;
+      }
+
+      setFormData({
+        title: data.title || "",
+        date: data.date || "",
+        source_platform: data.sourcePlatform || "小红书",
+        author_name: data.authorName || "",
+        tags_by_author: data.tagsByAuthor || "",
+        content: data.content || ""
+      });
+
+      alert("文章信息识别成功！");
+    } catch (err) {
+      console.error("识别文章出错：", err);
+      alert("识别失败，请检查链接是否正确");
+    } finally {
+      setIsLoadingUrl(false);
+    }
+  };
+
   const handleSave = () => {
     const tagIds = selectedTags.map(tag => tag.tagId).filter(Boolean);
-    onSubmit?.(formData, initialData?.articleId, tagIds);  // 传递 articleId 和 tagIds
+    onSubmit?.(formData, initialData?.articleId, tagIds);
     onClose();
   };
 
@@ -97,13 +134,21 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
               <div className="flex justify-between items-center mb-2">
                 <label className="block text-sm font-medium text-neutral-700">链接</label>
                 <button 
-                  className="px-3 py-1 text-sm font-medium bg-black text-white rounded-md hover:bg-gray-800"
+                  type="button"
+                  onClick={handleUrlRecognize}
+                  disabled={isLoadingUrl}
+                  className="px-3 py-1 text-sm font-medium bg-black text-white rounded-md hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  识别url
+                  {isLoadingUrl ? "识别中..." : "识别url"}
                 </button>
               </div>
               <input
-                className="w-full px-4 py-1 border border-neutral-200 rounded-lg text-sm outline-none text-neutral-900"
+                type="text"
+                value={articleUrl}
+                onChange={(e) => setArticleUrl(e.target.value)}
+                placeholder="请输入小红书文章链接"
+                disabled={isLoadingUrl}
+                className="w-full px-4 py-1 border border-neutral-200 rounded-lg text-sm outline-none text-neutral-900 disabled:bg-gray-100"
               />
             </div>
 

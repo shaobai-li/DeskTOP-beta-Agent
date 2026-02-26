@@ -23,3 +23,7 @@ export function rebuildArticlesEmbedding() {
 export function updateArticleTags(articleId, tagIds) {
     return apiPatch(`/articles/${articleId}/tags`, tagIds);
 }
+
+export function createArticleFromUrl(url) {
+    return apiPost("/articles/from-url", { url });
+}
