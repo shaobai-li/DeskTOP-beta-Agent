@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from typing import List, Dict, Optional
@@ -6,8 +6,9 @@ from datetime import datetime
 from models.article import Article
 from models.tag import Tag
 from utils import to_camel_case, uuid7
-from config.settings import VECTOR_INDEX_PATH
+from config.settings import VECTOR_INDEX_PATH, BGE_MODEL_PATH
 import re
+import numpy as np
 
 # RAG related import
 from sentence_transformers import SentenceTransformer
@@ -68,16 +69,16 @@ class ArticleService:
 
     @staticmethod
     async def create_article(title: str, date: str, source_platform: str = "小红书", 
-                      author_name: str = "", tags_by_author: str = "", content: str = "", db: AsyncSession = None) -> Dict:
-        """创建新文章"""
-        # 检查标题是否已存在
+                      author_name: str = "", tags_by_author: str = "", content: str = "", 
+                      db: AsyncSession = None, auto_embed: bool = True) -> Dict:
+        """创建新文章
+        """
         result = await db.execute(
             select(Article).where(Article.title == title.strip())
         )
         if result.scalar_one_or_none():
             raise ValueError("文章标题已存在")
 
-        # 创建新文章
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         new_article = Article(
             article_id=uuid7(),
@@ -94,6 +95,16 @@ class ArticleService:
         db.add(new_article)
         await db.commit()
         await db.refresh(new_article)
+        
+        if auto_embed and content.strip():
+            try:
+                print(f"# 自动向量化并添加到索引...")
+                await ArticleService.add_article_to_vector_index(
+                    new_article.article_id, db
+                )
+                await db.refresh(new_article)
+            except Exception as e:
+                print(f"⚠️  向量化失败: {str(e)}")
         
         return to_camel_case([new_article.to_dict()])[0]
 
@@ -186,6 +197,57 @@ class ArticleService:
         tags_info = [{"tagId": tag.tag_id, "name": tag.name} for tag in article.tags]
         article_dict['tags'] = tags_info
         return to_camel_case([article_dict])[0]
+
+    @staticmethod
+    async def add_article_to_vector_index(article_id: str, db: AsyncSession):
+        """增量添加单篇文章到向量索引
+        
+        功能步骤：
+        1. 获取文章并验证
+        2. 生成 embedding_id（当前最大ID + 1）
+        3. 向量化文章内容
+        4. 加载/创建 IndexIDMap 索引
+        5. 添加向量到索引
+        6. 更新数据库中的 embedding_id
+        7. 保存索引文件
+        """
+        article = await db.get(Article, article_id)
+        if not article:
+            raise ValueError(f"文章不存在: {article_id}")
+        
+        if article.embedding_id is not None:
+            raise ValueError(f"文章已有 embedding_id ({article.embedding_id})，无需重复添加")
+        
+        if not article.content or article.content.strip() == "":
+            raise ValueError("文章内容为空，无法向量化")
+        
+        result = await db.execute(
+            select(func.max(Article.embedding_id))
+        )
+        max_embedding_id = result.scalar()
+        new_embedding_id = (max_embedding_id + 1) if max_embedding_id is not None else 0
+        
+        if not VECTOR_INDEX_PATH.exists():
+            raise ValueError(
+                "向量索引文件不存在，无法增量添加。"
+            )
+        
+        index = faiss.read_index(str(VECTOR_INDEX_PATH))
+        if not isinstance(index, faiss.IndexIDMap):
+            raise ValueError(
+                "现有索引不是 IndexIDMap 类型，无法增量添加。"
+            )
+        
+        embedding_model = SentenceTransformer(str(BGE_MODEL_PATH), device="cpu")
+        embedding = embedding_model.encode([article.content], normalize_embeddings=True)
+        
+        embedding_id_array = np.array([new_embedding_id], dtype=np.int64)
+        index.add_with_ids(embedding, embedding_id_array)
+        
+        article.embedding_id = new_embedding_id
+        await db.commit()
+        
+        faiss.write_index(index, str(VECTOR_INDEX_PATH))
 
     @staticmethod
     async def update_embedding_ids(embedding_id_list: List[int], db: AsyncSession = None):
