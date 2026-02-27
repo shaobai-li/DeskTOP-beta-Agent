@@ -239,8 +239,7 @@ class ArticleService:
         return {"message": f"重建文章向量数据库成功，索引文件: {VECTOR_INDEX_PATH}", "duration": {toc - tic}}
 
     @staticmethod
-    async def create_article_from_url(url: str, db: AsyncSession) -> Dict:
-        """从小红书 URL 自动创建文章"""
+    async def fetch_article_from_url(url: str) -> Dict:
         parser = get_parser(url)
         if not parser:
             raise ValueError("不支持的平台，目前仅支持小红书")
@@ -276,12 +275,11 @@ class ArticleService:
         date_match = re.search(r'(\d{2}-\d{2})', words)
         date = date_match.group(1) if date_match else datetime.now().strftime("%m-%d")
         
-        return await ArticleService.create_article(
-            title=title,
-            date=date,
-            source_platform=data["source_platform"],
-            author_name=data["author_name"],
-            tags_by_author=tags_by_author,
-            content=content,
-            db=db
-        )
+        return to_camel_case([{
+            "title": title,
+            "date": date,
+            "source_platform": data["source_platform"],
+            "author_name": data["author_name"],
+            "tags_by_author": tags_by_author,
+            "content": content
+        }])[0]

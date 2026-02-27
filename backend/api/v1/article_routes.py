@@ -142,11 +142,10 @@ async def rebuild_articles_embedding(db: AsyncSession = Depends(get_db)):
         )
 
 
-@router.post("/articles/from-url", status_code=status.HTTP_201_CREATED)
-async def create_article_from_url(data: ArticleFromUrl, db: AsyncSession = Depends(get_db)):
-    """从小红书 URL 自动创建文章"""
+@router.post("/articles/fetch-from-url", status_code=status.HTTP_200_OK)
+async def fetch_article_from_url(data: ArticleFromUrl):
     try:
-        return await ArticleService.create_article_from_url(data.url, db)
+        return await ArticleService.fetch_article_from_url(data.url)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -155,5 +154,5 @@ async def create_article_from_url(data: ArticleFromUrl, db: AsyncSession = Depen
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"创建失败: {str(e)}"
+            detail=f"抓取失败: {str(e)}"
         )
