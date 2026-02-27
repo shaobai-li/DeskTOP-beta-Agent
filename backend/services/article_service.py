@@ -140,6 +140,7 @@ class ArticleService:
         if tags_by_author is not None:
             article.tags_by_author = tags_by_author.strip()
 
+        content_changed = content is not None and content.strip() != article.content
         if content is not None:
             article.content = content.strip()
 
@@ -149,19 +150,41 @@ class ArticleService:
             article.updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             await db.commit()
             await db.refresh(article)
-        
+
+        # content 有变化时，同步更新向量索引
+        if content_changed and article.embedding_id is not None and VECTOR_INDEX_PATH.exists():
+            try:
+                index = faiss.read_index(str(VECTOR_INDEX_PATH))
+                if isinstance(index, faiss.IndexIDMap):
+                    embedding_model = SentenceTransformer(str(BGE_MODEL_PATH), device="cpu")
+                    new_embedding = embedding_model.encode([article.content], normalize_embeddings=True)
+                    index.remove_ids(np.array([article.embedding_id], dtype=np.int64))
+                    index.add_with_ids(new_embedding, np.array([article.embedding_id], dtype=np.int64))
+                    faiss.write_index(index, str(VECTOR_INDEX_PATH))
+                    print(f"# 已更新向量索引 embedding_id={article.embedding_id}")
+            except Exception as e:
+                print(f"⚠️  向量索引更新失败: {str(e)}")
+
         return to_camel_case([article.to_dict()])[0]
 
     @staticmethod
     async def delete_article(article_id: str, db: AsyncSession = None) -> Dict:
-        """删除指定 article_id 的文章"""
+        """删除指定 article_id 的文章，同时删除对应的向量索引数据"""
         article = await db.get(Article, article_id)
         if not article:
             raise ValueError(f"文章 {article_id} 不存在")
 
+        embedding_id = article.embedding_id
+
         await db.delete(article)
         await db.commit()
-        
+
+        if embedding_id is not None and VECTOR_INDEX_PATH.exists():
+            index = faiss.read_index(str(VECTOR_INDEX_PATH))
+            index.remove_ids(np.array([embedding_id], dtype=np.int64))
+            faiss.write_index(index, str(VECTOR_INDEX_PATH))
+            print(f"# 已从向量索引中删除 embedding_id={embedding_id}")
+
         return {"message": f"文章 {article_id} 已删除"}
 
     @staticmethod
