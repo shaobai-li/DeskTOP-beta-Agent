@@ -24,6 +24,6 @@ export function updateArticleTags(articleId, tagIds) {
     return apiPatch(`/articles/${articleId}/tags`, tagIds);
 }
 
-export function createArticleFromUrl(url) {
-    return apiPost("/articles/from-url", { url });
+export function fetchArticleFromUrl(url) {
+    return apiPost("/articles/fetch-from-url", { url });
 }

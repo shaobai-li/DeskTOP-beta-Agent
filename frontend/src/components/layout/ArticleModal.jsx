@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import DarkBackground from '@components/common/DarkBackground';
 import TagsInput from "@components/common/TagsInput";
 import { useChat } from "@contexts/ChatContext";
-import { createArticleFromUrl } from "@services/articlesService";
+import { fetchArticleFromUrl } from "@services/articlesService";
 import modalCloseIcon from "@assets/icon-ui-modal-close.svg";
 
 export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = null }) {
@@ -79,7 +79,7 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
 
     setIsLoadingUrl(true);
     try {
-      const { data, error } = await createArticleFromUrl(articleUrl);
+      const { data, error } = await fetchArticleFromUrl(articleUrl);
       if (error) {
         console.error("识别文章失败：", error);
         alert(`识别失败: ${error}`);
