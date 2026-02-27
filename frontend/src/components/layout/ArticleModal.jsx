@@ -121,8 +121,9 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
           <div className="flex items-center justify-between py-4 border-b border-neutral-200">
             <h2 className="text-2xl font-bold">文章设置</h2>
             <button 
-              className="h-9 w-9 rounded-lg bg-transparent hover:bg-neutral-100 flex items-center justify-center"
+              className="h-9 w-9 rounded-lg bg-transparent hover:bg-neutral-100 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
               onClick={onClose}
+              disabled={isLoadingUrl}
             >
               <img src={modalCloseIcon} alt="close" className="w-6 h-6" />
             </button>
@@ -230,12 +231,17 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
           </div>
 
           <div className="flex justify-end gap-3 py-4 border-t border-neutral-200">
-            <button onClick={onClose} className="px-5 py-1 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-md hover:bg-neutral-50">
+            <button
+              onClick={onClose}
+              disabled={isLoadingUrl}
+              className="px-5 py-1 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-md hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
               取消
             </button>
             <button
               onClick={handleSave}
-              className="px-5 py-1 text-sm font-medium text-white bg-neutral-900 rounded-md hover:bg-neutral-800"
+              disabled={isLoadingUrl}
+              className="px-5 py-1 text-sm font-medium text-white bg-neutral-900 rounded-md hover:bg-neutral-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {isEditMode ? '更新' : '保存'}
             </button>
