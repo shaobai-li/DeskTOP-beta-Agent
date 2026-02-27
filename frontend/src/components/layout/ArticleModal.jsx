@@ -131,27 +131,29 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, initialData = 
 
           <div className="py-4 space-y-4">
 
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-neutral-700">链接</label>
-                <button 
-                  type="button"
-                  onClick={handleUrlRecognize}
+            {!isEditMode && (
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-neutral-700">链接</label>
+                  <button 
+                    type="button"
+                    onClick={handleUrlRecognize}
+                    disabled={isLoadingUrl}
+                    className="px-3 py-1 text-sm font-medium bg-black text-white rounded-md hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {isLoadingUrl ? "识别中..." : "识别url"}
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={articleUrl}
+                  onChange={(e) => setArticleUrl(e.target.value)}
+                  placeholder="请输入小红书文章链接"
                   disabled={isLoadingUrl}
-                  className="px-3 py-1 text-sm font-medium bg-black text-white rounded-md hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                >
-                  {isLoadingUrl ? "识别中..." : "识别url"}
-                </button>
+                  className="w-full px-4 py-1 border border-neutral-200 rounded-lg text-sm outline-none text-neutral-900 disabled:bg-gray-100"
+                />
               </div>
-              <input
-                type="text"
-                value={articleUrl}
-                onChange={(e) => setArticleUrl(e.target.value)}
-                placeholder="请输入小红书文章链接"
-                disabled={isLoadingUrl}
-                className="w-full px-4 py-1 border border-neutral-200 rounded-lg text-sm outline-none text-neutral-900 disabled:bg-gray-100"
-              />
-            </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">标题</label>
